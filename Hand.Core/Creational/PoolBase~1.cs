@@ -59,6 +59,8 @@ public abstract class PoolBase<TResource>
     /// <inheritdoc />
     public virtual TResource Get()
     {
+        if (CheckActiveCount())
+            return default;
         if (_pool.TryTake(out var resource))
         {
             lock (_actives)

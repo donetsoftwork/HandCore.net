@@ -27,7 +27,7 @@ public class DictionaryProviderWhenAllTests(ITestOutputHelper output)
         //TaskInfo
         var (bus, provider) = CreateEventBus();
         var taskHandler = new TaskHandler(_output);
-        provider.AddEventHandler(taskHandler);
+        provider.AddTaskHandler(taskHandler);
         for (int i = 0; i < 10; i++)
         {
             await bus.PublishAsync("Event" + i);
@@ -57,7 +57,7 @@ public class DictionaryProviderWhenAllTests(ITestOutputHelper output)
         var handler = new Handler(_output);
         provider.AddHandler(handler);
         var taskHandler = new TaskHandler(_output);
-        provider.AddEventHandler(taskHandler);
+        provider.AddTaskHandler(taskHandler);
         var asyncHandler = new AsyncHandler(_output);
         provider.AddHandler(asyncHandler);
         for (int i = 0; i < 10; i++)

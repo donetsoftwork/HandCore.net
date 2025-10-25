@@ -27,13 +27,12 @@ public class ConcurrentJobService
     /// 并发作业服务
     /// </summary>
     /// <param name="processor"></param>
-    /// <param name="reduceTime"></param>
-    /// <param name="concurrencyLevel">并发数量</param>
-    public ConcurrentJobService(IProcessor processor, TimeSpan reduceTime, int concurrencyLevel)
-        : base(processor, reduceTime)
+    /// <param name="options"></param>
+    public ConcurrentJobService(IProcessor processor, ReduceOptions options)
+        : base(processor, options)
     {
         _processor = processor;
-        _pool = new(this, concurrencyLevel - 1);
+        _pool = new(this, (int)options.ConcurrencyLevel - 1);
     }
     /// <inheritdoc />
     public override bool Stop()

@@ -1,4 +1,3 @@
-using Hand.Concurrent;
 using Hand.EventHandlers;
 using Hand.Job;
 using Hand.Tasks;
@@ -17,11 +16,10 @@ public class EventBus : IEventBus
     /// <param name="options"></param>
     public EventBus(IEventHandlerProvider handlerProvider, EventBusOptions options)
     {
-        var concurrency = new ConcurrentControl(options.ConcurrencyLevel);
-        _scheduler = new ConcurrentTaskScheduler(concurrency);
+        _scheduler = new ConcurrentTaskScheduler(options);
         _taskFactory = new TaskFactory(_scheduler);
         _dispatcher = new EventDispatcher(handlerProvider, options.HanderTimeOut, _scheduler, _taskFactory);
-        _job = CreateJob(_scheduler, options.ReduceTime);
+        _job = ReduceJobService.Create(_scheduler, options);
     }
     #region 配置
     private readonly EventDispatcher _dispatcher;
@@ -48,17 +46,17 @@ public class EventBus : IEventBus
         // 启动作业执行
         _job.Start();
     }
-    /// <summary>
-    /// 构造作业服务
-    /// </summary>
-    /// <param name="scheduler"></param>
-    /// <param name="reduceTime"></param>
-    /// <returns></returns>
-    public static IJobService CreateJob(ConcurrentTaskScheduler scheduler, TimeSpan reduceTime)
-    {
-        var concurrencyLevel = scheduler.MaximumConcurrencyLevel;
-        if (concurrencyLevel<1)
-            return new ReduceJobService(scheduler, reduceTime);
-        return new ConcurrentJobService(scheduler, reduceTime, concurrencyLevel);
-    }
+    ///// <summary>
+    ///// 构造作业服务
+    ///// </summary>
+    ///// <param name="scheduler"></param>
+    ///// <param name="options"></param>
+    ///// <returns></returns>
+    //public static IJobService CreateJob(ConcurrentTaskScheduler scheduler, ReduceOptions options)
+    //{
+    //    var concurrencyLevel = scheduler.MaximumConcurrencyLevel;
+    //    if (concurrencyLevel < 1)
+    //        return new ReduceJobService(scheduler, options);
+    //    return new ConcurrentJobService(scheduler, options);
+    //}
 }

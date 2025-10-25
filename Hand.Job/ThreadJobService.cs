@@ -39,12 +39,12 @@ public class ThreadJobService(IProcessor processor)
     /// </summary>
     protected virtual void StartThread()
     {
-        //Thread thread = new(Run)
-        //{
-        //    IsBackground = true
-        //};
-        //thread.Start();
-        ThreadPool.QueueUserWorkItem(_ => Run(), null);
+        Thread thread = new(Run)
+        {
+            IsBackground = true
+        };
+        thread.Start();
+        //ThreadPool.QueueUserWorkItem(_ => Run(), null);
     }
     /// <inheritdoc />
     public virtual bool Stop()

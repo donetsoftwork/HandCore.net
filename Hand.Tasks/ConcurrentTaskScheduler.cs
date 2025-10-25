@@ -6,8 +6,8 @@ namespace Hand.Tasks;
 /// <summary>
 /// 并发调度器
 /// </summary>
-/// <param name="concurrency"></param>
-public class ConcurrentTaskScheduler(ConcurrentControl concurrency)
+/// <param name="options"></param>
+public class ConcurrentTaskScheduler(ConcurrentOptions options)
     : TaskScheduler, IProcessor
 {
     #region 配置
@@ -15,15 +15,23 @@ public class ConcurrentTaskScheduler(ConcurrentControl concurrency)
     /// 任务
     /// </summary>
     private readonly LinkedList<Task> _tasks = new();
+#if NET9_0_OR_GREATER
+    private readonly Lock _taskLock = new();
+#endif
     /// <summary>
     /// 并发控制
     /// </summary>
-    protected readonly ConcurrentControl _concurrency = concurrency;
+    protected readonly ConcurrentControl _control = new(options.ConcurrencyLevel);
+    /// <summary>
+    /// 当前并发数
+    /// </summary>
+    public int Concurrency
+        => _control.Count;
     /// <summary>
     /// 并发上限
     /// </summary>
     public override int MaximumConcurrencyLevel
-        => _concurrency.Limit;
+        => _control.Limit;
     /// <summary>
     /// 待执行任务数量
     /// </summary>
@@ -34,7 +42,11 @@ public class ConcurrentTaskScheduler(ConcurrentControl concurrency)
     /// <inheritdoc />
     protected override IEnumerable<Task> GetScheduledTasks()
     {
+#if NET9_0_OR_GREATER
+        lock (_taskLock)
+#else
         lock (_tasks)
+#endif
         {
             return [.. _tasks];
         }
@@ -42,7 +54,11 @@ public class ConcurrentTaskScheduler(ConcurrentControl concurrency)
     /// <inheritdoc />
     protected override void QueueTask(Task task)
     {
+#if NET9_0_OR_GREATER
+        lock (_taskLock)
+#else
         lock (_tasks)
+#endif
         {
             _tasks.AddLast(task);
         }
@@ -67,12 +83,12 @@ public class ConcurrentTaskScheduler(ConcurrentControl concurrency)
                 break;
             default:
                 // 其他增加占用并发配额
-                if (_concurrency.Increment())
+                if (_control.Increment())
                 {
                     task.ContinueWith(t =>
                     {
                         // 执行完成返回并发配额
-                        _concurrency.Decrement();
+                        _control.Decrement();
                     }, this);
                 }
                 else
@@ -94,14 +110,18 @@ public class ConcurrentTaskScheduler(ConcurrentControl concurrency)
     {
         if (_tasks.Contains(task))
         {
+#if NET9_0_OR_GREATER
+            lock (_taskLock)
+#else
             lock (_tasks)
+#endif
             {
                 return _tasks.Remove(task);
             }
         }
         return false;
     }
-    #endregion
+#endregion
     #region IProcessor
     /// <inheritdoc />
     public bool Run()
@@ -109,11 +129,11 @@ public class ConcurrentTaskScheduler(ConcurrentControl concurrency)
         if (_tasks.Count == 0)
             return false;
         // 占用并发配额
-        if (_concurrency.Increment())
+        if (_control.Increment())
         {
             var state = RunCore();
             // 执行结束返回并发配额
-            _concurrency.Decrement();
+            _control.Decrement();
             return state;
         }
         return false;
@@ -125,7 +145,11 @@ public class ConcurrentTaskScheduler(ConcurrentControl concurrency)
     private bool RunCore()
     {
         LinkedListNode<Task> first = null;
+#if NET9_0_OR_GREATER
+        lock (_taskLock)
+#else
         lock (_tasks)
+#endif
         {
             first = _tasks.First;
             if (first is null)

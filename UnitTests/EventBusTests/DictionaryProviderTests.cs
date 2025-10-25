@@ -25,7 +25,7 @@ public class DictionaryProviderTests(ITestOutputHelper output)
         //TaskInfo
         var (bus, provider) = CreateEventBus();
         var taskHandler = new TaskHandler(_output);
-        provider.AddEventHandler(taskHandler);
+        provider.AddTaskHandler(taskHandler);
         for (int i = 0; i < 100; i++)
             bus.Publish("Event" + i);
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Sleep");
@@ -49,9 +49,9 @@ public class DictionaryProviderTests(ITestOutputHelper output)
         var handler = new Handler(_output);
         provider.AddHandler(handler);
         var taskHandler = new TaskHandler(_output);
-        provider.AddEventHandler(taskHandler);
-        var asyncHandler = new AsyncHandler(_output);
-        provider.AddHandler(asyncHandler);
+        provider.AddTaskHandler(taskHandler);
+        //var asyncHandler = new AsyncHandler(_output);
+        //provider.AddHandler(asyncHandler);
         for (int i = 0; i < 100; i++)
             bus.Publish("Event" + i);
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Sleep");
