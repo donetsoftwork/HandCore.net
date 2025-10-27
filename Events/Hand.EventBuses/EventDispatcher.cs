@@ -6,40 +6,29 @@ namespace Hand.Events;
 /// <summary>
 /// 事件分发器
 /// </summary>
-public class EventDispatcher(
-    IEventHandlerProvider handlerProvider
-    , TimeSpan handerTimeOut
-    , ConcurrentTaskScheduler scheduler
-    , TaskFactory taskFactory)
+public class EventDispatcher(EventBusOptions options)
+    : ConcurrentTaskFactory(options)
 {
     #region 配置
-    private readonly IEventHandlerProvider _handlerProvider = handlerProvider;
-    private readonly ConcurrentTaskScheduler _scheduler = scheduler;
-    private readonly TaskFactory _taskFactory = taskFactory;
-    private readonly TimeSpan _handerTimeOut = handerTimeOut;
+    private readonly TimeSpan _handerTimeOut = options.HanderTimeOut;
     #endregion
     /// <summary>
     /// 分发事件
     /// </summary>
     /// <typeparam name="TEvent"></typeparam>
     /// <param name="event"></param>
-    public void Dispatch<TEvent>(TEvent @event)
+    /// <param name="provider"></param>
+    public void Dispatch<TEvent>(TEvent @event, IEventHandlerProvider provider)
     {
         var tokenSource = new CancellationTokenSource(_handerTimeOut);
-        foreach (var handler in _handlerProvider.GetTaskHandlers<TEvent>())
+        foreach (var handler in provider.GetTaskHandlers<TEvent>())
         {
-            _taskFactory.StartNew(() => handler.TaskHandle(@event, tokenSource.Token))
-                .ContinueWith(t =>
-                {
-                    var task = t.Result;
-                    // 异步事件分发注册处理等待完成
-                    if (task is not null)
-                        _scheduler.AddTask(task);
-                }, default, TaskContinuationOptions.OnlyOnRanToCompletion, _scheduler);
+            StartTask(() => handler.TaskHandle(@event, tokenSource.Token));
         }
         // 使用任务工厂启动同步事件分发操作
-        foreach (var handler in _handlerProvider.GetHandlers<TEvent>())
-            _taskFactory.StartNew(() => Handle(handler, @event, tokenSource.Token));
+        foreach (var handler in provider.GetHandlers<TEvent>())
+            StartNew(() => Handle(handler, @event, tokenSource.Token));
+        //_job.Start();
     }
     /// <summary>
     /// 处理同步事件

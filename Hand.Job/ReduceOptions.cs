@@ -11,5 +11,9 @@ public class ReduceOptions
     /// <summary>
     /// 主线程休眠暂停时间，默认50毫秒
     /// </summary>
-    public TimeSpan ReduceTime { get; set; } = TimeSpan.FromMilliseconds(50);
+    public TimeSpan ReduceTime = TimeSpan.FromMilliseconds(50);
+    /// <summary>
+    /// 是否自动启动
+    /// </summary>
+    public bool AutoStart = true;
 }

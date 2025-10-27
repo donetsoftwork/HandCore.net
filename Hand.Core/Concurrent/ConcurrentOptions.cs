@@ -8,5 +8,5 @@ public class ConcurrentOptions
     /// <summary>
     /// 事件总线并发上限，默认ushort.MaxValue
     /// </summary>
-    public uint ConcurrencyLevel { get; set; } = ushort.MaxValue;
+    public uint ConcurrencyLevel = ushort.MaxValue;
 }

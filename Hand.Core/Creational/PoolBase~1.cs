@@ -40,6 +40,9 @@ public abstract class PoolBase<TResource>
     /// 已激活资源(正在使用)
     /// </summary>
     protected readonly LinkedList<TResource> _actives = new();
+#if NET9_0_OR_GREATER
+    private readonly Lock _activeLock = new();
+#endif
     /// <summary>
     /// 资源池大小
     /// </summary>
@@ -63,7 +66,11 @@ public abstract class PoolBase<TResource>
             return default;
         if (_pool.TryTake(out var resource))
         {
+#if NET9_0_OR_GREATER
+            lock (_activeLock)
+#else
             lock (_actives)
+#endif
             {
                 _actives.AddLast(resource);
             }
@@ -71,7 +78,11 @@ public abstract class PoolBase<TResource>
         }
         if (CheckActiveCount())
             return default;
+#if NET9_0_OR_GREATER
+        lock (_activeLock)
+#else
         lock (_actives)
+#endif
         {
             if (CheckActiveCount())
                 return default;
@@ -127,7 +138,11 @@ public abstract class PoolBase<TResource>
     /// <param name="resource"></param>
     protected virtual bool Clean(ref TResource resource)
     {
+#if NET9_0_OR_GREATER
+        lock (_activeLock)
+#else
         lock (_actives)
+#endif
             _actives.Remove(resource);
         return CheckPoolSize();
     }

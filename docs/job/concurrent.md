@@ -1,16 +1,16 @@
 # 《手搓》线程池
 
-## 一、什么是手搓线程池
+## 一、什么是《手搓》线程池
 >* 手搓线程池并不是用来完全代替系统线程池的
 >* 你可以把手搓线程池看做系统线程池的一部分
->* 就好比在东海用大的集装箱搞养殖
+>* 就好比在东海用集装箱搞养殖
 >* 一个集装箱里养鱼
 >* 另一个集装箱里养虾
 >* 搞好隔离,鱼虾都不耽搁
 
 ## 二、最常用线程池的场景是什么
 >* 当然是Task,是用TaskFactory.StartNew方法创建Task
->* TaskFactory我们也可以手搓
+>* TaskFactory也可以手搓
 >* 手搓TaskFactory就需要手搓TaskScheduler
 >* 前一篇文章的手搓EventBus里面包含了手搓的TaskScheduler
 
@@ -64,7 +64,7 @@ var result = await TimeoutHelper.ThrowIfTimeout(task, TimeSpan.FromSeconds(1));
 >* 计算九九乘法表,每次算术0.1秒,1秒结束
 >* 其一说明线程池起作用了,不用手动调用Run了
 >* 其二线程池提供了并发处理能力,平均并发为8
->* 仔细观察结果会发现,最开始的并发是1,后面越来约大,最大并发是10
+>* 仔细观察结果会发现,最开始的并发是1,后面越来越大,最大并发是10
 
 ```csharp
 var options = new ReduceOptions { ConcurrencyLevel = 10 };
@@ -196,7 +196,7 @@ class ConcurrentJobService : ReduceJobService
 ### 2. ConcurrentJobService工作原理
 >* ConcurrentJobService本身就是一个线程,可以称为主线程
 >* ConcurrentJobService执行成功就从Pool里面激活一个线程
->* ConcurrentJobService执行失败就等待一段时间,通过ReduceTime配置(默认50毫秒)
+>* ConcurrentJobService执行失败就休眠一段时间,通过ReduceTime配置(默认50毫秒)
 >* 主线程就像找食物的搜索狼,线程池就像狼窝,狼窝里面都是贪吃的吃货狼
 >* 搜索狼找到食物就开吃,每吃一口就狼嚎
 >* 听到一声狼嚎,狼窝里面就出来一个吃货狼
@@ -209,6 +209,7 @@ class ConcurrentJobService : ReduceJobService
 >* 当然能
 >* ActionThreadPool提供类系统线程池效果,传个委托就行
 >* 其实就是实现IProcessor,把需要做的事情包装进去就行了
+>* 自己再手搓一个也不难
 
 ### 1. 单并发测试
 >* ConcurrencyLevel设置为1
@@ -355,12 +356,12 @@ void Hello(string name)
 // Thread31 Hello User99,10:56:12.425
 ```
 
-### 3. 用ActionThreadPool,但能不能知道它啥时候执行完呢
+### 3. 用ActionThreadPool,能不能知道它啥时候执行完呢
 >* 这不就是TaskFactory做的事情吗?
 >* 现在强制ActionThreadPool能做到吗?
->* 山人自有妙计,还是有办法的
+>* 山人自有妙计,完全可以实现
 >* 用TaskWrapper把action包装成Task再让ActionThreadPool执行就OK了
->* TaskWrapper是用TaskCompletionSource简单包装而来
+>* TaskWrapper是用TaskCompletionSource简单封装而来
 >* 如果action执行有异常,await也是会抛异常的哟
 
 ```csharp
@@ -372,12 +373,15 @@ var wrapper2 = TaskWrapper.Wrap(() => Hello("李四"));
 pool.Add(wrapper1.Run);
 pool.Add(wrapper2.Run);
 await Task.WhenAll(wrapper1.Original, wrapper2.Original);
+
+// Thread31 Hello 张三,11:58:47.600
+// Thread31 Hello 李四,11:58:47.617
 ```
 
 ### 4. 用ActionThreadPool能执行Func并拿到结果吗
 >* 当然也能
 >* 还是要用山人妙计
->* 还是用TaskWrapper包装后再让ActionThreadPool执行
+>* 用TaskWrapper包装后再让ActionThreadPool执行
 
 ```csharp
 var options = new ReduceOptions { ConcurrencyLevel = 1 };

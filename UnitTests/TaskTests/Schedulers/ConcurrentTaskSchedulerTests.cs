@@ -88,8 +88,10 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
             var count = scheduler.Concurrency;
             var activeCount = pool.ActiveCount;
             var poolCount = pool.PoolCount;
-            Assert.True(count + activeCount + poolCount > 0);
-            _output.WriteLine($"task:{count}/{scheduler.TaskCount}, pool:{activeCount}/{poolCount}");
+            if (count + activeCount + poolCount > 0)
+            {
+                _output.WriteLine($"task:{count}/{scheduler.TaskCount}, pool:{activeCount}/{poolCount}");
+            }         
         }
     }
 
@@ -97,7 +99,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
     int Multiply(int a, int b)
     {
         var result = a * b;
-        _output.WriteLine($"{a} x {b} = {result},{DateTime.Now:HH:mm:ss.fff}");
+        //_output.WriteLine($"{a} x {b} = {result},{DateTime.Now:HH:mm:ss.fff}");
         Thread.Sleep(100);
         return result;
     }

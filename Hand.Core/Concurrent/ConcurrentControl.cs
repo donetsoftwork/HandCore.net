@@ -22,12 +22,14 @@ public class ConcurrentControl(uint limit = ushort.MaxValue, uint count = 0)
         => _count;
     #endregion
     /// <summary>
-    /// 增加
+    /// 尝试增加
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public bool Increment(ushort value  = 1)
+    public bool TryIncrement(ushort value  = 1)
     {
+        if (_count >= _limit)
+            return false;
         int val = value;
         var count = Interlocked.Add(ref _count, val);
         if (count > _limit)
@@ -39,12 +41,22 @@ public class ConcurrentControl(uint limit = ushort.MaxValue, uint count = 0)
         return true;
     }
     /// <summary>
-    /// 减少
+    /// 增加
+    /// </summary>
+    /// <param name="value"></param>
+    public void Increment(int value = 1)
+    {
+        Interlocked.Add(ref _count, value);
+    }
+    /// <summary>
+    /// 尝试减少
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public bool Decrement(ushort value = 1)
+    public bool TryDecrement(ushort value = 1)
     {
+        if(_count <= 0)
+            return false;
         int val = value;
         var count = Interlocked.Add(ref _count, -val);
         if (count < 0)
@@ -54,5 +66,13 @@ public class ConcurrentControl(uint limit = ushort.MaxValue, uint count = 0)
             return false;
         }
         return true;
+    }
+    /// <summary>
+    /// 减少
+    /// </summary>
+    /// <param name="value"></param>
+    public void Decrement(int value = 1)
+    {
+        Interlocked.Add(ref _count, -value);
     }
 }

@@ -24,6 +24,9 @@ public class ServiceDictionaryProvider(IDictionary provider)
     /// 字典存储
     /// </summary>
     protected readonly IDictionary _provider = provider;
+#if NET9_0_OR_GREATER
+    private readonly Lock _providerLock = new();
+#endif
     #endregion
     /// <summary>
     /// 添加服务
@@ -68,7 +71,11 @@ public class ServiceDictionaryProvider(IDictionary provider)
     {
         if (_provider[key] is ICollection<TService> collection)
             return collection;
+#if NET9_0_OR_GREATER
+        lock (_providerLock)
+#else
         lock (_provider)
+#endif
         {
             if (_provider[key] is ICollection<TService> collectionNew)
                 return collectionNew;

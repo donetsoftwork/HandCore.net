@@ -8,5 +8,5 @@ public class EventAsyncBusOptions
     /// <summary>
     /// 一次性等待所有任务完成
     /// </summary>
-    public bool TasksWhenAll { get; set; } = false;
+    public bool TasksWhenAll = false;
 }

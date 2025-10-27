@@ -3,16 +3,26 @@ namespace Hand.Job;
 /// <summary>
 /// 节约作业服务
 /// </summary>
-/// <param name="processor">操作</param>
-/// <param name="options">配置</param>
-public class ReduceJobService(IProcessor processor, ReduceOptions options)
-    : ThreadJobService(processor)
+public class ReduceJobService
+    : ThreadJobService
 {
+    /// <summary>
+    /// 节约作业服务
+    /// </summary>
+    /// <param name="processor">操作</param>
+    /// <param name="options">配置</param>
+    public ReduceJobService(IProcessor processor, ReduceOptions options)
+        : base(processor)
+    {
+        _reduceTime = options.ReduceTime;
+        if(options.AutoStart)
+            Start();
+    }
     #region 配置
     /// <summary>
     /// 休眠暂停时间
     /// </summary>
-    protected readonly TimeSpan _reduceTime = options.ReduceTime;
+    protected readonly TimeSpan _reduceTime;
     /// <summary>
     /// 休眠暂停时间
     /// </summary>

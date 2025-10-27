@@ -11,5 +11,5 @@ public class EventBusOptions
     /// <summary>
     /// 事件处理超时时间，默认1000毫秒
     /// </summary>
-    public TimeSpan HanderTimeOut { get; set; } = TimeSpan.FromMilliseconds(1000);
+    public TimeSpan HanderTimeOut = TimeSpan.FromMilliseconds(1000);
 }

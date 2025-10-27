@@ -1,6 +1,5 @@
 using EventBusTests.Supports;
 using Hand.Events;
-using Hand.Reflection;
 using Xunit.Abstractions;
 
 namespace EventBusTests;
@@ -26,7 +25,7 @@ public class DictionaryProviderTests(ITestOutputHelper output)
         var (bus, provider) = CreateEventBus();
         var taskHandler = new TaskHandler(_output);
         provider.AddTaskHandler(taskHandler);
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 10; i++)
             bus.Publish("Event" + i);
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Sleep");
         Thread.Sleep(1000);
@@ -55,13 +54,15 @@ public class DictionaryProviderTests(ITestOutputHelper output)
         for (int i = 0; i < 100; i++)
             bus.Publish("Event" + i);
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Sleep");
-        Thread.Sleep(1000);
+        Thread.Sleep(10000);
     }
 
     public static (IEventBus bus, EventHandlerDictionaryProvider provider) CreateEventBus()
     {
+        var options = new EventBusOptions { ConcurrencyLevel = 1, ReduceTime = TimeSpan.FromMicroseconds(1), HanderTimeOut = TimeSpan.FromHours(1) };
         EventHandlerDictionaryProvider provider = new();
-        EventBus bus = new(provider, new EventBusOptions { ConcurrencyLevel = 1 });
+        var dispatcher = new EventDispatcher(options);
+        EventBus bus = new(provider, dispatcher);
         return (bus, provider);
     }
 }

@@ -21,7 +21,12 @@ public class ConcurrentTaskScheduler(ConcurrentOptions options)
     /// <summary>
     /// 并发控制
     /// </summary>
-    protected readonly ConcurrentControl _control = new(options.ConcurrencyLevel);
+    private readonly ConcurrentControl _control = new(options.ConcurrencyLevel);
+    /// <summary>
+    /// 并发控制
+    /// </summary>
+    internal ConcurrentControl Control
+        => _control;
     /// <summary>
     /// 当前并发数
     /// </summary>
@@ -62,42 +67,7 @@ public class ConcurrentTaskScheduler(ConcurrentOptions options)
         {
             _tasks.AddLast(task);
         }
-    }
-    /// <summary>
-    /// 添加异步
-    /// </summary>
-    /// <param name="task"></param>
-    public void AddTask(Task task)
-    {
-        switch (task.Status)
-        {
-            case TaskStatus.RanToCompletion:
-            case TaskStatus.Faulted:
-            case TaskStatus.Canceled:
-                // 执行完成的忽略
-                break;
-            case TaskStatus.Created:
-                // 尚未调度的启动
-                // 实际是添加,但不能直接调用QueueTask
-                task.Start(this);
-                break;
-            default:
-                // 其他增加占用并发配额
-                if (_control.Increment())
-                {
-                    task.ContinueWith(t =>
-                    {
-                        // 执行完成返回并发配额
-                        _control.Decrement();
-                    }, this);
-                }
-                else
-                {
-                    task.ContinueWith(t => { }, this);
-                }
-                break;
-        }
-    }
+    } 
     /// <inheritdoc />
     protected override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
     {
@@ -128,11 +98,11 @@ public class ConcurrentTaskScheduler(ConcurrentOptions options)
     {
         if (_tasks.Count == 0)
             return false;
-        // 占用并发配额
-        if (_control.Increment())
+        // 扣除并发配额
+        if (_control.TryIncrement())
         {
             var state = RunCore();
-            // 执行结束返回并发配额
+            // 执行结束返还并发配额
             _control.Decrement();
             return state;
         }
@@ -156,12 +126,7 @@ public class ConcurrentTaskScheduler(ConcurrentOptions options)
                 return false;
             _tasks.Remove(first);
         }
-        try
-        {
-            // 不能向外层抛异常,会打断外层任务调度服务
-            TryExecuteTask(first.Value);
-        }
-        catch { }
+        TryExecuteTask(first.Value);
         return true;
     }
     #endregion
