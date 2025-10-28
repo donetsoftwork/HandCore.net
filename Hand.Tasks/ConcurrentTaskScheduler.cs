@@ -8,7 +8,7 @@ namespace Hand.Tasks;
 /// </summary>
 /// <param name="options"></param>
 public class ConcurrentTaskScheduler(ConcurrentOptions options)
-    : TaskScheduler, IProcessor
+    : TaskScheduler, IProcessor, IQueueProcessor<Task>
 {
     #region 配置
     /// <summary>
@@ -91,43 +91,63 @@ public class ConcurrentTaskScheduler(ConcurrentOptions options)
         }
         return false;
     }
-#endregion
+    #endregion
+    #region ICollectionProcessor<Task>
+    /// <inheritdoc />
+    public bool TryTake(out Task item)
+    {
+        LinkedListNode<Task> first = null;
+        var state = false;
+        if (_tasks.Count > 0)
+        {
+            // 扣除并发配额
+            if (_control.TryIncrement())
+            {
+#if NET9_0_OR_GREATER
+                lock (_taskLock)
+#else
+                lock (_tasks)
+#endif
+                {
+                    first = _tasks.First;
+                    if (first is not null)
+                    {
+                        state = true;
+                        _tasks.Remove(first);
+                    }                        
+                }
+                // 不需要执行,返还并发配额
+                if (!state)
+                    _control.Increment();
+            }
+        }
+        if (state)
+        {
+            item = first.Value;
+            return true;
+        }
+        item = default;
+        return false;
+    }
+    /// <inheritdoc />
+    public bool Run(ref Task instance)
+    {
+        var state = TryExecuteTask(instance);
+        // 执行结束返还并发配额
+        _control.Decrement();
+        return state;
+    }
+    #endregion
     #region IProcessor
     /// <inheritdoc />
     public bool Run()
     {
-        if (_tasks.Count == 0)
-            return false;
-        // 扣除并发配额
-        if (_control.TryIncrement())
+        if(TryTake(out var task))
         {
-            var state = RunCore();
-            // 执行结束返还并发配额
-            _control.Decrement();
-            return state;
+            Run(ref task);
+            return true;
         }
         return false;
-    }
-    /// <summary>
-    /// 实际执行
-    /// </summary>
-    /// <returns></returns>
-    private bool RunCore()
-    {
-        LinkedListNode<Task> first = null;
-#if NET9_0_OR_GREATER
-        lock (_taskLock)
-#else
-        lock (_tasks)
-#endif
-        {
-            first = _tasks.First;
-            if (first is null)
-                return false;
-            _tasks.Remove(first);
-        }
-        TryExecuteTask(first.Value);
-        return true;
     }
     #endregion
 }

@@ -7,11 +7,11 @@ namespace Hand.Job;
 /// </summary>
 /// <param name="processor"></param>
 /// <param name="maxSize"></param>
-public class ThreadJobPool(IProcessor processor, int maxSize)
+public class ThreadJobPool<TItem>(IQueueProcessor<TItem> processor, int maxSize)
     : PoolBase<IJobService>(0, maxSize)
 {
     #region 配置
-    private readonly IProcessor _processor = processor;
+    private readonly IQueueProcessor<TItem> _processor = processor;
     /// <summary>
     /// 种子
     /// </summary>
@@ -41,7 +41,7 @@ public class ThreadJobPool(IProcessor processor, int maxSize)
     #region PoolBase<IJobService>
     /// <inheritdoc />
     protected override IJobService CreateNew()
-        => new RecycleJobService(this, Interlocked.Increment(ref _jobSeed), _processor);
+        => new RecycleJobService<TItem>(this, Interlocked.Increment(ref _jobSeed), _processor);
     /// <inheritdoc />
     protected override bool Clean(ref IJobService resource)
     {
@@ -49,29 +49,29 @@ public class ThreadJobPool(IProcessor processor, int maxSize)
         return base.Clean(ref resource);
     }
     #endregion
+}
+/// <summary>
+/// 可回收作业
+/// </summary>
+/// <param name="pool"></param>
+/// <param name="id"></param>
+/// <param name="processor"></param>
+internal class RecycleJobService<TItem>(IPool<IJobService> pool, int id, IQueueProcessor<TItem> processor)
+    : ThreadJobService<TItem>(processor)
+{
+    #region 配置
+    private readonly IPool<IJobService> _pool = pool;
+    private readonly int _id = id;
     /// <summary>
-    /// 可回收作业
+    /// 标识
     /// </summary>
-    /// <param name="pool"></param>
-    /// <param name="id"></param>
-    /// <param name="processor"></param>
-    internal class RecycleJobService(IPool<IJobService> pool, int id, IProcessor processor)
-        : ThreadJobService(processor)
+    public int Id
+        => _id;
+    #endregion
+    /// <inheritdoc />
+    protected override void Run(IQueueProcessor<TItem> processor, CancellationToken token)
     {
-        #region 配置
-        private readonly IPool<IJobService> _pool = pool;
-        private readonly int _id = id;
-        /// <summary>
-        /// 标识
-        /// </summary>
-        public int Id
-            => _id;
-        #endregion
-        /// <inheritdoc />
-        protected override void Run(IProcessor processor, CancellationToken token)
-        {
-            base.Run(processor, token);
-            _pool.Return(this);
-        }
+        base.Run(processor, token);
+        _pool.Return(this);
     }
 }

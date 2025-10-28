@@ -3,24 +3,24 @@ namespace Hand.Job;
 /// <summary>
 /// 并发作业服务
 /// </summary>
-public class ConcurrentJobService
-    : ReduceJobService, IProcessor
+public class ConcurrentJobService<TItem>
+    : ReduceJobService<TItem>, IQueueProcessor<TItem>
 {
     #region 配置
-    private readonly IProcessor _processor;
+    private readonly IQueueProcessor<TItem> _processor;
     /// <summary>
     /// 服务池
     /// </summary>
-    private readonly ThreadJobPool _pool;
+    private readonly ThreadJobPool<TItem> _pool;
     /// <summary>
     /// 服务池
     /// </summary>
-    public ThreadJobPool Pool 
+    public ThreadJobPool<TItem> Pool 
         => _pool;
     /// <summary>
     /// 作业执行对象
     /// </summary>
-    public IProcessor Processor 
+    public IQueueProcessor<TItem> Processor 
         => _processor;
     #endregion
     /// <summary>
@@ -28,7 +28,7 @@ public class ConcurrentJobService
     /// </summary>
     /// <param name="processor"></param>
     /// <param name="options"></param>
-    public ConcurrentJobService(IProcessor processor, ReduceOptions options)
+    public ConcurrentJobService(IQueueProcessor<TItem> processor, ReduceOptions options)
         : base(processor, options)
     {
         _processor = processor;
@@ -42,13 +42,14 @@ public class ConcurrentJobService
         return true;
     }
     /// <inheritdoc />
-    protected override async void Run(IProcessor processor, CancellationToken token)
+    protected override async void Run(IQueueProcessor<TItem> processor, CancellationToken token)
     {
         while (true)
         {
-            if (_processor.Run())
+            if (processor.TryTake(out var item))
             {
                 _pool.Increment();
+                processor.Run(ref item);
             }
             else
             {
@@ -59,14 +60,19 @@ public class ConcurrentJobService
                 break;
         }
     }
+    #region ICollectionProcessor<TItem>
     /// <inheritdoc />
-    bool IProcessor.Run()
+    bool IQueueProcessor<TItem>.TryTake(out TItem item)
     {
-        if(_processor.Run())
+        if( _processor.TryTake(out item))
         {
             _pool.Increment();
             return true;
         }
         return false;
     }
+    /// <inheritdoc />
+    bool IProcessor<TItem>.Run(ref TItem instance)
+        => _processor.Run(ref instance);
+    #endregion
 }

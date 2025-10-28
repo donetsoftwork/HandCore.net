@@ -24,10 +24,10 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
         var options = new ConcurrentOptions { ConcurrencyLevel = 10 };
         var scheduler = new ConcurrentTaskScheduler(options);
         var factory = new TaskFactory(scheduler);
-        var task = factory.StartNew(() => Multiply(1, 2));
+        var task = factory.StartNew(() => Multiply(2, 3));
         scheduler.Run();
         var result = await TimeoutHelper.ThrowIfTimeout(task, TimeSpan.FromSeconds(1));
-        Assert.Equal(3, result);
+        Assert.Equal(6, result);
     }
     [Fact]
     public async void TestTask()
@@ -35,11 +35,11 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
         var options = new ConcurrentOptions { ConcurrencyLevel = 10 };
         var scheduler = new ConcurrentTaskScheduler(options);
         var factory = new TaskFactory(scheduler);
-        var task = factory.StartNew(() => Multiply(1, 2));
-        var jobService = new ThreadJobService(scheduler);
+        var task = factory.StartNew(() => Multiply(2, 3));
+        var jobService = new ThreadJobService<Task>(scheduler);
         jobService.Start();
         var result = await task;
-        Assert.Equal(3, result);
+        Assert.Equal(6, result);
     }
     [Fact]
     public void TestConcurrent0()
@@ -47,7 +47,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var scheduler = new ConcurrentTaskScheduler(options);
         var factory = new TaskFactory(scheduler);
-        var jobService = new ConcurrentJobService(scheduler, options);
+        var jobService = options.CreateJob(scheduler);
         jobService.Start();
         Start(factory);
         Thread.Sleep(5000);
@@ -58,7 +58,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var scheduler = new ConcurrentTaskScheduler(options);
         var factory = new TaskFactory(scheduler);
-        var jobService = new ConcurrentJobService(scheduler, options);
+        var jobService = new ConcurrentJobService<Task>(scheduler, options);
         jobService.Start();
         Start(factory);
         Wait(jobService);
@@ -78,7 +78,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
             }
         }
     }
-    private void Wait(ConcurrentJobService jobService)
+    private void Wait(ConcurrentJobService<Task> jobService)
     {
         var pool = jobService.Pool;
         var scheduler = (jobService.Processor as ConcurrentTaskScheduler)!;
@@ -99,7 +99,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
     int Multiply(int a, int b)
     {
         var result = a * b;
-        //_output.WriteLine($"{a} x {b} = {result},{DateTime.Now:HH:mm:ss.fff}");
+        _output.WriteLine($"{a} x {b} = {result},{DateTime.Now:HH:mm:ss.fff}");
         Thread.Sleep(100);
         return result;
     }

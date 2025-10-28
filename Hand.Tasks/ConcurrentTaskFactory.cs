@@ -26,8 +26,7 @@ public class ConcurrentTaskFactory
         : base(scheduler)
     {
         _control = scheduler.Control;
-        _job = ReduceJobService.Create(scheduler, options);
-        //_job.Start();
+        _job = options.CreateJob(scheduler);
     }
     #region 配置
     /// <summary>
@@ -37,7 +36,7 @@ public class ConcurrentTaskFactory
     /// <summary>
     /// 作业服务
     /// </summary>
-    private readonly ReduceJobService _job;
+    private readonly ReduceJobService<Task> _job;
     #endregion
     /// <summary>
     /// 启动服务
@@ -66,7 +65,7 @@ public class ConcurrentTaskFactory
                 _control.Decrement();
                 // ContinueWith不能使用当前TaskScheduler,会导致死锁
             }, TaskScheduler.Default);
-            return task;
+            //return task;
         });
     }
     /// <summary>

@@ -43,7 +43,7 @@ public class ActionThreadPoolTests(ITestOutputHelper output)
   [Fact]
     public async Task Concurrent()
     {
-        var options = new ReduceOptions { ConcurrencyLevel = 4 };
+        var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var pool = new ActionThreadPool(options);
         pool.Start();
         for (int i = 0; i < 100; i++)

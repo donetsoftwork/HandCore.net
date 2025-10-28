@@ -6,7 +6,7 @@ namespace Hand.Job;
 /// Action线程池
 /// </summary>
 public class ActionThreadPool
-    : IJobService, IProcessor
+    : IJobService, IQueueProcessor<Action>
 {
     /// <summary>
     /// Action线程池
@@ -14,14 +14,14 @@ public class ActionThreadPool
     /// <param name="options"></param>
     public ActionThreadPool(ReduceOptions options)
     {
-        _job = ReduceJobService.Create(this, options);
+        _job = options.CreateJob(this);
     }
     #region 配置
     private readonly ConcurrentQueue<Action> _actions = new();
     /// <summary>
     /// 作业服务
     /// </summary>
-    private readonly IJobService _job;
+    private readonly ReduceJobService<Action> _job;
     #endregion
     /// <summary>
     /// 添加进队列
@@ -42,16 +42,15 @@ public class ActionThreadPool
     void IJobService.Run()
         => _job.Run();
     #endregion
-    #region IProcessor
+    #region ICollectionProcessor<Action>
     /// <inheritdoc />
-    public bool Run()
+    public bool TryTake(out Action item)
+        => _actions.TryDequeue(out item);
+    /// <inheritdoc />
+    public bool Run(ref Action instance)
     {
-        if(_actions.TryDequeue(out var action))
-        {
-            action();
-            return true;
-        }
-        return false;
+        instance();
+        return true;
     }
     #endregion
 }

@@ -4,14 +4,14 @@ namespace Hand.Job;
 /// 线程作业服务
 /// </summary>
 /// <param name="processor"></param>
-public class ThreadJobService(IProcessor processor)
+public class ThreadJobService<TItem>(IQueueProcessor<TItem> processor)
     : IJobService, IDisposable
 {
     #region 配置
     /// <summary>
     /// 操作
     /// </summary>
-    private readonly IProcessor _processor = processor;
+    private readonly IQueueProcessor<TItem> _processor = processor;
     /// <summary>
     /// Token
     /// </summary>
@@ -69,10 +69,11 @@ public class ThreadJobService(IProcessor processor)
     /// </summary>
     /// <param name="processor"></param>
     /// <param name="token"></param>
-    protected virtual void Run(IProcessor processor, CancellationToken token)
+    protected virtual void Run(IQueueProcessor<TItem> processor, CancellationToken token)
     {
-        while (processor.Run())
+        while (processor.TryTake(out var item))
         {
+            processor.Run(ref item);
             if (token.IsCancellationRequested)
                 break;
         }

@@ -2,8 +2,6 @@ using Hand.Concurrent;
 using Hand.Job;
 using Hand.Tasks;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using Xunit.Abstractions;
 
 namespace TaskTests.Schedulers;
@@ -24,6 +22,12 @@ public class MockIOTests(ITestOutputHelper output)
         {
             throw new Exception("Server is busy!!!");
         }
+        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} GetProductAsync({id}),{DateTime.Now:HH:mm:ss.fff}");
+        return new(id);
+    }
+    internal Product GetProduct(int id)
+    {
+        Thread.Sleep(100);
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} GetProductAsync({id}),{DateTime.Now:HH:mm:ss.fff}");
         return new(id);
     }
@@ -74,6 +78,25 @@ public class MockIOTests(ITestOutputHelper output)
         {
             var id = i;
             var task = factory.StartTask(() => GetProductAsync(id));
+            tasks.Add(task);
+        }
+        var products = await Task.WhenAll(tasks);
+        sw.Stop();
+        _output.WriteLine($"end {DateTime.Now:HH:mm:ss.fff}, Elapsed {sw.ElapsedMilliseconds}");
+        Assert.True(sw.ElapsedMilliseconds < 300);
+    }
+    [Fact]
+    public async void StartNew()
+    {
+        var options = new ReduceOptions { ConcurrencyLevel = 7 };
+        var factory = new ConcurrentTaskFactory(options);
+        _output.WriteLine($"begin {DateTime.Now:HH:mm:ss.fff}");
+        Stopwatch sw = Stopwatch.StartNew();
+        List<Task<Product>> tasks = new(7);
+        for (int i = 0; i < 7; i++)
+        {
+            var id = i;
+            var task = factory.StartNew(() => GetProduct(id));
             tasks.Add(task);
         }
         var products = await Task.WhenAll(tasks);
