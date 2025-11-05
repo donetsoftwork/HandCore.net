@@ -15,8 +15,4 @@ public interface IJobService
     /// </summary>
     /// <returns></returns>
     bool Stop();
-    /// <summary>
-    /// 执行
-    /// </summary>
-    void Run();
 }

@@ -11,18 +11,17 @@ public class ActionThreadPoolTests(ITestOutputHelper output)
     public async Task Action()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
-        var pool = new ActionThreadPool(options);
-        pool.Start();
+        var pool = options.CreateJob(ActionProcessor.Instance);
         pool.Add(() => Hello("张三"));
         pool.Add(() => Hello("李四"));
         await Task.Delay(1000);
+        HttpClient client = new HttpClient();
     }
     [Fact]
     public async Task Wrap()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
-        var pool = new ActionThreadPool(options);
-        pool.Start();
+        var pool = options.CreateJob(ActionProcessor.Instance);
         var wrapper1 = TaskWrapper.Wrap(() => Hello("张三"));
         var wrapper2 = TaskWrapper.Wrap(() => Hello("李四"));
         pool.Add(wrapper1.Run);
@@ -33,19 +32,17 @@ public class ActionThreadPoolTests(ITestOutputHelper output)
     public async Task Func()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
-        var pool = new ActionThreadPool(options);
-        pool.Start();
+        var pool = options.CreateJob(ActionProcessor.Instance);
         var wrapper = TaskWrapper.Wrap(() => Multiply(9, 9));
         pool.Add(wrapper.Run);
         var result = await wrapper.Original;
         Assert.Equal(81, result);
     }
-  [Fact]
+    [Fact]
     public async Task Concurrent()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
-        var pool = new ActionThreadPool(options);
-        pool.Start();
+        var pool = options.CreateJob(ActionProcessor.Instance);
         for (int i = 0; i < 100; i++)
         {
             var user = "User" + i;

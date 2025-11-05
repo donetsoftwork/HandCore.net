@@ -41,6 +41,4 @@ public class MySchedulerTests
         await Task.Delay(1);
         return num + num;
     }
-
-
 }

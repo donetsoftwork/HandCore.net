@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Hand.Core\Hand.Core.csproj" />
     <ProjectReference Include="..\Hand.Job\Hand.Job.csproj" />
+    <ProjectReference Include="..\Hand.Services\Hand.Services.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="readme.md" Pack="true" PackagePath="\" />

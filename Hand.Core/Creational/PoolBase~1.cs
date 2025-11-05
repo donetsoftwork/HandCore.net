@@ -44,6 +44,21 @@ public abstract class PoolBase<TResource>
     private readonly Lock _activeLock = new();
 #endif
     /// <summary>
+    /// 已激活资源(正在使用)
+    /// </summary>
+    public TResource[] Actives
+    {
+        get 
+        {
+#if NET9_0_OR_GREATER
+            lock (_activeLock)
+#else
+            lock (_actives)
+#endif
+                return [.. _actives];
+        }
+    }
+    /// <summary>
     /// 资源池大小
     /// </summary>
     public int PoolCount
@@ -143,7 +158,6 @@ public abstract class PoolBase<TResource>
 #else
         lock (_actives)
 #endif
-            _actives.Remove(resource);
-        return CheckPoolSize();
+            return _actives.Remove(resource) && CheckPoolSize();
     }
 }

@@ -432,7 +432,7 @@ public int Multiply(int a, int b)
 >* GetProduct同步方法执行1次耗时0.1秒
 >* ConcurrencyLevel设置为7
 >* 现在优化后获取7条只要0.1秒
->* 如果冷启动按指数递进关系要至少要0.3秒多
+>* 如果冷启动按指数递进关系至少要0.3秒多
 >* 这就快了3倍
 >* 如果ConcurrencyLevel越大,效果就越明显
 

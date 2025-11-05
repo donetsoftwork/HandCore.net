@@ -1,3 +1,4 @@
+using Hand;
 using Hand.Concurrent;
 using Hand.Job;
 using Hand.Tasks;
@@ -13,7 +14,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
     public async Task Timeout()
     {
         var options = new ConcurrentOptions { ConcurrencyLevel = 10 };
-        var scheduler = new ConcurrentTaskScheduler(options);
+        var scheduler = new QueueTaskScheduler();
         var factory = new TaskFactory(scheduler);
         var task = factory.StartNew(() => Multiply(1, 2));
         await Assert.ThrowsAsync<TimeoutException>(async () => await TimeoutHelper.ThrowIfTimeout(task, TimeSpan.FromSeconds(1)));
@@ -22,10 +23,10 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
     public async Task TestRun()
     {
         var options = new ConcurrentOptions { ConcurrencyLevel = 10 };
-        var scheduler = new ConcurrentTaskScheduler(options);
+        var scheduler = new QueueTaskScheduler();
         var factory = new TaskFactory(scheduler);
         var task = factory.StartNew(() => Multiply(2, 3));
-        scheduler.Run();
+        //scheduler.Run();
         var result = await TimeoutHelper.ThrowIfTimeout(task, TimeSpan.FromSeconds(1));
         Assert.Equal(6, result);
     }
@@ -33,10 +34,10 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
     public async void TestTask()
     {
         var options = new ConcurrentOptions { ConcurrencyLevel = 10 };
-        var scheduler = new ConcurrentTaskScheduler(options);
+        var scheduler = new QueueTaskScheduler();
         var factory = new TaskFactory(scheduler);
         var task = factory.StartNew(() => Multiply(2, 3));
-        var jobService = new ThreadJobService<Task>(scheduler);
+        var jobService = new ThreadJobService<Task>(scheduler.Queue, scheduler);
         jobService.Start();
         var result = await task;
         Assert.Equal(6, result);
@@ -45,7 +46,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
     public void TestConcurrent0()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
-        var scheduler = new ConcurrentTaskScheduler(options);
+        var scheduler = new QueueTaskScheduler();
         var factory = new TaskFactory(scheduler);
         var jobService = options.CreateJob(scheduler);
         jobService.Start();
@@ -56,16 +57,17 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
     public void TestConcurrent()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
-        var scheduler = new ConcurrentTaskScheduler(options);
+        var scheduler = new QueueTaskScheduler();
         var factory = new TaskFactory(scheduler);
-        var jobService = new ConcurrentJobService<Task>(scheduler, options);
+        var jobService = options.CreateJob(scheduler.Queue, scheduler);
         jobService.Start();
         Start(factory);
         Wait(jobService);
-        Start(factory);
-        Wait(jobService);
+        //Start(factory);
+        //Wait(jobService);
         Thread.Sleep(5000);
     }
+    
 
     private void Start(TaskFactory factory)
     {
@@ -78,20 +80,20 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
             }
         }
     }
-    private void Wait(ConcurrentJobService<Task> jobService)
+    private void Wait(ReduceJobService<Task> jobService)
     {
         var pool = jobService.Pool;
-        var scheduler = (jobService.Processor as ConcurrentTaskScheduler)!;
+        var scheduler = (jobService.Processor as QueueTaskScheduler)!;
         for (int i = 0; i < 30; i++)
         {
             Thread.Sleep(50);
-            var count = scheduler.Concurrency;
+            //var count = scheduler.Concurrency;
             var activeCount = pool.ActiveCount;
             var poolCount = pool.PoolCount;
-            if (count + activeCount + poolCount > 0)
+            if (activeCount + poolCount > 0)
             {
-                _output.WriteLine($"task:{count}/{scheduler.TaskCount}, pool:{activeCount}/{poolCount}");
-            }         
+                _output.WriteLine($"task:{scheduler.Count}, pool:{activeCount}/{poolCount}");
+            }
         }
     }
 

@@ -25,7 +25,7 @@ public class DictionaryProviderTests(ITestOutputHelper output)
         var (bus, provider) = CreateEventBus();
         var taskHandler = new TaskHandler(_output);
         provider.AddTaskHandler(taskHandler);
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 100; i++)
             bus.Publish("Event" + i);
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Sleep");
         Thread.Sleep(1000);
@@ -59,7 +59,7 @@ public class DictionaryProviderTests(ITestOutputHelper output)
 
     public static (IEventBus bus, EventHandlerDictionaryProvider provider) CreateEventBus()
     {
-        var options = new EventBusOptions { ConcurrencyLevel = 1, ReduceTime = TimeSpan.FromMicroseconds(1), HanderTimeOut = TimeSpan.FromHours(1) };
+        var options = new EventBusOptions { ConcurrencyLevel = 4, ReduceTime = TimeSpan.FromMicroseconds(1), HanderTimeOut = TimeSpan.FromHours(1) };
         EventHandlerDictionaryProvider provider = new();
         var dispatcher = new EventDispatcher(options);
         EventBus bus = new(provider, dispatcher);

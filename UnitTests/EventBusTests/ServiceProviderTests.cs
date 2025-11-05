@@ -14,6 +14,7 @@ public class ServiceProviderTests
             .ScanEventHandler(ServiceLifetime.Scoped, typeof(ServiceProviderTests).Assembly)
             //.AddEventHandlerProvider()
             .AddSingleton(new EventBusOptions { ConcurrencyLevel = 1 })
+            .AddSingleton<EventDispatcher>()
             .AddEventBus<EventBus>()
             .AddSingleton(output);
         var serviceProvider = services.BuildServiceProvider();

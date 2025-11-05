@@ -1,4 +1,7 @@
+using Hand.Collections;
 using Hand.Concurrent;
+using Hand.ConcurrentCollections;
+using Hand.States;
 
 namespace Hand.Job;
 
@@ -16,22 +19,30 @@ public class ReduceOptions
     /// 是否自动启动
     /// </summary>
     public bool AutoStart = true;
-
+    /// <summary>
+    /// 处理子元素限时
+    /// </summary>
+    public TimeSpan ItemLife = TimeSpan.FromHours(1);
     #region CreateJob
     /// <summary>
     /// 构造作业服务
     /// </summary>
     /// <typeparam name="TItem"></typeparam>
     /// <param name="options"></param>
+    /// <param name="queue"></param>
     /// <param name="processor"></param>
     /// <returns></returns>
-    public static ReduceJobService<TItem> CreateJob<TItem>(ReduceOptions options, IQueueProcessor<TItem> processor)
-    {
-        var concurrencyLevel = options.ConcurrencyLevel;
-        if (concurrencyLevel < 1u)
-            return new ReduceJobService<TItem>(processor, options);
-        return new ConcurrentJobService<TItem>(processor, options);
-    }
+    public static ReduceJobService<TItem> CreateJob<TItem>(ReduceOptions options, IQueue<TItem> queue, IQueueProcessor<TItem> processor)
+        => new(queue, processor, options);
+    /// <summary>
+    /// 构造作业服务
+    /// </summary>
+    /// <typeparam name="TItem"></typeparam>
+    /// <param name="queue"></param>
+    /// <param name="processor"></param>
+    /// <returns></returns>
+    public ReduceJobService<TItem> CreateJob<TItem>(IQueue<TItem> queue, IQueueProcessor<TItem> processor)
+        => CreateJob(this, queue, processor);
     /// <summary>
     /// 构造作业服务
     /// </summary>
@@ -39,6 +50,13 @@ public class ReduceOptions
     /// <param name="processor"></param>
     /// <returns></returns>
     public ReduceJobService<TItem> CreateJob<TItem>(IQueueProcessor<TItem> processor)
-        => CreateJob(this, processor);
+        => CreateJob(this, new ConcurrentQueueAdapter<TItem>(), processor);
+    /// <summary>
+    /// 构造作业服务
+    /// </summary>
+    /// <param name="processor"></param>
+    /// <returns></returns>
+    public ReduceJobService<IState<bool>> CreateJob(Processor processor)
+        => CreateJob(this, processor.Queue, processor);
     #endregion
 }

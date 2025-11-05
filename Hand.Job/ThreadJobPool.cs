@@ -1,3 +1,4 @@
+using Hand.Collections;
 using Hand.Creational;
 
 namespace Hand.Job;
@@ -5,12 +6,18 @@ namespace Hand.Job;
 /// <summary>
 /// 线程作业服务池
 /// </summary>
+/// <typeparam name="TItem"></typeparam>
+/// <param name="queue"></param>
 /// <param name="processor"></param>
 /// <param name="maxSize"></param>
-public class ThreadJobPool<TItem>(IQueueProcessor<TItem> processor, int maxSize)
-    : PoolBase<IJobService>(0, maxSize)
+public class ThreadJobPool<TItem>(IQueue<TItem> queue, IQueueProcessor<TItem> processor, int maxSize)
+    : PoolBase<ThreadJobService<TItem>>(0, maxSize)
 {
     #region 配置
+    /// <summary>
+    /// 队列
+    /// </summary>
+    private readonly IQueue<TItem> _queue = queue;
     private readonly IQueueProcessor<TItem> _processor = processor;
     /// <summary>
     /// 种子
@@ -40,10 +47,10 @@ public class ThreadJobPool<TItem>(IQueueProcessor<TItem> processor, int maxSize)
     }
     #region PoolBase<IJobService>
     /// <inheritdoc />
-    protected override IJobService CreateNew()
-        => new RecycleJobService<TItem>(this, Interlocked.Increment(ref _jobSeed), _processor);
+    protected override ThreadJobService<TItem> CreateNew()
+        => new RecycleJobService<TItem>(this, Interlocked.Increment(ref _jobSeed), _queue, _processor);
     /// <inheritdoc />
-    protected override bool Clean(ref IJobService resource)
+    protected override bool Clean(ref ThreadJobService<TItem> resource)
     {
         resource.Stop();
         return base.Clean(ref resource);
@@ -53,14 +60,16 @@ public class ThreadJobPool<TItem>(IQueueProcessor<TItem> processor, int maxSize)
 /// <summary>
 /// 可回收作业
 /// </summary>
+/// <typeparam name="TItem"></typeparam>
 /// <param name="pool"></param>
 /// <param name="id"></param>
+/// <param name="queue"></param>
 /// <param name="processor"></param>
-internal class RecycleJobService<TItem>(IPool<IJobService> pool, int id, IQueueProcessor<TItem> processor)
-    : ThreadJobService<TItem>(processor)
+internal class RecycleJobService<TItem>(ThreadJobPool<TItem> pool, int id, IQueue<TItem> queue, IQueueProcessor<TItem> processor)
+    : ThreadJobService<TItem>(queue, processor)
 {
     #region 配置
-    private readonly IPool<IJobService> _pool = pool;
+    private readonly ThreadJobPool<TItem> _pool = pool;
     private readonly int _id = id;
     /// <summary>
     /// 标识
@@ -69,9 +78,18 @@ internal class RecycleJobService<TItem>(IPool<IJobService> pool, int id, IQueueP
         => _id;
     #endregion
     /// <inheritdoc />
-    protected override void Run(IQueueProcessor<TItem> processor, CancellationToken token)
+    public override bool Activate(TItem instance)
     {
-        base.Run(processor, token);
+        if(base.Activate(instance))
+        {
+            _pool.Increment();
+            return true;
+        }
+        return false;
+    }
+    /// <inheritdoc />
+    public override void Dispose()
+    {
         _pool.Return(this);
     }
 }
