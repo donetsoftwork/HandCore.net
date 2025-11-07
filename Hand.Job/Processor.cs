@@ -47,7 +47,7 @@ public sealed class Processor(IQueue<JobItem> queue)
     public IJobState Add(Action action, CancellationToken token)
     {
         var state = new CancelableActionState(action, token);
-        _queue.Enqueue(state);
+        Enqueue(_queue, state);
         return state;
     }
     #endregion
@@ -72,7 +72,7 @@ public sealed class Processor(IQueue<JobItem> queue)
     public IJobResult<TResult> Add<TResult>(Func<TResult> func, CancellationToken token)
     {
         var result = new CancelableFuncResult<TResult>(func, token);
-        _queue.Enqueue(result);
+        Enqueue(_queue, result);
         return result;
     }
     #endregion
@@ -97,7 +97,7 @@ public sealed class Processor(IQueue<JobItem> queue)
     public IJobState AddTask(Func<CancellationToken, Task> func, CancellationToken token)
     {
         var state = new CancelableTaskState(func, token);
-        _queue.Enqueue(state);
+        Enqueue(_queue, state);
         return state;
     }
     #endregion
@@ -111,7 +111,7 @@ public sealed class Processor(IQueue<JobItem> queue)
     public IJobResult<TResult> AddTask<TResult>(Func<Task<TResult>> func)
     {
         var result = new TaskResult<TResult>(func);
-        _queue.Enqueue(result);
+        Enqueue(_queue, result);
         return result;
     }
     /// <summary>
@@ -124,7 +124,7 @@ public sealed class Processor(IQueue<JobItem> queue)
     public IJobResult<TResult> AddTask<TResult>(Func<CancellationToken, Task<TResult>> func, CancellationToken token)
     {
         var result = new CancelableTaskResult<TResult>(func, token);
-        _queue.Enqueue(result);
+        Enqueue(_queue, result);
         return result;
     }
     #endregion
@@ -145,7 +145,7 @@ public sealed class Processor(IQueue<JobItem> queue)
                     }
                     catch (Exception ex)
                     {
-                        OnException(job, ex);
+                        Exception(job, ex);
                     }
                 }
                 else if (item is IAsyncJobItem asyncJob)
@@ -156,14 +156,14 @@ public sealed class Processor(IQueue<JobItem> queue)
                     }
                     catch (Exception ex)
                     {
-                        OnException(asyncJob, ex);
+                        Exception(asyncJob, ex);
                     }
                 }
             }
             else
             {
                 if (item is ICancelable cancelable)
-                    OnCancel(cancelable);
+                    Cancel(cancelable);
                 break;
             }
             if (token.IsCancellationRequested)
@@ -179,7 +179,7 @@ public sealed class Processor(IQueue<JobItem> queue)
     /// <param name="callBack"></param>
     /// <param name="ex"></param>
 
-    private static void OnException(IExceptionable callBack, Exception ex)
+    public static void Exception(IExceptionable callBack, Exception ex)
     {
         try
         {
@@ -191,12 +191,30 @@ public sealed class Processor(IQueue<JobItem> queue)
     /// 取消
     /// </summary>
     /// <param name="cancelable"></param>
-    private static void OnCancel(ICancelable cancelable)
+    public static void Cancel(ICancelable cancelable)
     {
         try
         {
             cancelable.OnCancel();
         }
         catch { }
+    }
+    /// <summary>
+    /// 入队
+    /// </summary>
+    /// <typeparam name="TItem"></typeparam>
+    /// <param name="queue"></param>
+    /// <param name="item"></param>
+    public static void Enqueue<TItem>(IQueue<JobItem> queue, TItem item)
+        where TItem : JobItem, ICancelable
+    {
+        if(item.Status)
+        {
+            queue.Enqueue(item);
+        }
+        else
+        {
+            Cancel(item);
+        }
     }
 }

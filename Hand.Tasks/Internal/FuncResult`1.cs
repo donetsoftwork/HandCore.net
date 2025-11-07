@@ -1,7 +1,8 @@
+using Hand.Job;
 using Hand.States;
 using Hand.Structural;
 
-namespace Hand.Job.Internal;
+namespace Hand.Tasks.Internal;
 
 /// <summary>
 /// Func结果
@@ -9,7 +10,7 @@ namespace Hand.Job.Internal;
 /// <typeparam name="TResult"></typeparam>
 /// <param name="original"></param>
 internal class FuncResult<TResult>(Func<TResult> original)
-    : ResultCallBack<TResult>, IJobItem, IWrapper<Func<TResult>>
+    : TaskCallBack<TResult>, IJobItem, IWrapper<Func<TResult>>, ITaskJobResult<TResult>
 {
     #region 配置
     private readonly Func<TResult> _original = original;

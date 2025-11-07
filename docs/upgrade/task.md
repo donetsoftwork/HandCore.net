@@ -1,4 +1,4 @@
-# 异步"伪线程"优化《手搓》线程池,支持任务清退
+# 异步"伪线程"重构《手搓》线程池,支持任务清退
 >* 网友@舟翅桐和@0611163建议Task清退机制
 >* 多次尝试不能很好实现清退
 >* 使用异步"伪线程"推倒重构《手搓》线程池重见光明
@@ -117,7 +117,7 @@ private static async Task<int> CountAsynWithIsCancellationRequested(int num, Can
 >* 其中A、B逻辑不能超过800毫秒,C逻辑不能超过600毫秒
 >* 为了更好实现需求,A和B并行节约时间
 >* 用CreateLinkedTokenSource实现C操作要同时满足总耗时不超过1秒,C本身不超过600毫秒
->* 综上CancellationToken作用很大,可以设置超时、可以手动触发还可以支持多组条件组合
+>* 综上CancellationToken作用很大,可以设置超时、可以手动触发还可以支持多条件组合
 
 
 ~~~csharp
@@ -156,7 +156,7 @@ private static async Task<int> C(int arg, int a, int b, CancellationToken token)
 }
 ~~~
 
-## 三、《手搓》线程池可清退的任务
+## 三、《手搓》线程池可清退任务
 ### 1. 单个异步任务清退Case
 >* 通过processor.AddTask添加异步任务并启动线程池
 >* 通过tokenSource.Cancel()取消
@@ -206,7 +206,7 @@ void Hello(string name, int time = 10)
 }
 ~~~
 
-## 四、《手搓》线程池可清退的线程
+## 四、《手搓》线程池可清退线程
 ### 1. 堵塞线程池的Case
 >* ConcurrencyLevel设置为1
 >* 这次先添加10个正常的任务
@@ -219,11 +219,11 @@ void Hello(string name, int time = 10)
 >* 但是可以把当前“线程”回收,避免由此可能导致的线程池堵塞
 >* 上面的线程笔者特意加了引号,这里说的“线程”实际是一个“线程配额”,来自系统线程池
 >* 回收也是一个配额,原方法一旦开始运行只能等他自行结束
+>* 技术上停止线程也是可以实现的,但这可能导致不可预期的后果,强烈反对强行终止线程
 >* 而手搓线程要做的是找系统线程池再要一个“配额”
 >* 特别提醒不要以为不会堵塞《手搓》线程池就可以随便加超时任务
 >* 最终消耗的都是系统线程池的资源
 >* 当系统线程池耗完,整个程序就不好了,当然《手搓》线程池也会成为无源之水，无本之木
-
 
 ~~~csharp
 var options = new ReduceOptions { ConcurrencyLevel = 1 };
@@ -234,10 +234,6 @@ for (int i = 0; i < 10; i++)
     var user = "User" + i;
     processor.Add(() => Hello(user, 20));
 }
-var sw = Stopwatch.StartNew();
-Hello("Item");
-sw.Stop();
-_output.WriteLine("Item Span :" + sw.Elapsed.TotalMilliseconds);
 var bugToken = new CancellationTokenSource();
 bugToken.CancelAfter(TimeSpan.FromMilliseconds(1000));
 processor.Add(() => Hello("Bug", 2000), bugToken.Token);
@@ -358,11 +354,11 @@ void Hello(string name, int time = 10)
 ~~~
 
 ### 2. 没有token参数的任务堵塞线程池怎么办
->* 这次增加了参数ItemLife,设置为1秒
+>* 这次增加配置ItemLife(默认1小时),设置为1秒
 >* 依然是添加10个任务,插入一个Bug,再添加90个任务
 >* 这次Bug没有设置token
 >* 效果跟上次差不多,线程池阻塞1秒
->* Bug插入40之后
+>* Bug插入到40之后
 >* 也就是说ItemLife提供了全局保护
 >* 再配合前面的token,可以有效提供线程池的可用性
 >* 必须强调一下,为了测试博文中设置的线程池都很小
@@ -489,13 +485,19 @@ await Task.Delay(5000);
 // Thread8 Hello User99,02:41:34.587
 ~~~
 
+### 3. token取消单任务和ItemLife全局保护的区别
+>* token设置超时时间是从添加任务开始算的
+>* ItemLife是从单个任务开始执行开始算的
+>* 对于单个任务可能还没执行就过期了
+>* 如果线程池足够大没有任务堆积的情况,两个有效期可等同看待
+
 ## 五、追踪《手搓》线程池任务状态
 ### 1. 追踪同步任务状态的Case
 >* 添加Action任务会返回一个state
 >* 任务尚未执行IsSuccess为false
 >* 任务执行成功IsSuccess为true
 >* 另外state还有属性IsCancel,为true时表示任务已经取消
->* Exception属性表示任务执行过程总触发的异常
+>* Exception属性表示任务执行过程中触发的异常
 >* 《手搓》线程池以上特性是不是比系统线程池要方便不少
 >* 另外请大家放心,任务状态信息通过回调赋值,对性能几乎没有影响
 
@@ -646,19 +648,19 @@ static async Task<int> CountAsync(int num, CancellationToken token = default)
 ### 1. 重构后的手搓线程池
 >* 手搓线程池还是由"主线程"和真实线程池构成
 >* 区别在于"主线程"的职责的发生了变化
->* 当然"线程"也发生了很大的变化,有真实线程变为"伪线程"
+>* 当然"线程"也发生了很大的变化,由真线程变为"伪线程"
 
 ### 2. "主线程"的变化
 >* "主线程"不再执行任务,考虑到任务可能阻塞线程
 >* 如果先阻塞了主线程,继而其他线程都执行完回收后,再突发任务,会导致"饿死"线程池的不良后果
 >* 就是任务堆积,线程池没满但就是没线程在执行
->* 主线程就干3件事
+>* 主线程只做3件事
 >* 其一就是检查有无线程被阻塞,对被阻塞的线程进行回收
 >* 其二是否有任务需要执行,如果有任务就激活一个线程
 >* 其三就是休眠一段时间,通过ReduceTime配置,默认50毫秒
 
-### 3. 真实线程变为"伪线程"
->* 由于需要支持异步,如果用真实线程await异步操作,那就是浪费一个线程
+### 3. 真线程变为"伪线程"
+>* 由于需要支持异步,如果用真线程await异步操作,那就是浪费一个线程
 >* 所以重构为从系统线程池"申请"线程"配额",await的时候线程还给系统,系统可以另行安排
 >* await完成线程再次激活,当然不见得还是前面那个线程,所以变成了"伪线程",也可以说是一个线程"配额"
 

@@ -1,7 +1,7 @@
-using Hand.States;
+using Hand.Job;
 using Hand.Structural;
 
-namespace Hand.Job.Internal;
+namespace Hand.Tasks.Internal;
 
 /// <summary>
 /// 可取消异步结果
@@ -10,7 +10,7 @@ namespace Hand.Job.Internal;
 /// <param name="original"></param>
 /// <param name="token"></param>
 internal class CancelableTaskResult<TResult>(Func<CancellationToken, Task<TResult>> original, CancellationToken token)
-    : ResultCallBack<TResult>, IAsyncJobItem, IWrapper<Func<CancellationToken, Task<TResult>>>
+    : TaskCallBack<TResult>, IAsyncJobItem, IWrapper<Func<CancellationToken, Task<TResult>>>, ITaskJobResult<TResult>
 {
     #region 配置
     private readonly Func<CancellationToken, Task<TResult>> _original = original;

@@ -91,12 +91,17 @@ public class ReduceJobService<TItem>
                 // 超过阈值配置ItemLife
                 // 关闭回收超期线程
                 item.Dispose();
+                // 任务超时(失效),尝试取消
+                if (item.LastItem is ICancelable cancelable)
+                    Job.Processor.Cancel(cancelable);
             }
             else if(item.LastItem is IState<bool> state && !state.Status)
             {
-                // 任务超时(失效)
                 // 关闭回收超期线程
                 item.Dispose();
+                // 任务超时(失效),尝试取消
+                if (state is ICancelable cancelable)
+                    Job.Processor.Cancel(cancelable);
             }
         }
     }

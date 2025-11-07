@@ -1,22 +1,22 @@
-using Hand.States;
+using Hand.Job;
+using Hand.Models;
 using Hand.Structural;
 
-namespace Hand.Job.Internal;
+namespace Hand.Tasks.Internal;
 
 /// <summary>
-/// 可取消异步结果
+/// 可取消异步状态
 /// </summary>
-/// <typeparam name="TResult"></typeparam>
 /// <param name="original"></param>
 /// <param name="token"></param>
-internal class CancelableTaskResult<TResult>(Func<CancellationToken, Task<TResult>> original, CancellationToken token)
-    : ResultCallBack<TResult>, IAsyncJobItem, IWrapper<Func<CancellationToken, Task<TResult>>>
+internal class CancelableTaskState(Func<CancellationToken, Task> original, CancellationToken token)
+    : TaskCallBack<Empty>, IAsyncJobItem, IWrapper<Func<CancellationToken, Task>>, ITaskJobState
 {
     #region 配置
-    private readonly Func<CancellationToken, Task<TResult>> _original = original;
+    private readonly Func<CancellationToken, Task> _original = original;
     private readonly CancellationToken _token = token;
     /// <inheritdoc />
-    public Func<CancellationToken, Task<TResult>> Original
+    public Func<CancellationToken, Task> Original 
         => _original;
     /// <summary>
     /// 取消令牌
@@ -26,6 +26,9 @@ internal class CancelableTaskResult<TResult>(Func<CancellationToken, Task<TResul
     /// <inheritdoc />
     public bool Status
         => !_token.IsCancellationRequested;
+    /// <inheritdoc />
+    Task ITaskJobState.Task
+        => _source.Task;
     #endregion
     /// <inheritdoc />
     public async Task RunAsync(CancellationToken token)
@@ -37,6 +40,7 @@ internal class CancelableTaskResult<TResult>(Func<CancellationToken, Task<TResul
         }
         var linked = CancellationTokenSource.CreateLinkedTokenSource(_token, token);
         var task = _original(linked.Token);
-        OnSuccess(await task.ConfigureAwait(false));
+        await task.ConfigureAwait(false);
+        OnSuccess(Empty.Value);
     }
 }

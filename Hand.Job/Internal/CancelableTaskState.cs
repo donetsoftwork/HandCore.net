@@ -8,7 +8,7 @@ namespace Hand.Job.Internal;
 /// </summary>
 /// <param name="original"></param>
 /// <param name="token"></param>
-public class CancelableTaskState(Func<CancellationToken, Task> original, CancellationToken token)
+internal class CancelableTaskState(Func<CancellationToken, Task> original, CancellationToken token)
     : StateCallBack, IAsyncJobItem, IWrapper<Func<CancellationToken, Task>>
 {
     #region 配置

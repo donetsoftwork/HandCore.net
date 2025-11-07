@@ -7,7 +7,7 @@ namespace Hand.Job.Internal;
 /// 包装Action
 /// </summary>
 /// <param name="original"></param>
-public class ActionState(Action original)
+internal class ActionState(Action original)
     : StateCallBack, IJobItem, IWrapper<Action>
 {
     #region 配置

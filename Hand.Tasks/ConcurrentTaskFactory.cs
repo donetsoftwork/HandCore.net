@@ -1,5 +1,7 @@
+using Hand.Collections;
 using Hand.Job;
 using Hand.Tasks.Internal;
+using TaskItem = Hand.States.IState<bool>;
 
 namespace Hand.Tasks;
 
@@ -25,27 +27,20 @@ public class ConcurrentTaskFactory
     private ConcurrentTaskFactory(QueueTaskScheduler scheduler, TaskFactoryOptions options)
         : base(default, options.CreationOptions, options.ContinuationOptions, scheduler)
     {
-        _concurrentScheduler = scheduler;
+        _queue = scheduler.Queue;
         _job = options.CreateJob(scheduler.Queue, scheduler);
     }
     #region 配置
-    /// <summary>
-    /// 调度器
-    /// </summary>
-    private readonly QueueTaskScheduler _concurrentScheduler;
-    ///// <summary>
-    ///// 异步并发控制
-    ///// </summary>
-    //private readonly ConcurrentControl _taskControl;
+    private readonly IQueue<TaskItem> _queue;
     /// <summary>
     /// 作业服务
     /// </summary>
-    private readonly ReduceJobService<Task> _job;
+    private readonly ReduceJobService<TaskItem> _job;
     /// <summary>
-    /// 并发调度器
+    /// 作业服务
     /// </summary>
-    public QueueTaskScheduler ConcurrentScheduler
-        => _concurrentScheduler;
+    public ReduceJobService<TaskItem> Job 
+        => _job;
     #endregion
     /// <summary>
     /// 启动服务
@@ -59,60 +54,109 @@ public class ConcurrentTaskFactory
     /// <returns></returns>
     public bool Stop()
         => _job.Stop();
+    #region StartNew
+    #region State
+    /// <summary>
+    /// 启动任务
+    /// </summary>
+    /// <param name="action"></param>
+    /// <returns></returns>
+    public new Task StartNew(Action action)
+    {
+        var state = TaskWrapper.Wrap(action);
+        _queue.Enqueue(state);
+        return state.Task;
+    }
+    /// <summary>
+    /// 启动任务
+    /// </summary>
+    /// <param name="action"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public new Task StartNew(Action action, CancellationToken token)
+    {
+        var state = TaskWrapper.Wrap(action, token);
+        Processor.Enqueue(_queue, state);
+        return state.Task;
+    }
+    #endregion
+    #region Result
+    /// <summary>
+    /// 启动任务
+    /// </summary>
+    /// <param name="func"></param>
+    /// <returns></returns>
+    public new Task<TResult> StartNew<TResult>(Func<TResult> func)
+    {
+        var result = TaskWrapper.Wrap(func);
+        _queue.Enqueue(result);
+        return result.Task;
+    }
+    /// <summary>
+    /// 启动任务
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="func"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public new Task<TResult> StartNew<TResult>(Func<TResult> func, CancellationToken token)
+    {
+        var result = TaskWrapper.Wrap(func, token);
+        Processor.Enqueue(_queue, result);
+        return result.Task;
+    }
+    #endregion
+    #endregion
+    #region StartTask
+    #region State
     /// <summary>
     /// 启动异步任务
     /// </summary>
     /// <param name="func"></param>
     /// <returns></returns>
     public Task StartTask(Func<Task> func)
-        => TaskState.StartTask(this, func);
-    //{
-    //    return StartNew(() => {
-    //        var task = func();
-    //        _control.Increment();
-    //        task.ContinueWith(t =>
-    //        {
-    //            _control.Decrement();
-    //            // ContinueWith不能使用当前TaskScheduler,会导致死锁
-    //        }, TaskScheduler.Default);
-    //        //return task;
-    //    });
-    //}
-    //private ConcurrentDictionary<Task, Task> _tracks = [];
+    {
+        var state = TaskWrapper.Wrap(func);
+        _queue.Enqueue(state);
+        return state.Task;
+    }
+    /// <summary>
+    /// 添加异步
+    /// </summary>
+    /// <param name="func"></param>
+    /// <param name="token"></param>
+    public Task StartTask(Func<CancellationToken, Task> func, CancellationToken token)
+    {
+        var state = TaskWrapper.Wrap(func, token);
+        Processor.Enqueue(_queue, state);
+        return state.Task;
+    }
+    #endregion
+    #region Result
     /// <summary>
     /// 启动异步任务
     /// </summary>
     /// <param name="func"></param>
     /// <returns></returns>
     public Task<TResult> StartTask<TResult>(Func<Task<TResult>> func)
-        => FuncTaskState<TResult>.StartTask(this, func);
-    //{
-    //    var source = new TaskCompletionSource<TResult>();
-    //    StartNew(() => {
-    //        var task = func();
-    //        _control.Increment();
-    //        var continueTask = task.ContinueWith(t =>
-    //        {
-    //            _control.Decrement();
-    //            //_tracks.TryRemove(t, out _);
-    //            if (t.IsCanceled)
-    //            {
-    //                source.SetCanceled();
-    //            }
-    //            else if (t.IsFaulted)
-    //            {
-    //                source.SetException(t.Exception);
-    //            }
-    //            else
-    //            {
-    //                source.SetResult(t.Result);
-    //            }
-    //            // ContinueWith不能使用当前TaskScheduler,可能会导致死锁
-    //        }, TaskScheduler.Default);
-    //        //_tracks[task] = continueTask;
-    //        //await task;
-    //        //return task;
-    //    });
-    //    return source.Task;
-    //}
+    {
+        var result = TaskWrapper.Wrap(func);
+        _queue.Enqueue(result);
+        return result.Task;
+    }
+    /// <summary>
+    /// 添加异步
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="func"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public Task<TResult> StartTask<TResult>(Func<CancellationToken, Task<TResult>> func, CancellationToken token)
+    {
+        var result = TaskWrapper.Wrap(func, token);
+        Processor.Enqueue(_queue, result);
+        return result.Task;
+    }
+    #endregion
+    #endregion
 }

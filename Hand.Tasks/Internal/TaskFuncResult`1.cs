@@ -1,14 +1,14 @@
-using Hand.States;
+using Hand.Job;
 using Hand.Structural;
 
-namespace Hand.Job.Internal;
+namespace Hand.Tasks.Internal;
 
 /// <summary>
 /// 异步结果
 /// </summary>
 /// <param name="original"></param>
-internal class TaskResult<TResult>(Func<Task<TResult>> original)
-    : ResultCallBack<TResult>, IAsyncJobItem, IWrapper<Func<Task<TResult>>>
+internal class TaskFuncResult<TResult>(Func<Task<TResult>> original)
+    : TaskCallBack<TResult>, IAsyncJobItem, IWrapper<Func<Task<TResult>>>, ITaskJobResult<TResult>
 {
     #region 配置
     private readonly Func<Task<TResult>> _original = original;

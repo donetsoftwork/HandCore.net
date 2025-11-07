@@ -1,21 +1,22 @@
-using Hand.States;
+using Hand.Job;
 using Hand.Structural;
 
-namespace Hand.Job.Internal;
+namespace Hand.Tasks.Internal;
 
 /// <summary>
-/// 包装可取消的Action
+/// 可取消的Func的结果
 /// </summary>
+/// <typeparam name="TResult"></typeparam>
 /// <param name="original"></param>
 /// <param name="token"></param>
-internal class CancelableActionState(Action original, CancellationToken token)
-    : StateCallBack, IJobItem, IWrapper<Action>
+internal class CancelableFuncResult<TResult>(Func<TResult> original, CancellationToken token)
+    : TaskCallBack<TResult>, IJobItem, IWrapper<Func<TResult>>, ITaskJobResult<TResult>
 {
     #region 配置
-    private readonly Action _original = original;
+    private readonly Func<TResult> _original = original;
     private readonly CancellationToken _token = token;
     /// <inheritdoc />
-    public Action Original
+    public Func<TResult> Original
         => _original;
     /// <summary>
     /// 取消令牌
@@ -34,7 +35,6 @@ internal class CancelableActionState(Action original, CancellationToken token)
             OnCancel();
             return;
         }
-        _original();
-        OnSuccess();
+        OnSuccess(_original());
     }
 }

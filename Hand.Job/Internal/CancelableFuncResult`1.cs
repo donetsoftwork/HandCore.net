@@ -9,7 +9,7 @@ namespace Hand.Job.Internal;
 /// <typeparam name="TResult"></typeparam>
 /// <param name="original"></param>
 /// <param name="token"></param>
-public class CancelableFuncResult<TResult>(Func<TResult> original, CancellationToken token)
+internal class CancelableFuncResult<TResult>(Func<TResult> original, CancellationToken token)
     : ResultCallBack<TResult>, IJobItem, IWrapper<Func<TResult>>
 {
     #region 配置

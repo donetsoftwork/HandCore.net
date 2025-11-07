@@ -1,7 +1,8 @@
-using Hand.States;
+using Hand.Job;
+using Hand.Models;
 using Hand.Structural;
 
-namespace Hand.Job.Internal;
+namespace Hand.Tasks.Internal;
 
 /// <summary>
 /// 包装可取消的Action
@@ -9,7 +10,7 @@ namespace Hand.Job.Internal;
 /// <param name="original"></param>
 /// <param name="token"></param>
 internal class CancelableActionState(Action original, CancellationToken token)
-    : StateCallBack, IJobItem, IWrapper<Action>
+    : TaskCallBack<Empty>, IJobItem, IWrapper<Action>, ITaskJobState
 {
     #region 配置
     private readonly Action _original = original;
@@ -25,6 +26,9 @@ internal class CancelableActionState(Action original, CancellationToken token)
     /// <inheritdoc />
     public bool Status
         => !_token.IsCancellationRequested;
+    /// <inheritdoc />
+    Task ITaskJobState.Task
+        => _source.Task;
     #endregion
     /// <inheritdoc />
     public void Run()
@@ -35,6 +39,6 @@ internal class CancelableActionState(Action original, CancellationToken token)
             return;
         }
         _original();
-        OnSuccess();
+        OnSuccess(Empty.Value);
     }
 }
