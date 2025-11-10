@@ -6,6 +6,18 @@ namespace TaskTests.Tasks;
 public class TaskFactoryTests(ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
+
+    [Fact]
+    public async void Action()
+    {
+        var sw = Stopwatch.StartNew();
+        var task = Task.Factory.StartNew(() => Hello("张三", 1000));
+        var task2 = Task.Factory.StartNew(() => Hello("李四", 1000));
+        var task3 = Task.Factory.StartNew(() => Hello("王二", 1000));
+        await Task.WhenAll(task, task2, task3);
+        sw.Stop();
+        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.Elapsed.TotalMilliseconds}");
+    }
     [Fact]
     public async void ActionTimeout()
     {
@@ -84,10 +96,5 @@ public class TaskFactoryTests(ITestOutputHelper output)
     {
         Thread.Sleep(time);
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Hello {name},{DateTime.Now:HH:mm:ss.fff}");
-    }
-    async Task HelloAsync(string name, CancellationToken token = default)
-    {
-        await Task.Delay(10, token);
-        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} HelloAsync {name},{DateTime.Now:HH:mm:ss.fff}");
     }
 }

@@ -34,8 +34,6 @@ public class ReduceJobService<TItem>
     /// </summary>
     public TimeSpan ReduceTime 
         => _reduceTime;
-    #endregion
-    #region 配置
     /// <summary>
     /// 服务池
     /// </summary>

@@ -1,3 +1,4 @@
+using Hand.Job;
 using Hand.Tasks;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -15,7 +16,7 @@ public class FriendTests(ITestOutputHelper output)
     public async void TestRun()
     {
         var sw = Stopwatch.StartNew();
-        var factory = new ConcurrentTaskFactory(new TaskFactoryOptions { ConcurrencyLevel = 3 });
+        var factory = new ConcurrentTaskFactory(new ReduceOptions { ConcurrencyLevel = 3 });
         List<Task<int>> tasks = new(30);
         for (int i = 0; i < 10; i++)
         {
@@ -36,32 +37,35 @@ public class FriendTests(ITestOutputHelper output)
 
     public async Task<int> One(int i, CancellationToken token = default)
     {
-        _output.WriteLine($"One Start {i}:{DateTime.Now:HH:mm:ss.fff}");
+        token.ThrowIfCancellationRequested();
+        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} One Start {i}:{DateTime.Now:HH:mm:ss.fff}");
         await Task.Delay(100, token);
-        //token.ThrowIfCancellationRequested();
-        _output.WriteLine($"One End {i}:{DateTime.Now:HH:mm:ss.fff}");
+        token.ThrowIfCancellationRequested();
+        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} One End {i}:{DateTime.Now:HH:mm:ss.fff}");
         return 1;
     }
     public async Task<int> Two(int i, CancellationToken token = default)
     {
-        _output.WriteLine($"Two Start {i}:{DateTime.Now:HH:mm:ss.fff}");
+        token.ThrowIfCancellationRequested();
+        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Two Start {i}:{DateTime.Now:HH:mm:ss.fff}");
         await Task.Delay(100, token);
-        //token.ThrowIfCancellationRequested();
-        _output.WriteLine($"Two End {i}:{DateTime.Now:HH:mm:ss.fff}");
+        token.ThrowIfCancellationRequested();
+        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Two End {i}:{DateTime.Now:HH:mm:ss.fff}");
         return 2;
     }
     public async Task<int> Three(int i, CancellationToken token = default)
     {
-        _output.WriteLine($"Three Start {i}:{DateTime.Now:HH:mm:ss.fff}");
+        token.ThrowIfCancellationRequested();
+        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Three Start {i}:{DateTime.Now:HH:mm:ss.fff}");
         await Task.Delay(100, token);
-        //token.ThrowIfCancellationRequested();
-        _output.WriteLine($"Three End {i}:{DateTime.Now:HH:mm:ss.fff}");
+        token.ThrowIfCancellationRequested();
+        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Three End {i}:{DateTime.Now:HH:mm:ss.fff}");
         return 3;
     }
     [Fact]
     public async void Sum()
     {        
-        var factory = new ConcurrentTaskFactory(new TaskFactoryOptions { ConcurrencyLevel = 3 });
+        var factory = new ConcurrentTaskFactory(new ReduceOptions { ConcurrencyLevel = 3 });
         var tokenSource = new CancellationTokenSource();
         var sw = Stopwatch.StartNew();
         var one = factory.StartTask(() => One(1, tokenSource.Token));
@@ -81,7 +85,7 @@ public class FriendTests(ITestOutputHelper output)
     [Fact]
     public async void Cancel()
     {
-        var factory = new ConcurrentTaskFactory(new TaskFactoryOptions { ConcurrencyLevel = 10 });
+        var factory = new ConcurrentTaskFactory(new ReduceOptions { ConcurrencyLevel = 10 });
         var tokenSource = new CancellationTokenSource(100);
         var sw = Stopwatch.StartNew();
         var onetTask = factory.StartTask(() => One(1, tokenSource.Token));
@@ -108,7 +112,7 @@ public class FriendTests(ITestOutputHelper output)
     [Fact]
     public async void Partial()
     {
-        var factory = new ConcurrentTaskFactory(new TaskFactoryOptions { ConcurrencyLevel = 1 });
+        var factory = new ConcurrentTaskFactory(new ReduceOptions { ConcurrencyLevel = 1 });
         var tasks = new List<Task<int>>(100);
         var tokenSource = new CancellationTokenSource(9000);
         for (var i = 0; i < 10; i++)

@@ -13,19 +13,20 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void ActionState()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
+        var options = new ReduceOptions { ConcurrencyLevel = 3 };
         var factory = new ConcurrentTaskFactory(options);
         var sw = Stopwatch.StartNew();
         var task = factory.StartNew(() => Hello("张三", 1000));
-        Assert.NotNull(task);
-        await task;
+        var task2 = factory.StartNew(() => Hello("李四", 1000));
+        var task3 = factory.StartNew(() => Hello("王二", 1000));
+        await Task.WhenAll(task, task2, task3);
         sw.Stop();
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.Elapsed.TotalMilliseconds}");
     }
     [Fact]
     public async void ActionItemLife()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1, ItemLife = TimeSpan.FromSeconds(1) };
+        var options = new ReduceOptions { ConcurrencyLevel = 1, ItemLife = TimeSpan.FromSeconds(1) };
         var factory = new ConcurrentTaskFactory(options);
         var sw = Stopwatch.StartNew();
         var task = factory.StartNew(() => Hello("张三", 2000));
@@ -46,19 +47,25 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void TaskState()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
+        var options = new ReduceOptions { ConcurrencyLevel = 3 };
         var factory = new ConcurrentTaskFactory(options);
-        var task = factory.StartTask(() => HelloAsync("张三"));
-        Assert.NotNull(task);
-        await task;
+        var sw = Stopwatch.StartNew();
+        var task = factory.StartTask(() => HelloAsync("张三", 1000));
+        var task2 = factory.StartTask(() => HelloAsync("李四", 1000));
+        var task3 = factory.StartTask(() => HelloAsync("王二", 1000));
+        await Task.WhenAll(task, task2, task3);
+        sw.Stop();
+        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.Elapsed.TotalMilliseconds}");
     }
     [Fact]
     public async void TaskItemLife()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1, ItemLife = TimeSpan.FromSeconds(1) };
+        var options = new ReduceOptions { ConcurrencyLevel = 1, ItemLife = TimeSpan.FromSeconds(1) };
         var factory = new ConcurrentTaskFactory(options);
+        var tokenSource = new CancellationTokenSource();
+        tokenSource.CancelAfter(TimeSpan.FromSeconds(1));
         var sw = Stopwatch.StartNew();
-        var task = factory.StartTask(() => HelloAsync("张三", 2000));
+        var task = factory.StartTask(() => HelloAsync("张三", 2000, tokenSource.Token));
         Assert.NotNull(task);
         try
         {
@@ -76,7 +83,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void FuncResult()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
+        var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
         var task = factory.StartNew(() => Count(3));
         Assert.NotNull(task);
@@ -86,7 +93,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void TaskResult()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
+        var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
         var tokenSource = new CancellationTokenSource();
         tokenSource.CancelAfter(TimeSpan.FromSeconds(1));
@@ -97,7 +104,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void ActionCancel()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
+        var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
         var tokenSource = new CancellationTokenSource();
         var sw = Stopwatch.StartNew();
@@ -122,7 +129,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void ActionTimeout()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
+        var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
         var tokenSource = new CancellationTokenSource();
         var sw = Stopwatch.StartNew();
@@ -146,7 +153,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void TaskCancel()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
+        var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
         var tokenSource = new CancellationTokenSource();
         var task = factory.StartTask((t) => HelloAsync("张三", 500, t), tokenSource.Token);
@@ -156,7 +163,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void TaskCancel0()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
+        var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
         var tokenSource = new CancellationTokenSource();
         var sw = Stopwatch.StartNew();
@@ -181,7 +188,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void TestTask()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
+        var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
         var task = factory.StartNew(() => Multiply(2, 3));
         var result = await task;
@@ -190,7 +197,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void Cancel()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
+        var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
         var tokenSource = new CancellationTokenSource();
         tokenSource.CancelAfter(TimeSpan.FromMicroseconds(1));
@@ -200,7 +207,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void TestConcurrent0()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 10 };
+        var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var factory = new ConcurrentTaskFactory(options);
         Start(factory);
         await Task.Delay(5000);
@@ -208,7 +215,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void OneByone()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
+        var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
         Start(factory);
         await Task.Delay(10000);
@@ -216,7 +223,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     [Fact]
     public async void TestConcurrent()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 10 };
+        var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var factory = new ConcurrentTaskFactory(options);
         Start(factory);
         Wait(factory.Job);
@@ -225,6 +232,30 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         await Task.Delay(5000);
     }
 
+    [Fact]
+    public async void TaskOneByone()
+    {
+        var options = new ReduceOptions { ConcurrencyLevel = 1 };
+        var factory = new ConcurrentTaskFactory(options);
+        StartTask(factory);
+        await Task.Delay(10000);
+    }
+    [Fact]
+    public async void TaskConcurrent()
+    {
+        var options = new ReduceOptions { ConcurrencyLevel = 10 };
+        var factory = new ConcurrentTaskFactory(options);
+        StartTask(factory);
+        await Task.Delay(10000);
+    }
+    private void StartTask(ConcurrentTaskFactory factory)
+    {
+        for (int i = 1; i < 100; i++)
+        {
+            var user = "User" + i;
+            factory.StartTask(() => HelloAsync(user));
+        }
+    }
 
     private void Start(TaskFactory factory)
     {

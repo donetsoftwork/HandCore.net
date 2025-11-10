@@ -35,7 +35,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
     [Fact]
     public async void TestConcurrent0()
     {
-        var options = new TaskFactoryOptions { ConcurrencyLevel = 10 };
+        var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var factory = new ConcurrentTaskFactory(options);
         Start(factory);
         await Task.Delay(10000);

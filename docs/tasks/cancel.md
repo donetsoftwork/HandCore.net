@@ -198,6 +198,9 @@ _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.E
 >* 耗时1秒,两个任务执行成功,并触发取消异常
 >* 第3个并未实际执行,这里要归功于token参数起到了拦截的作用
 >* 系统TaskFactory没有控制异步和并发的逻辑就不对比
+>* 另外需要特别强调《手搓》TaskFactory支持调用异步,但必须是使用StartTask方法
+>* 如果使用StartNew方法意味着把异步方法当同步执行
+>* 就不能控制并发了,只是简单触发之后在系统线程池里执行而已
 
 ~~~csharp
 var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
@@ -238,117 +241,131 @@ async Task HelloAsync(string name, int time = 10, CancellationToken token = defa
 ### 2. 单并发控制异步任务的Case
 >* ConcurrencyLevel设置为1
 >* 手搓线程池就可以让它摆出一字长蛇阵
->* 并发控制是相当的稳
+>* 虽然线程Id不只1个,但都是间隔相同时间(误差不超过1毫秒)
+>* 并发控制那是相当的稳
 
 ~~~csharp
 var options = new TaskFactoryOptions { ConcurrencyLevel = 1 };
 var factory = new ConcurrentTaskFactory(options);
-Start(factory);
+StartTask(factory);
 await Task.Delay(10000);
 
-private void Start(TaskFactory factory)
+private void StartTask(ConcurrentTaskFactory factory)
 {
-    for (int i = 1; i < 10; i++)
+    for (int i = 1; i < 100; i++)
     {
-        for (int j = 1; j < 10; j++)
-        {
-            int a = i, b = j;
-            factory.StartNew(() => Multiply(a, b));
-        }
+        var user = "User" + i;
+        factory.StartTask(() => HelloAsync(user));
     }
 }
-int Multiply(int a, int b)
+async Task HelloAsync(string name, int time = 10, CancellationToken token = default)
 {
-    var result = a * b;
-    _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} {a} x {b} = {result},{DateTime.Now:HH:mm:ss.fff}");
-    Thread.Sleep(100);
-    return result;
+    await Task.Delay(time, token);
+    _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} HelloAsync {name},{DateTime.Now:HH:mm:ss.fff}");
 }
 
-// Thread11 1 x 1 = 1,08:55:05.898
-// Thread11 1 x 2 = 2,08:55:06.005
-// Thread11 1 x 3 = 3,08:55:06.117
-// Thread11 1 x 4 = 4,08:55:06.229
-// Thread11 1 x 5 = 5,08:55:06.341
-// Thread11 1 x 6 = 6,08:55:06.453
-// Thread11 1 x 7 = 7,08:55:06.565
-// Thread11 1 x 8 = 8,08:55:06.677
-// Thread11 1 x 9 = 9,08:55:06.789
-// Thread11 2 x 1 = 2,08:55:06.900
-// Thread11 2 x 2 = 4,08:55:07.011
-// Thread11 2 x 3 = 6,08:55:07.123
-// Thread11 2 x 4 = 8,08:55:07.235
-// Thread11 2 x 5 = 10,08:55:07.347
-// Thread11 2 x 6 = 12,08:55:07.459
-// Thread11 2 x 7 = 14,08:55:07.571
-// Thread11 2 x 8 = 16,08:55:07.683
-// Thread11 2 x 9 = 18,08:55:07.795
-// Thread11 3 x 1 = 3,08:55:07.906
-// Thread11 3 x 2 = 6,08:55:08.017
-// Thread11 3 x 3 = 9,08:55:08.129
-// Thread11 3 x 4 = 12,08:55:08.240
-// Thread11 3 x 5 = 15,08:55:08.351
-// Thread11 3 x 6 = 18,08:55:08.463
-// Thread11 3 x 7 = 21,08:55:08.575
-// Thread11 3 x 8 = 24,08:55:08.687
-// Thread11 3 x 9 = 27,08:55:08.799
-// Thread11 4 x 1 = 4,08:55:08.910
-// Thread11 4 x 2 = 8,08:55:09.022
-// Thread11 4 x 3 = 12,08:55:09.134
-// Thread11 4 x 4 = 16,08:55:09.246
-// Thread11 4 x 5 = 20,08:55:09.358
-// Thread11 4 x 6 = 24,08:55:09.469
-// Thread11 4 x 7 = 28,08:55:09.581
-// Thread11 4 x 8 = 32,08:55:09.693
-// Thread11 4 x 9 = 36,08:55:09.805
-// Thread11 5 x 1 = 5,08:55:09.917
-// Thread11 5 x 2 = 10,08:55:10.029
-// Thread11 5 x 3 = 15,08:55:10.140
-// Thread11 5 x 4 = 20,08:55:10.252
-// Thread11 5 x 5 = 25,08:55:10.364
-// Thread11 5 x 6 = 30,08:55:10.475
-// Thread11 5 x 7 = 35,08:55:10.587
-// Thread11 5 x 8 = 40,08:55:10.699
-// Thread11 5 x 9 = 45,08:55:10.810
-// Thread11 6 x 1 = 6,08:55:10.922
-// Thread11 6 x 2 = 12,08:55:11.034
-// Thread11 6 x 3 = 18,08:55:11.146
-// Thread11 6 x 4 = 24,08:55:11.257
-// Thread11 6 x 5 = 30,08:55:11.369
-// Thread11 6 x 6 = 36,08:55:11.481
-// Thread11 6 x 7 = 42,08:55:11.592
-// Thread11 6 x 8 = 48,08:55:11.704
-// Thread11 6 x 9 = 54,08:55:11.816
-// Thread11 7 x 1 = 7,08:55:11.928
-// Thread11 7 x 2 = 14,08:55:12.038
-// Thread11 7 x 3 = 21,08:55:12.150
-// Thread11 7 x 4 = 28,08:55:12.262
-// Thread11 7 x 5 = 35,08:55:12.374
-// Thread11 7 x 6 = 42,08:55:12.486
-// Thread11 7 x 7 = 49,08:55:12.598
-// Thread11 7 x 8 = 56,08:55:12.710
-// Thread11 7 x 9 = 63,08:55:12.822
-// Thread11 8 x 1 = 8,08:55:12.934
-// Thread11 8 x 2 = 16,08:55:13.046
-// Thread11 8 x 3 = 24,08:55:13.158
-// Thread11 8 x 4 = 32,08:55:13.270
-// Thread11 8 x 5 = 40,08:55:13.382
-// Thread11 8 x 6 = 48,08:55:13.494
-// Thread11 8 x 7 = 56,08:55:13.606
-// Thread11 8 x 8 = 64,08:55:13.718
-// Thread11 8 x 9 = 72,08:55:13.830
-// Thread11 9 x 1 = 9,08:55:13.942
-// Thread11 9 x 2 = 18,08:55:14.054
-// Thread11 9 x 3 = 27,08:55:14.166
-// Thread11 9 x 4 = 36,08:55:14.278
-// Thread11 9 x 5 = 45,08:55:14.390
-// Thread11 9 x 6 = 54,08:55:14.502
-// Thread11 9 x 7 = 63,08:55:14.614
-// Thread11 9 x 8 = 72,08:55:14.725
-// Thread11 9 x 9 = 81,08:55:14.836
+// Thread11 HelloAsync User1,09:41:51.473
+// Thread11 HelloAsync User2,09:41:51.489
+// Thread11 HelloAsync User3,09:41:51.505
+// Thread10 HelloAsync User4,09:41:51.521
+// Thread10 HelloAsync User5,09:41:51.537
+// Thread10 HelloAsync User6,09:41:51.553
+// Thread10 HelloAsync User7,09:41:51.569
+// Thread11 HelloAsync User8,09:41:51.585
+// Thread11 HelloAsync User9,09:41:51.600
+// Thread11 HelloAsync User10,09:41:51.616
+// Thread11 HelloAsync User11,09:41:51.632
+// Thread10 HelloAsync User12,09:41:51.648
+// Thread10 HelloAsync User13,09:41:51.664
+// Thread10 HelloAsync User14,09:41:51.680
+// Thread10 HelloAsync User15,09:41:51.696
+// Thread11 HelloAsync User16,09:41:51.712
+// Thread11 HelloAsync User17,09:41:51.728
+// Thread11 HelloAsync User18,09:41:51.744
+// Thread11 HelloAsync User19,09:41:51.760
+// Thread11 HelloAsync User20,09:41:51.776
+// Thread11 HelloAsync User21,09:41:51.792
+// Thread11 HelloAsync User22,09:41:51.808
+// Thread11 HelloAsync User23,09:41:51.824
+// Thread10 HelloAsync User24,09:41:51.840
+// Thread10 HelloAsync User25,09:41:51.856
+// Thread10 HelloAsync User26,09:41:51.872
+// Thread10 HelloAsync User27,09:41:51.888
+// Thread10 HelloAsync User28,09:41:51.904
+// Thread10 HelloAsync User29,09:41:51.920
+// Thread10 HelloAsync User30,09:41:51.936
+// Thread10 HelloAsync User31,09:41:51.952
+// Thread11 HelloAsync User32,09:41:51.968
+// Thread11 HelloAsync User33,09:41:51.984
+// Thread11 HelloAsync User34,09:41:52.000
+// Thread11 HelloAsync User35,09:41:52.016
+// Thread10 HelloAsync User36,09:41:52.032
+// Thread10 HelloAsync User37,09:41:52.048
+// Thread10 HelloAsync User38,09:41:52.064
+// Thread10 HelloAsync User39,09:41:52.080
+// Thread10 HelloAsync User40,09:41:52.096
+// Thread10 HelloAsync User41,09:41:52.112
+// Thread10 HelloAsync User42,09:41:52.128
+// Thread10 HelloAsync User43,09:41:52.144
+// Thread11 HelloAsync User44,09:41:52.160
+// Thread11 HelloAsync User45,09:41:52.176
+// Thread11 HelloAsync User46,09:41:52.192
+// Thread11 HelloAsync User47,09:41:52.208
+// Thread10 HelloAsync User48,09:41:52.224
+// Thread10 HelloAsync User49,09:41:52.240
+// Thread10 HelloAsync User50,09:41:52.256
+// Thread10 HelloAsync User51,09:41:52.272
+// Thread10 HelloAsync User52,09:41:52.288
+// Thread10 HelloAsync User53,09:41:52.303
+// Thread10 HelloAsync User54,09:41:52.319
+// Thread10 HelloAsync User55,09:41:52.335
+// Thread11 HelloAsync User56,09:41:52.351
+// Thread11 HelloAsync User57,09:41:52.367
+// Thread11 HelloAsync User58,09:41:52.383
+// Thread10 HelloAsync User59,09:41:52.399
+// Thread10 HelloAsync User60,09:41:52.415
+// Thread10 HelloAsync User61,09:41:52.431
+// Thread10 HelloAsync User62,09:41:52.447
+// Thread10 HelloAsync User63,09:41:52.463
+// Thread11 HelloAsync User64,09:41:52.479
+// Thread11 HelloAsync User65,09:41:52.495
+// Thread11 HelloAsync User66,09:41:52.511
+// Thread11 HelloAsync User67,09:41:52.527
+// Thread11 HelloAsync User68,09:41:52.543
+// Thread11 HelloAsync User69,09:41:52.559
+// Thread11 HelloAsync User70,09:41:52.575
+// Thread11 HelloAsync User71,09:41:52.591
+// Thread10 HelloAsync User72,09:41:52.607
+// Thread10 HelloAsync User73,09:41:52.622
+// Thread10 HelloAsync User74,09:41:52.638
+// Thread10 HelloAsync User75,09:41:52.654
+// Thread11 HelloAsync User76,09:41:52.670
+// Thread11 HelloAsync User77,09:41:52.686
+// Thread11 HelloAsync User78,09:41:52.702
+// Thread11 HelloAsync User79,09:41:52.718
+// Thread10 HelloAsync User80,09:41:52.734
+// Thread10 HelloAsync User81,09:41:52.750
+// Thread10 HelloAsync User82,09:41:52.766
+// Thread10 HelloAsync User83,09:41:52.782
+// Thread10 HelloAsync User84,09:41:52.798
+// Thread10 HelloAsync User85,09:41:52.814
+// Thread10 HelloAsync User86,09:41:52.830
+// Thread10 HelloAsync User87,09:41:52.846
+// Thread11 HelloAsync User88,09:41:52.862
+// Thread11 HelloAsync User89,09:41:52.878
+// Thread10 HelloAsync User90,09:41:52.894
+// Thread10 HelloAsync User91,09:41:52.910
+// Thread11 HelloAsync User92,09:41:52.926
+// Thread11 HelloAsync User93,09:41:52.942
+// Thread11 HelloAsync User94,09:41:52.958
+// Thread10 HelloAsync User95,09:41:52.974
+// Thread10 HelloAsync User96,09:41:52.990
+// Thread10 HelloAsync User97,09:41:53.006
+// Thread10 HelloAsync User98,09:41:53.022
+// Thread10 HelloAsync User99,09:41:53.038
 ~~~
 
-### 2. 多并发控制异步任务的Case
+### 3. 多并发控制异步任务的Case
 >* ConcurrencyLevel设置为10
 >* 清晰可见的10个并发
 >* 虽然线程数量是在线程池里是从0开始按指数关系(0,1,2,4,8)递增到ConcurrencyLevel配置
@@ -357,92 +374,230 @@ int Multiply(int a, int b)
 ~~~csharp
 var options = new TaskFactoryOptions { ConcurrencyLevel = 10 };
 var factory = new ConcurrentTaskFactory(options);
-Start(factory);
+StartTask(factory);
 await Task.Delay(10000);
 
-// Thread10 1 x 2 = 2,09:05:14.810
-// Thread35 1 x 7 = 7,09:05:14.810
-// Thread32 1 x 4 = 4,09:05:14.810
-// Thread38 2 x 1 = 2,09:05:14.810
-// Thread33 1 x 5 = 5,09:05:14.810
-// Thread11 1 x 1 = 1,09:05:14.810
-// Thread36 1 x 8 = 8,09:05:14.810
-// Thread37 1 x 9 = 9,09:05:14.810
-// Thread34 1 x 6 = 6,09:05:14.810
-// Thread31 1 x 3 = 3,09:05:14.810
-// Thread34 2 x 4 = 8,09:05:14.914
-// Thread35 3 x 1 = 3,09:05:14.914
-// Thread37 2 x 8 = 16,09:05:14.914
-// Thread38 2 x 7 = 14,09:05:14.914
-// Thread33 2 x 5 = 10,09:05:14.914
-// Thread10 2 x 3 = 6,09:05:14.914
-// Thread11 2 x 6 = 12,09:05:14.914
-// Thread32 3 x 2 = 6,09:05:14.914
-// Thread36 2 x 9 = 18,09:05:14.914
-// Thread31 2 x 2 = 4,09:05:14.914
-// Thread11 3 x 3 = 9,09:05:15.026
-// Thread10 3 x 5 = 15,09:05:15.026
-// Thread31 3 x 4 = 12,09:05:15.026
-// Thread36 4 x 1 = 4,09:05:15.026
-// Thread34 3 x 9 = 27,09:05:15.026
-// Thread35 4 x 3 = 12,09:05:15.026
-// Thread38 3 x 8 = 24,09:05:15.026
-// Thread32 4 x 2 = 8,09:05:15.026
-// Thread33 3 x 7 = 21,09:05:15.026
-// Thread37 3 x 6 = 18,09:05:15.026
-// Thread33 4 x 5 = 20,09:05:15.138
-// Thread11 4 x 9 = 36,09:05:15.138
-// Thread31 5 x 2 = 10,09:05:15.138
-// Thread37 4 x 4 = 16,09:05:15.138
-// Thread35 5 x 4 = 20,09:05:15.138
-// Thread38 4 x 8 = 32,09:05:15.138
-// Thread10 5 x 3 = 15,09:05:15.138
-// Thread32 4 x 7 = 28,09:05:15.138
-// Thread34 4 x 6 = 24,09:05:15.138
-// Thread36 5 x 1 = 5,09:05:15.138
-// Thread32 6 x 1 = 6,09:05:15.250
-// Thread36 5 x 6 = 30,09:05:15.250
-// Thread11 5 x 8 = 40,09:05:15.250
-// Thread35 5 x 9 = 45,09:05:15.250
-// Thread38 6 x 4 = 24,09:05:15.250
-// Thread33 6 x 5 = 30,09:05:15.250
-// Thread10 5 x 5 = 25,09:05:15.250
-// Thread34 6 x 3 = 18,09:05:15.250
-// Thread31 6 x 2 = 12,09:05:15.250
-// Thread37 5 x 7 = 35,09:05:15.250
-// Thread35 7 x 1 = 7,09:05:15.362
-// Thread10 7 x 4 = 28,09:05:15.362
-// Thread37 7 x 3 = 21,09:05:15.362
-// Thread33 6 x 6 = 36,09:05:15.362
-// Thread34 7 x 5 = 35,09:05:15.362
-// Thread36 7 x 2 = 14,09:05:15.362
-// Thread38 7 x 6 = 42,09:05:15.362
-// Thread31 6 x 8 = 48,09:05:15.362
-// Thread32 6 x 9 = 54,09:05:15.362
-// Thread11 6 x 7 = 42,09:05:15.362
-// Thread11 7 x 9 = 63,09:05:15.474
-// Thread35 8 x 2 = 16,09:05:15.474
-// Thread36 8 x 1 = 8,09:05:15.474
-// Thread10 7 x 7 = 49,09:05:15.474
-// Thread32 8 x 3 = 24,09:05:15.474
-// Thread31 8 x 6 = 48,09:05:15.474
-// Thread37 8 x 5 = 40,09:05:15.474
-// Thread34 8 x 7 = 56,09:05:15.474
-// Thread38 7 x 8 = 56,09:05:15.474
-// Thread33 8 x 4 = 32,09:05:15.474
-// Thread34 8 x 9 = 72,09:05:15.586
-// Thread37 9 x 3 = 27,09:05:15.586
-// Thread33 9 x 2 = 18,09:05:15.586
-// Thread35 9 x 8 = 72,09:05:15.586
-// Thread32 9 x 1 = 9,09:05:15.586
-// Thread31 9 x 5 = 45,09:05:15.586
-// Thread11 8 x 8 = 64,09:05:15.586
-// Thread10 9 x 6 = 54,09:05:15.586
-// Thread38 9 x 7 = 63,09:05:15.586
-// Thread36 9 x 4 = 36,09:05:15.586
-// Thread11 9 x 9 = 81,09:05:15.698
+// Thread32 HelloAsync User1,09:45:23.848
+// Thread34 HelloAsync User5,09:45:23.848
+// Thread11 HelloAsync User6,09:45:23.848
+// Thread35 HelloAsync User10,09:45:23.848
+// Thread33 HelloAsync User2,09:45:23.848
+// Thread10 HelloAsync User7,09:45:23.848
+// Thread31 HelloAsync User8,09:45:23.848
+// Thread36 HelloAsync User3,09:45:23.848
+// Thread38 HelloAsync User4,09:45:23.848
+// Thread37 HelloAsync User9,09:45:23.848
+// Thread38 HelloAsync User19,09:45:23.864
+// Thread36 HelloAsync User18,09:45:23.864
+// Thread33 HelloAsync User17,09:45:23.864
+// Thread34 HelloAsync User16,09:45:23.864
+// Thread31 HelloAsync User14,09:45:23.864
+// Thread36 HelloAsync User12,09:45:23.864
+// Thread38 HelloAsync User11,09:45:23.864
+// Thread33 HelloAsync User15,09:45:23.864
+// Thread34 HelloAsync User13,09:45:23.864
+// Thread35 HelloAsync User20,09:45:23.864
+// Thread35 HelloAsync User30,09:45:23.880
+// Thread34 HelloAsync User25,09:45:23.880
+// Thread34 HelloAsync User29,09:45:23.880
+// Thread35 HelloAsync User26,09:45:23.880
+// Thread34 HelloAsync User24,09:45:23.880
+// Thread34 HelloAsync User23,09:45:23.880
+// Thread33 HelloAsync User28,09:45:23.880
+// Thread35 HelloAsync User22,09:45:23.880
+// Thread36 HelloAsync User27,09:45:23.880
+// Thread38 HelloAsync User21,09:45:23.880
+// Thread34 HelloAsync User40,09:45:23.896
+// Thread38 HelloAsync User39,09:45:23.896
+// Thread36 HelloAsync User37,09:45:23.896
+// Thread34 HelloAsync User36,09:45:23.896
+// Thread34 HelloAsync User32,09:45:23.896
+// Thread35 HelloAsync User34,09:45:23.896
+// Thread38 HelloAsync User31,09:45:23.896
+// Thread36 HelloAsync User35,09:45:23.896
+// Thread31 HelloAsync User33,09:45:23.896
+// Thread33 HelloAsync User38,09:45:23.896
+// Thread33 HelloAsync User50,09:45:23.912
+// Thread31 HelloAsync User49,09:45:23.912
+// Thread36 HelloAsync User46,09:45:23.912
+// Thread38 HelloAsync User48,09:45:23.912
+// Thread31 HelloAsync User44,09:45:23.912
+// Thread33 HelloAsync User47,09:45:23.912
+// Thread31 HelloAsync User42,09:45:23.912
+// Thread35 HelloAsync User45,09:45:23.912
+// Thread33 HelloAsync User41,09:45:23.912
+// Thread34 HelloAsync User43,09:45:23.912
+// Thread35 HelloAsync User59,09:45:23.928
+// Thread34 HelloAsync User60,09:45:23.928
+// Thread31 HelloAsync User54,09:45:23.928
+// Thread33 HelloAsync User58,09:45:23.928
+// Thread31 HelloAsync User55,09:45:23.928
+// Thread35 HelloAsync User56,09:45:23.928
+// Thread36 HelloAsync User57,09:45:23.928
+// Thread34 HelloAsync User51,09:45:23.928
+// Thread33 HelloAsync User52,09:45:23.928
+// Thread38 HelloAsync User53,09:45:23.928
+// Thread38 HelloAsync User70,09:45:23.944
+// Thread36 HelloAsync User69,09:45:23.944
+// Thread34 HelloAsync User66,09:45:23.944
+// Thread35 HelloAsync User65,09:45:23.944
+// Thread38 HelloAsync User67,09:45:23.944
+// Thread35 HelloAsync User63,09:45:23.944
+// Thread36 HelloAsync User64,09:45:23.944
+// Thread34 HelloAsync User61,09:45:23.944
+// Thread33 HelloAsync User68,09:45:23.944
+// Thread31 HelloAsync User62,09:45:23.944
+// Thread35 HelloAsync User80,09:45:23.960
+// Thread33 HelloAsync User79,09:45:23.960
+// Thread31 HelloAsync User75,09:45:23.960
+// Thread33 HelloAsync User78,09:45:23.960
+// Thread38 HelloAsync User76,09:45:23.960
+// Thread31 HelloAsync User72,09:45:23.960
+// Thread31 HelloAsync User71,09:45:23.960
+// Thread33 HelloAsync User73,09:45:23.960
+// Thread35 HelloAsync User77,09:45:23.960
+// Thread34 HelloAsync User74,09:45:23.960
+// Thread34 HelloAsync User90,09:45:23.976
+// Thread35 HelloAsync User85,09:45:23.976
+// Thread33 HelloAsync User87,09:45:23.976
+// Thread34 HelloAsync User88,09:45:23.976
+// Thread34 HelloAsync User83,09:45:23.976
+// Thread34 HelloAsync User81,09:45:23.976
+// Thread35 HelloAsync User82,09:45:23.976
+// Thread38 HelloAsync User86,09:45:23.976
+// Thread33 HelloAsync User84,09:45:23.976
+// Thread31 HelloAsync User89,09:45:23.976
+// Thread31 HelloAsync User99,09:45:23.992
+// Thread38 HelloAsync User98,09:45:23.992
+// Thread33 HelloAsync User96,09:45:23.992
+// Thread35 HelloAsync User97,09:45:23.992
+// Thread34 HelloAsync User94,09:45:23.992
+// Thread33 HelloAsync User91,09:45:23.992
+// Thread36 HelloAsync User92,09:45:23.992
+// Thread31 HelloAsync User93,09:45:23.992
+// Thread32 HelloAsync User95,09:45:23.992
 ~~~
 
+### 4. 网友@舟翅桐的Case也再跑一次
+>* 这个Case是他在[上一篇博文](https://www.cnblogs.com/xiangji/p/19168188)的评论里提出的
+>* 是个非常有意思的Case
+>* 同时这里特别感谢@舟翅桐提出任务清退的概念
+>* 3个并发分别执行3个不同异步任务
+>* 每个方法有开始和结束日志
+>* 可以清晰的看到每3个开始再3个结束
+>* 每个任务0.1秒,执行30个任务,3个并发
+>* 总耗时1秒,Nice!!!
+
+~~~csharp
+var sw = Stopwatch.StartNew();
+var factory = new ConcurrentTaskFactory(new TaskFactoryOptions { ConcurrencyLevel = 3 });
+List<Task<int>> tasks = new(30);
+for (int i = 0; i < 10; i++)
+{
+    var index = i;
+    var t1 = factory.StartTask(() => One(index));
+    var t2 = factory.StartTask(() => Two(index));
+    var t3 = factory.StartTask(() => Three(index));
+
+    tasks.Add(t1);
+    tasks.Add(t2);
+    tasks.Add(t3);
+}
+
+await Task.WhenAll(tasks);
+sw.Stop();
+_output.WriteLine("Total Span :" + sw.Elapsed.TotalMilliseconds);
+
+public async Task<int> One(int i, CancellationToken token = default)
+{
+    token.ThrowIfCancellationRequested();
+    _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} One Start {i}:{DateTime.Now:HH:mm:ss.fff}");
+    await Task.Delay(100, token);
+    token.ThrowIfCancellationRequested();
+    _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} One End {i}:{DateTime.Now:HH:mm:ss.fff}");
+    return 1;
+}
+public async Task<int> Two(int i, CancellationToken token = default)
+{
+    token.ThrowIfCancellationRequested();
+    _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Two Start {i}:{DateTime.Now:HH:mm:ss.fff}");
+    await Task.Delay(100, token);
+    token.ThrowIfCancellationRequested();
+    _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Two End {i}:{DateTime.Now:HH:mm:ss.fff}");
+    return 2;
+}
+public async Task<int> Three(int i, CancellationToken token = default)
+{
+    token.ThrowIfCancellationRequested();
+    _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Three Start {i}:{DateTime.Now:HH:mm:ss.fff}");
+    await Task.Delay(100, token);
+    token.ThrowIfCancellationRequested();
+    _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Three End {i}:{DateTime.Now:HH:mm:ss.fff}");
+    return 3;
+}
+
+// Thread31 Three Start 0:09:50:48.945
+// Thread11 One Start 0:09:50:48.945
+// Thread8 Two Start 0:09:50:48.945
+// Thread31 Two End 0:09:50:49.050
+// Thread8 Three End 0:09:50:49.050
+// Thread11 One End 0:09:50:49.050
+// Thread8 One Start 1:09:50:49.050
+// Thread11 Two Start 1:09:50:49.050
+// Thread31 Three Start 1:09:50:49.050
+// Thread31 Three End 1:09:50:49.162
+// Thread8 One End 1:09:50:49.162
+// Thread11 Two End 1:09:50:49.162
+// Thread11 Two Start 2:09:50:49.162
+// Thread8 Three Start 2:09:50:49.162
+// Thread31 One Start 2:09:50:49.162
+// Thread11 Two End 2:09:50:49.273
+// Thread31 One End 2:09:50:49.273
+// Thread8 Three End 2:09:50:49.273
+// Thread8 Three Start 3:09:50:49.273
+// Thread31 Two Start 3:09:50:49.273
+// Thread11 One Start 3:09:50:49.273
+// Thread11 Two End 3:09:50:49.385
+// Thread8 Three End 3:09:50:49.385
+// Thread8 One Start 4:09:50:49.385
+// Thread11 Two Start 4:09:50:49.385
+// Thread32 One End 3:09:50:49.385
+// Thread32 Three Start 4:09:50:49.385
+// Thread32 One End 4:09:50:49.497
+// Thread11 Two End 4:09:50:49.497
+// Thread33 Three End 4:09:50:49.497
+// Thread11 Two Start 5:09:50:49.497
+// Thread32 One Start 5:09:50:49.497
+// Thread33 Three Start 5:09:50:49.497
+// Thread32 Two End 5:09:50:49.609
+// Thread33 Three End 5:09:50:49.609
+// Thread11 One End 5:09:50:49.609
+// Thread11 One Start 6:09:50:49.609
+// Thread32 Three Start 6:09:50:49.609
+// Thread33 Two Start 6:09:50:49.609
+// Thread11 Two End 6:09:50:49.721
+// Thread32 Three End 6:09:50:49.721
+// Thread33 One End 6:09:50:49.721
+// Thread11 One Start 7:09:50:49.721
+// Thread32 Two Start 7:09:50:49.721
+// Thread33 Three Start 7:09:50:49.721
+// Thread33 Two End 7:09:50:49.833
+// Thread32 One End 7:09:50:49.833
+// Thread33 One Start 8:09:50:49.833
+// Thread32 Two Start 8:09:50:49.833
+// Thread8 Three End 7:09:50:49.833
+// Thread8 Three Start 8:09:50:49.833
+// Thread8 Two End 8:09:50:49.945
+// Thread32 Three End 8:09:50:49.945
+// Thread32 Two Start 9:09:50:49.945
+// Thread8 One Start 9:09:50:49.945
+// Thread34 One End 8:09:50:49.945
+// Thread34 Three Start 9:09:50:49.945
+// Thread34 One End 9:09:50:50.057
+// Thread32 Two End 9:09:50:50.057
+// Thread8 Three End 9:09:50:50.057
+// Total Span :1116.4711
+~~~
 
 ## 四、全局设置超时的Case
 ### 1. 同步任务无CancellationToken的Case
