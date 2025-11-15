@@ -114,11 +114,8 @@ public abstract class PoolBase<TResource>
             if (Clean(ref resource))
                 _pool.Add(resource);
         }
-        catch (Exception ex)
+        catch/* (Exception ex)*/
         {
-#if NET7_0_OR_GREATER
-            Console.WriteLine(ex.ToString());
-#endif
         }
     }
     /// <summary>

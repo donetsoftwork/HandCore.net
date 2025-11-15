@@ -23,6 +23,8 @@ public class TaskTests(ITestOutputHelper output)
     {
         var tokenSource = new CancellationTokenSource();
         var sw = Stopwatch.StartNew();
+        // 此处CancelAfter对Task.Run没效果
+        // 除非在Run之前已取消
         tokenSource.CancelAfter(TimeSpan.FromSeconds(1));
         var task = Task.Run(() => Hello("张三", 2000), tokenSource.Token);
         Assert.NotNull(task);

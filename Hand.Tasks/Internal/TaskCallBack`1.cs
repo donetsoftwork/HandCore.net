@@ -1,5 +1,6 @@
 using Hand.Job;
 using Hand.States;
+using System.Runtime.CompilerServices;
 
 namespace Hand.Tasks.Internal;
 
@@ -19,6 +20,7 @@ public class TaskCallBack<TResult>
     /// Task封装
     /// </summary>
     protected readonly TaskCompletionSource<TResult> _source = new();
+    //protected readonly AsyncTaskMethodBuilder<TResult> _source = AsyncTaskMethodBuilder<TResult>.Create();
     /// <summary>
     /// Task
     /// </summary>
@@ -42,7 +44,7 @@ public class TaskCallBack<TResult>
     /// </summary>
     /// <param name="result"></param>
     public virtual void OnSuccess(TResult result)
-        => _source.TrySetResult(result);
+        => _source.SetResult(result);
     /// <inheritdoc />
     public virtual void OnFail()
         => _source.SetCanceled();

@@ -28,7 +28,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
         var factory = new TaskFactory(scheduler);
         var task = factory.StartNew(() => Multiply(2, 3));
         var jobService = new ThreadJobService<IState<bool>> (scheduler.Queue, scheduler);
-        //jobService.Start();
+        jobService.Start();
         var result = await task;
         Assert.Equal(6, result);
     }
@@ -47,7 +47,6 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
         var scheduler = new QueueTaskScheduler();
         var factory = new TaskFactory(scheduler);
         var jobService = options.CreateJob(scheduler.Queue, scheduler);
-        //jobService.Start();
         Start(factory);
         await Wait(jobService);
         //Start(factory);

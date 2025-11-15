@@ -25,14 +25,13 @@ public class MyProcessorTests(ITestOutputHelper output)
     [Fact]
     public async Task Concurrent()
     {
-        var options = new ReduceOptions { ConcurrencyLevel = 10 };
+        var options = new ReduceOptions { ConcurrencyLevel = 10, ItemLife = TimeSpan.FromSeconds(0.1), ReduceTime = TimeSpan.FromMicroseconds(1) };
         var processor = new MyProcessor(_output);
         var pool = options.CreateJob(processor);
         for (int i = 0; i < 100; i++)
         {
             pool.Add("User" + i);
         }
-        await Task.Delay(1000);
         await Task.Delay(1000);
     }
 

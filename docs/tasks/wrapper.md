@@ -133,6 +133,7 @@ _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.E
 >* 既然《手搓》TaskFactory那么强大,为什么还说鸡肋呢?
 >* 那是因为这些都是《手搓》线程池提供的技术支持
 >* 完全可以直接通过《手搓》线程池实现
+>* 可以参考以前的文章[异步"伪线程"重构《手搓》线程池,支持任务清退](https://www.cnblogs.com/xiangji/p/19192440)
 
 ~~~csharp
 var options = new ReduceOptions { ConcurrencyLevel = 1, ItemLife = TimeSpan.FromSeconds(1) };
@@ -276,12 +277,8 @@ class ReduceJobService<TItem>
 >* 通过实现ICancelable订阅取消处理
 >* 为了兼容系统线程池使用习惯,默认提供了基于委托(方法)的处理逻辑
 >* 实际《手搓》线程池是面向对象的
->* 通过实现IJobItem或IAsyncJobItem并实现IState<bool>,Processor就能支持了
->* 当然你要再实现IExceptionable和ICancelable也能得到相应的回调
->* 或许定义IQueueProcessor接口,定义自己的处理器逻辑是个更好的选择
->* 专门处理异步或同步
->* 或者处理特殊的数据结构和封装自己的异常处理逻辑
->* 能私人订制的线程池,又有谁不喜欢呢
+>* 《手搓》线程池是可以高度私人订制的线程池
+>* 有谁会不喜欢私人定制自己的线程池呢
 
 ~~~csharp
 class Processor(IQueue<IState<bool>> queue)
@@ -314,10 +311,206 @@ interface ICancelable
 }
 ~~~
 
-### 2. ActionProcessor
->* 顾名思义,该处理器是执行Action的
->* 不处理状态只同步执行Action
->* 有次特殊需求的可以获得更好的性能
+### 2. 《手搓》线程池支持私人定制任务
+#### 2.1 必需实现接口IState\<bool\>
+>* 只有一个Status属性告诉线程池你这个任务当前是否有效
+>* 如果Status为false线程池不会执行,直接忽略该任务
+>* 如果执行中途变成false,线程池会清退该任务
+
+#### 2.2 实现IJobItem或IAsyncJobItem
+>* 同步处理实现IJobItem
+>* 异步处理实现IAsyncJobItem
+
+#### 2.3 可选实现IExceptionable
+>* 实现IExceptionable可以订阅异常处理
+
+#### 2.4 可选实现ICancelable
+>* 实现ICancelable可以订阅取消处理
+>* 特别要注意,有些取消往往会触发异常
+>* 如果要完全处理取消,一般IExceptionable也是要实现的
+
+#### 3. 《手搓》线程池支持私人定制处理器
+>* 通过实现接口IQueueProcessor可以定制处理器
+>* 定制自己的处理器逻辑可能是一个更好的选择
+>* 比如为了性能专门处理异步或同步
+>* 或者处理特殊的数据结构和封装自己的异常处理逻辑
+>* 示例MyProcessor就是定制处理器
+>* MyProcessor紧贴业务,无需委托封装也无需定义IAsyncJobItem对象,直接处理业务对象
+>* 内存和性能都能做到极致
+
+~~~csharp
+var options = new ReduceOptions { ConcurrencyLevel = 10 };
+var processor = new MyProcessor(_output);
+var pool = options.CreateJob(processor);
+for (int i = 0; i < 100; i++)
+{
+    pool.Add("User" + i);
+}
+await Task.Delay(1000);
+
+/// <summary>
+/// 自定义处理器
+/// </summary>
+/// <param name="output"></param>
+class MyProcessor(ITestOutputHelper output)
+     : IQueueProcessor<string>
+{
+    private readonly ITestOutputHelper _output = output;
+    /// <inheritdoc />
+    public async void Run(IQueue<string> queue, ThreadJobService<string> service, CancellationToken token)
+    {
+        while (queue.TryDequeue(out var item))
+        {
+            if (service.Activate(item))
+                await RunItemAsync(item, token);
+            if (token.IsCancellationRequested)
+                break;
+        }
+        // 用完释放(回收)
+        service.Dispose();
+    }
+    /// <summary>
+    /// 执行单个
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public async Task RunItemAsync(string item, CancellationToken token)
+    {
+        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Hello {item},{DateTime.Now:HH:mm:ss.fff}");
+        try
+        {
+            await Task.Delay(10, token);
+        }
+        catch { }
+    }
+}
+
+// Thread8 Hello User1,19:49:05.835
+// Thread34 Hello User5,19:49:05.836
+// Thread36 Hello User7,19:49:05.836
+// Thread35 Hello User6,19:49:05.836
+// Thread33 Hello User4,19:49:05.835
+// Thread11 Hello User0,19:49:05.835
+// Thread31 Hello User2,19:49:05.835
+// Thread37 Hello User8,19:49:05.836
+// Thread32 Hello User3,19:49:05.835
+// Thread38 Hello User9,19:49:05.836
+// Thread31 Hello User10,19:49:05.853
+// Thread36 Hello User11,19:49:05.853
+// Thread37 Hello User12,19:49:05.853
+// Thread38 Hello User13,19:49:05.853
+// Thread34 Hello User14,19:49:05.853
+// Thread8 Hello User15,19:49:05.853
+// Thread35 Hello User16,19:49:05.853
+// Thread33 Hello User17,19:49:05.853
+// Thread11 Hello User19,19:49:05.853
+// Thread32 Hello User18,19:49:05.853
+// Thread33 Hello User20,19:49:05.868
+// Thread35 Hello User21,19:49:05.868
+// Thread34 Hello User22,19:49:05.868
+// Thread8 Hello User23,19:49:05.868
+// Thread34 Hello User24,19:49:05.868
+// Thread35 Hello User26,19:49:05.868
+// Thread37 Hello User25,19:49:05.868
+// Thread8 Hello User28,19:49:05.868
+// Thread33 Hello User27,19:49:05.868
+// Thread38 Hello User29,19:49:05.868
+// Thread38 Hello User30,19:49:05.884
+// Thread37 Hello User31,19:49:05.884
+// Thread38 Hello User32,19:49:05.884
+// Thread8 Hello User34,19:49:05.884
+// Thread35 Hello User35,19:49:05.884
+// Thread33 Hello User33,19:49:05.884
+// Thread38 Hello User36,19:49:05.884
+// Thread38 Hello User37,19:49:05.884
+// Thread8 Hello User39,19:49:05.884
+// Thread34 Hello User38,19:49:05.884
+// Thread37 Hello User40,19:49:05.900
+// Thread34 Hello User41,19:49:05.900
+// Thread37 Hello User43,19:49:05.900
+// Thread34 Hello User44,19:49:05.900
+// Thread8 Hello User42,19:49:05.900
+// Thread34 Hello User45,19:49:05.900
+// Thread34 Hello User46,19:49:05.900
+// Thread34 Hello User48,19:49:05.900
+// Thread37 Hello User47,19:49:05.900
+// Thread38 Hello User49,19:49:05.900
+// Thread38 Hello User50,19:49:05.916
+// Thread37 Hello User51,19:49:05.916
+// Thread34 Hello User52,19:49:05.916
+// Thread8 Hello User53,19:49:05.916
+// Thread35 Hello User54,19:49:05.916
+// Thread38 Hello User56,19:49:05.916
+// Thread8 Hello User57,19:49:05.916
+// Thread34 Hello User58,19:49:05.916
+// Thread33 Hello User55,19:49:05.916
+// Thread36 Hello User59,19:49:05.916
+// Thread36 Hello User60,19:49:05.932
+// Thread35 Hello User62,19:49:05.932
+// Thread33 Hello User61,19:49:05.932
+// Thread34 Hello User63,19:49:05.932
+// Thread38 Hello User64,19:49:05.932
+// Thread35 Hello User65,19:49:05.932
+// Thread38 Hello User67,19:49:05.932
+// Thread34 Hello User68,19:49:05.932
+// Thread36 Hello User66,19:49:05.932
+// Thread8 Hello User69,19:49:05.932
+// Thread8 Hello User70,19:49:05.948
+// Thread36 Hello User71,19:49:05.948
+// Thread8 Hello User75,19:49:05.948
+// Thread38 Hello User74,19:49:05.948
+// Thread34 Hello User73,19:49:05.948
+// Thread36 Hello User72,19:49:05.948
+// Thread38 Hello User77,19:49:05.948
+// Thread35 Hello User76,19:49:05.948
+// Thread36 Hello User78,19:49:05.948
+// Thread33 Hello User79,19:49:05.948
+// Thread8 Hello User80,19:49:05.964
+// Thread36 Hello User82,19:49:05.964
+// Thread33 Hello User81,19:49:05.964
+// Thread35 Hello User83,19:49:05.964
+// Thread8 Hello User86,19:49:05.964
+// Thread36 Hello User85,19:49:05.964
+// Thread33 Hello User87,19:49:05.964
+// Thread8 Hello User88,19:49:05.964
+// Thread34 Hello User84,19:49:05.964
+// Thread38 Hello User89,19:49:05.964
+// Thread38 Hello User90,19:49:05.980
+// Thread34 Hello User91,19:49:05.980
+// Thread34 Hello User94,19:49:05.980
+// Thread8 Hello User93,19:49:05.980
+// Thread34 Hello User95,19:49:05.980
+// Thread38 Hello User92,19:49:05.980
+// Thread38 Hello User97,19:49:05.980
+// Thread34 Hello User98,19:49:05.980
+// Thread35 Hello User96,19:49:05.980
+// Thread33 Hello User99,19:49:05.980
+~~~
+
+### 4. ActionProcessor
+>* ActionProcessor非常简单,只支持执行Action
+>* 正因为它逻辑简单,能获得更好的性能,专治性能强迫症患者
+>* 虽然简单,线程池的任务清退和并发控制却一点也不打折
+>* 把它是比喻为“小李飞刀”一点都不为过
+
+~~~csharp
+ var options = new ReduceOptions { ConcurrencyLevel = 1 };
+ var pool = options.CreateJob(ActionProcessor.Instance);
+ pool.Add(() => Hello("张三"));
+ pool.Add(() => Hello("李四"));
+ await Task.Delay(1000);
+
+void Hello(string name)
+{
+    _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Hello {name},{DateTime.Now:HH:mm:ss.fff}");
+    Thread.Sleep(1);
+}
+
+// Thread11 Hello 张三,09:57:57.195
+// Thread11 Hello 李四,09:57:57.202
+~~~
+
 
 好了,就介绍到这里,更多信息请查看源码库
 源码托管地址: https://github.com/donetsoftwork/HandCore.net ，欢迎大家直接查看源码。

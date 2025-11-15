@@ -130,7 +130,7 @@ public class ProcessorTests(ITestOutputHelper output)
     [Fact]
     public async void TaskConcurrent()
     {
-        var options = new ReduceOptions { ConcurrencyLevel = 10 };
+        var options = new ReduceOptions { ConcurrencyLevel = 10, ItemLife = TimeSpan.FromSeconds(0.1), ReduceTime = TimeSpan.FromMicroseconds(1) };
         var processor = new Processor();
         var pool = options.CreateJob(processor);
         for (int i = 0; i < 100; i++)
