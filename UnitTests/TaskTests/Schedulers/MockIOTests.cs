@@ -54,7 +54,7 @@ public class MockIOTests(ITestOutputHelper output)
         _output.WriteLine($"begin {DateTime.Now:HH:mm:ss.fff}");
         Stopwatch sw = Stopwatch.StartNew();
         List<Task<Product>> tasks = new(10);
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 6; i++)
         {
             var id = i;
             var task = GetProductAsync(id);

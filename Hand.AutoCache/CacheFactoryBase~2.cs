@@ -2,6 +2,8 @@
 using System.Threading;
 #endif
 
+using Hand.Storage;
+
 namespace Hand.Cache;
 
 /// <summary>
@@ -10,20 +12,17 @@ namespace Hand.Cache;
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
 public abstract class CacheFactoryBase<TKey, TValue>(ICacher<TKey, TValue> cacher)
-    : ICacher<TKey, TValue>
+    : AutoCacheBase<TKey, TValue>(cacher)
+    , IDataGet<TKey, TValue>
     where TKey : notnull
 {
     /// <summary>
-    /// 缓存基类
+    /// 缓存工厂基类
     /// </summary>
     public CacheFactoryBase()
         : this(new DictionaryCacher<TKey, TValue>())
     { 
     }
-    /// <summary>
-    /// 缓存字典
-    /// </summary>
-    private readonly ICacher<TKey, TValue> _cacher = cacher;
 #if NET9_0_OR_GREATER
     private readonly Lock _cacherLock = new();
 #endif
@@ -32,7 +31,7 @@ public abstract class CacheFactoryBase<TKey, TValue>(ICacher<TKey, TValue> cache
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public virtual TValue Get(in TKey key)
+    public virtual TValue Get(TKey key)
     {
         if (_cacher.TryGetCache(key, out TValue value))
             return value;
@@ -49,15 +48,6 @@ public abstract class CacheFactoryBase<TKey, TValue>(ICacher<TKey, TValue> cache
         }
         return value;
     }
-    /// <inheritdoc />
-    public bool ContainsKey(in TKey key)
-        => _cacher.ContainsKey(key);
-    /// <inheritdoc />
-    public bool TryGetCache(in TKey key, out TValue cached)
-        => _cacher.TryGetCache(key, out cached);
-    /// <inheritdoc />
-    public void Save(in TKey key, TValue value)
-        => _cacher.Save(key, value);
     /// <summary>
     /// 构造新值
     /// </summary>

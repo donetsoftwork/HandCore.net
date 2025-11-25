@@ -61,11 +61,7 @@ public class ConcurrentTaskFactory
     /// <param name="action"></param>
     /// <returns></returns>
     public new Task StartNew(Action action)
-    {
-        var state = TaskWrapper.Wrap(action);
-        _queue.Enqueue(state);
-        return state.Task;
-    }
+        => _queue.StartNew(action);
     /// <summary>
     /// 启动任务
     /// </summary>
@@ -73,11 +69,7 @@ public class ConcurrentTaskFactory
     /// <param name="token"></param>
     /// <returns></returns>
     public new Task StartNew(Action action, CancellationToken token)
-    {
-        var state = TaskWrapper.Wrap(action, token);
-        Processor.Enqueue(_queue, state);
-        return state.Task;
-    }
+        => _queue.StartNew(action, token);
     #endregion
     #region Result
     /// <summary>
@@ -86,11 +78,7 @@ public class ConcurrentTaskFactory
     /// <param name="func"></param>
     /// <returns></returns>
     public new Task<TResult> StartNew<TResult>(Func<TResult> func)
-    {
-        var result = TaskWrapper.Wrap(func);
-        _queue.Enqueue(result);
-        return result.Task;
-    }
+        => _queue.StartNew(func);
     /// <summary>
     /// 启动任务
     /// </summary>
@@ -99,11 +87,7 @@ public class ConcurrentTaskFactory
     /// <param name="token"></param>
     /// <returns></returns>
     public new Task<TResult> StartNew<TResult>(Func<TResult> func, CancellationToken token)
-    {
-        var result = TaskWrapper.Wrap(func, token);
-        Processor.Enqueue(_queue, result);
-        return result.Task;
-    }
+        => _queue.StartNew(func, token);
     #endregion
     #endregion
     #region StartTask
@@ -114,22 +98,14 @@ public class ConcurrentTaskFactory
     /// <param name="func"></param>
     /// <returns></returns>
     public Task StartTask(Func<Task> func)
-    {
-        var state = TaskWrapper.Wrap(func);
-        _queue.Enqueue(state);
-        return state.Task;
-    }
+        => _queue.StartTask(func);
     /// <summary>
     /// 添加异步
     /// </summary>
     /// <param name="func"></param>
     /// <param name="token"></param>
     public Task StartTask(Func<CancellationToken, Task> func, CancellationToken token)
-    {
-        var state = TaskWrapper.Wrap(func, token);
-        Processor.Enqueue(_queue, state);
-        return state.Task;
-    }
+        => _queue.StartTask(func, token);
     #endregion
     #region Result
     /// <summary>
@@ -138,11 +114,7 @@ public class ConcurrentTaskFactory
     /// <param name="func"></param>
     /// <returns></returns>
     public Task<TResult> StartTask<TResult>(Func<Task<TResult>> func)
-    {
-        var result = TaskWrapper.Wrap(func);
-        _queue.Enqueue(result);
-        return result.Task;
-    }
+        => _queue.StartTask(func);
     /// <summary>
     /// 添加异步
     /// </summary>
@@ -151,11 +123,7 @@ public class ConcurrentTaskFactory
     /// <param name="token"></param>
     /// <returns></returns>
     public Task<TResult> StartTask<TResult>(Func<CancellationToken, Task<TResult>> func, CancellationToken token)
-    {
-        var result = TaskWrapper.Wrap(func, token);
-        Processor.Enqueue(_queue, result);
-        return result.Task;
-    }
+        => _queue.StartTask(func, token);
     #endregion
     #endregion
 }

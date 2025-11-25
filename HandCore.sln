@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36414.22
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11217.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hand.Core", "Hand.Core\Hand.Core.csproj", "{CB539437-0F6C-40A7-B657-209EF38E1BC8}"
 EndProject
@@ -60,6 +60,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hand.ConcurrentCollections", "Hand.ConcurrentCollections\Hand.ConcurrentCollections.csproj", "{4126AE81-214D-4C21-8CE3-083C556A6D06}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConcurrentCollectionTests", "UnitTests\ConcurrentCollectionTests\ConcurrentCollectionTests.csproj", "{2458ACC5-23A4-4DC7-A677-DC47BB169EC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hand.AutoCache", "Hand.AutoCache\Hand.AutoCache.csproj", "{B37100B8-C270-40A4-8E4A-60EB18C97DB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hand.Enumerations", "Hand.Enumerations\Hand.Enumerations.csproj", "{A2B80D92-33AB-4956-B8E4-089DB99C8F59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hand.EnumerationTests", "UnitTests\Hand.EnumerationTests\Hand.EnumerationTests.csproj", "{12340339-FD70-4291-8345-F02B334D251C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -143,6 +149,18 @@ Global
 		{2458ACC5-23A4-4DC7-A677-DC47BB169EC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2458ACC5-23A4-4DC7-A677-DC47BB169EC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2458ACC5-23A4-4DC7-A677-DC47BB169EC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B37100B8-C270-40A4-8E4A-60EB18C97DB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B37100B8-C270-40A4-8E4A-60EB18C97DB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B37100B8-C270-40A4-8E4A-60EB18C97DB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B37100B8-C270-40A4-8E4A-60EB18C97DB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2B80D92-33AB-4956-B8E4-089DB99C8F59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2B80D92-33AB-4956-B8E4-089DB99C8F59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2B80D92-33AB-4956-B8E4-089DB99C8F59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2B80D92-33AB-4956-B8E4-089DB99C8F59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12340339-FD70-4291-8345-F02B334D251C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12340339-FD70-4291-8345-F02B334D251C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12340339-FD70-4291-8345-F02B334D251C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12340339-FD70-4291-8345-F02B334D251C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -159,6 +177,7 @@ Global
 		{43FA4683-3C5E-4844-A5B1-B6341D83286D} = {DD25F38A-ECD7-48BE-A4BB-2A150BA6B364}
 		{16BA4244-A77A-4E8C-BC88-4DAB90127879} = {238A4097-8BC6-4255-8B93-AB5ABC50F183}
 		{2458ACC5-23A4-4DC7-A677-DC47BB169EC5} = {238A4097-8BC6-4255-8B93-AB5ABC50F183}
+		{12340339-FD70-4291-8345-F02B334D251C} = {238A4097-8BC6-4255-8B93-AB5ABC50F183}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FDA13F32-5A40-4FB4-A57A-76C3FFB13DCF}
