@@ -19,7 +19,11 @@ public static class TimeoutHelper
         var completedTask = await Task.WhenAny(task, Task.Delay(timeout, tokenSource.Token));
         if (completedTask == task)
         {
+#if NET8_0_OR_GREATER
+            await tokenSource.CancelAsync();
+#else
             tokenSource.Cancel();
+#endif
             return await task;
         }
         throw new TimeoutException("The operation has timed out.");
@@ -37,7 +41,11 @@ public static class TimeoutHelper
         var completedTask = await Task.WhenAny(task, Task.Delay(timeout, tokenSource.Token));
         if (completedTask == task)
         {
+#if NET8_0_OR_GREATER
+            await tokenSource.CancelAsync();
+#else
             tokenSource.Cancel();
+#endif
             await task;
         }
         else
