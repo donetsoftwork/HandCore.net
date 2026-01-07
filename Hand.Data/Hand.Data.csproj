@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\package.props" />
+  <PropertyGroup>
+    <TargetFrameworks>net4.5;net7.0;net8.0;net9.0;net10.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>$(VersionBase).0-alpha</Version>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="readme.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hand.Core\Hand.Core.csproj" />
+    <ProjectReference Include="..\Hand.Disposables\Hand.Disposables.csproj" />
+  </ItemGroup>
+</Project>

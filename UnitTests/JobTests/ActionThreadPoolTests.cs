@@ -69,7 +69,7 @@ public class ActionThreadPoolTests(ITestOutputHelper output)
 
     void Hello(string name)
     {
-        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Hello {name},{DateTime.Now:HH:mm:ss.fff}");
         Thread.Sleep(10);
+        _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Hello {name},{DateTime.Now:HH:mm:ss.fff}");
     }
 }
