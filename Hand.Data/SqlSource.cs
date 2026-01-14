@@ -29,6 +29,18 @@ public class SqlSource(DbDataSource dataSource, int? commandTimeout = null)
     /// <inheritdoc/>
     IDbTransaction ISqlSource.Transaction
         => null;
+    /// <inheritdoc/>
+    CommandBehavior ISqlSource.SingleBehavior
+        => Behavior;
+    /// <inheritdoc/>
+    CommandBehavior ISqlSource.RowBehavior
+        => Behavior;
+    #endregion
+    #region CommandBehavior
+    /// <summary>
+    /// 执行行为
+    /// </summary>
+    public const CommandBehavior Behavior = CommandBehavior.CloseConnection | CommandBehavior.SequentialAccess;
     #endregion
     /// <inheritdoc/>
     public DbConnection CreateConnection()
@@ -62,9 +74,11 @@ public class SqlSource(DbDataSource dataSource, int? commandTimeout = null)
     public async Task<TransactionSource> BeginTransaction(int? commandTimeout = null, CancellationToken token = default)
     {
         var connection = _dataSource.CreateConnection();
-        await connection.OpenAsync(token);
+        await connection.OpenAsync(token)
+            .ConfigureAwait(false);
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        var transaction = await connection.BeginTransactionAsync(token);
+        var transaction = await connection.BeginTransactionAsync(token)
+            .ConfigureAwait(false);
 #else
         var transaction = connection.BeginTransaction();
 #endif
@@ -80,13 +94,31 @@ public class SqlSource(DbDataSource dataSource, int? commandTimeout = null)
     public async Task<TransactionSource> BeginTransaction(IsolationLevel level, int? commandTimeout = null, CancellationToken token = default)
     {
         var connection = _dataSource.CreateConnection();
-        await connection.OpenAsync(token);
+        await connection.OpenAsync(token)
+            .ConfigureAwait(false);
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-        var transaction = await connection.BeginTransactionAsync(level, token);
+        var transaction = await connection.BeginTransactionAsync(level, token)
+            .ConfigureAwait(false);
 #else
         var transaction = connection.BeginTransaction(level);
 #endif
         return new TransactionSource(connection, transaction, commandTimeout ?? _commandTimeout);
+    }
+    /// <inheritdoc/>
+    public async Task<DbDataReader> ExecuteReaderAsync(DbCommand command, CommandBehavior behavior, CancellationToken token)
+    {
+        await command.Connection.OpenAsync(token)
+            .ConfigureAwait(false);
+        return await command.ExecuteReaderAsync(behavior, token)
+            .ConfigureAwait(false);
+    }
+    /// <inheritdoc/>
+    public async Task<int> ExecuteNonQueryAsync(DbCommand command, CancellationToken token)
+    {
+        await command.Connection.OpenAsync(token)
+            .ConfigureAwait(false);
+        return await command.ExecuteNonQueryAsync(token)
+            .ConfigureAwait(false);
     }
     #endregion
 }

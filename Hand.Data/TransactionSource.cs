@@ -38,6 +38,25 @@ public class TransactionSource(DbConnection connection, DbTransaction transactio
     /// </summary>
     public int? CommandTimeout
         => _commandTimeout;
+    /// <inheritdoc/>
+    IDbTransaction ISqlSource.Transaction
+        => null;
+    /// <inheritdoc/>
+    CommandBehavior ISqlSource.SingleBehavior
+        => SingleBehavior;
+    /// <inheritdoc/>
+    CommandBehavior ISqlSource.RowBehavior
+        => RowBehavior;
+    #endregion
+    #region CommandBehavior
+    /// <summary>
+    /// 单结果
+    /// </summary>
+    public const CommandBehavior SingleBehavior = CommandBehavior.SequentialAccess | CommandBehavior.SingleResult;
+    /// <summary>
+    /// 单行
+    /// </summary>
+    public const CommandBehavior RowBehavior = SingleBehavior | CommandBehavior.SingleRow;
     #endregion
     /// <inheritdoc/>
     DbConnection ISqlSource.CreateConnection()
@@ -53,6 +72,12 @@ public class TransactionSource(DbConnection connection, DbTransaction transactio
         command.CommandType = CommandType.Text;
         return new DisposableResource<DbCommand>(command);
     }
+    /// <inheritdoc/>
+    public Task<DbDataReader> ExecuteReaderAsync(DbCommand command, CommandBehavior behavior, CancellationToken token)
+        => command.ExecuteReaderAsync(behavior, token);
+    /// <inheritdoc/>
+    public Task<int> ExecuteNonQueryAsync(DbCommand command, CancellationToken token)
+        => command.ExecuteNonQueryAsync(token);
     #region ITransaction
     /// <summary>
     /// 提交事务
