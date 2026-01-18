@@ -63,7 +63,7 @@ public class FriendTests(ITestOutputHelper output)
         return 3;
     }
     [Fact]
-    public async void Sum()
+    public async Task Sum()
     {        
         var factory = new ConcurrentTaskFactory(new ReduceOptions { ConcurrencyLevel = 3 });
         var tokenSource = new CancellationTokenSource();
@@ -83,7 +83,7 @@ public class FriendTests(ITestOutputHelper output)
         Assert.Equal(6, sum );
     }
     [Fact]
-    public async void Cancel()
+    public async Task Cancel()
     {
         var factory = new ConcurrentTaskFactory(new ReduceOptions { ConcurrencyLevel = 10 });
         var tokenSource = new CancellationTokenSource(100);
@@ -94,7 +94,7 @@ public class FriendTests(ITestOutputHelper output)
         await Task.Delay(50, tokenSource.Token);
         //tokenSource.Cancel();
         //var one = await onetTask;
-        await Assert.ThrowsAsync<TaskCanceledException>(() => onetTask);
+        await Assert.ThrowsAsync<OperationCanceledException>(() => onetTask);
         //await Assert.ThrowsAsync<TaskCanceledException>(() => twotTask);
         //await Assert.ThrowsAsync<TaskCanceledException>(() => threeTask);
         //try
@@ -110,7 +110,7 @@ public class FriendTests(ITestOutputHelper output)
         _output.WriteLine("Total Span :" + sw.Elapsed.TotalMilliseconds);
     }
     [Fact]
-    public async void Partial()
+    public async Task Partial()
     {
         var factory = new ConcurrentTaskFactory(new ReduceOptions { ConcurrencyLevel = 1 });
         var tasks = new List<Task<int>>(100);
@@ -139,15 +139,6 @@ public class FriendTests(ITestOutputHelper output)
         var sum = results.Sum();
         _output.WriteLine($"Sum：{sum}");
         Assert.True(sum > 0);
-    }
-
-    private static async Task Wait(List<Task<int>> tasks, ConcurrentBag<int> results)
-    {
-        foreach (var task in tasks)
-        {
-            var result = await task.ConfigureAwait(false);
-            results.Add(result);
-        }
     }
 }
 // Two Start 0:15:06:37.420

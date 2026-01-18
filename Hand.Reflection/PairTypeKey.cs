@@ -1,11 +1,3 @@
-using System;
-#if (NETSTANDARD1_1 || NETSTANDARD1_3 || NETSTANDARD1_6)
-using System.Reflection;
-#endif
-#if NET7_0_OR_GREATER || NETSTANDARD2_0_OR_GREATER
-using System.Runtime.CompilerServices;
-#endif
-
 namespace Hand.Reflection;
 
 /// <summary>
@@ -35,10 +27,10 @@ public readonly struct PairTypeKey(Type leftType, Type rightType)
     /// </summary>
     /// <returns></returns>
     public override int GetHashCode()
-#if (NETSTANDARD1_1 || NETSTANDARD1_3 || NETSTANDARD1_6 || NET45)
-        => _leftType.GetHashCode() ^ _rightType.GetHashCode();
+#if NET7_0_OR_GREATER
+        => HashCode.Combine(_leftType, _rightType); 
 #else
-        => HashCode.Combine(_leftType, RuntimeHelpers.GetHashCode(_rightType));
+        => _leftType.GetHashCode() ^ _rightType.GetHashCode();
 #endif
     #region IEquatable
     /// <summary>
@@ -87,12 +79,7 @@ public readonly struct PairTypeKey(Type leftType, Type rightType)
     /// <returns></returns>
     public static bool CheckNullCondition(Type declareType)
     {
-#if (NETSTANDARD1_1 || NETSTANDARD1_3 || NETSTANDARD1_6)
-        var sourceTypeInfo = declareType.GetTypeInfo();
-        return sourceTypeInfo.IsGenericType || !sourceTypeInfo.IsValueType;
-#else
         return declareType.IsGenericType || !declareType.IsValueType;
-#endif
     }
     /// <summary>
     /// 判断是否需要检查null(值类型转非值类型需要检查null)
@@ -102,16 +89,9 @@ public readonly struct PairTypeKey(Type leftType, Type rightType)
     /// <returns></returns>
     public static bool CheckNullCondition(Type sourceType, Type destType)
     {
-#if (NETSTANDARD1_1 || NETSTANDARD1_3 || NETSTANDARD1_6)
-        var destTypeInfo = destType.GetTypeInfo();
-        if(destTypeInfo.IsGenericType)
-            return false;
-        return destTypeInfo.IsValueType && CheckNullCondition(sourceType);
-#else
         if (destType.IsGenericType)
             return false;
         return destType.IsValueType && CheckNullCondition(sourceType);
-#endif
     }
     #endregion
     #region CheckType
@@ -122,16 +102,6 @@ public readonly struct PairTypeKey(Type leftType, Type rightType)
     /// <param name="rightType"></param>
     /// <returns></returns>
     public static bool CheckValueType(Type leftType, Type rightType)
-#if (NETSTANDARD1_1 || NETSTANDARD1_3 || NETSTANDARD1_6)
-        => CheckValueType(leftType.GetTypeInfo(), rightType.GetTypeInfo());
-    /// <summary>
-    /// 判断是否兼容值类型
-    /// </summary>
-    /// <param name="leftType"></param>
-    /// <param name="rightType"></param>
-    /// <returns></returns>
-    public static bool CheckValueType(TypeInfo leftType, TypeInfo rightType)
-#endif
     {
         if (leftType == rightType)
             return true;

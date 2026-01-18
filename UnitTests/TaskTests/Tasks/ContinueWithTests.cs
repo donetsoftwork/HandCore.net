@@ -3,7 +3,7 @@ namespace TaskTests.Tasks;
 public class ContinueWithTests
 {
     [Fact]
-    public async void FromResult()
+    public async Task FromResult()
     {
         int result = 0;
         var task = Task.FromResult(1);

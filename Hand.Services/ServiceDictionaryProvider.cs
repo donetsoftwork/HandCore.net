@@ -12,11 +12,7 @@ public class ServiceDictionaryProvider(IDictionary provider)
     /// 字典服务存储(简易服务容器)
     /// </summary>
     public ServiceDictionaryProvider()
-#if (NETSTANDARD1_1 || NETSTANDARD1_3 || NETSTANDARD1_6)
-        : this(new Dictionary<object, object>())
-#else
         : this(new Hashtable())
-#endif
     {
     }
     #region 配置

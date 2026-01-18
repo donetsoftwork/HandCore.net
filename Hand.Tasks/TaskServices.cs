@@ -116,10 +116,10 @@ public static class TaskServices
     /// <returns></returns>
     public static Task StartNew(this IQueue<TaskItem> queue, Action action, CancellationToken token)
     {
-#if  NET45
+#if NET45
         var state = TaskWrapper.Wrap(action, token);
         if (token.IsCancellationRequested)
-        {
+        {            
             state.OnCancel();
             return state.Task;
         }
