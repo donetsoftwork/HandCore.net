@@ -27,7 +27,7 @@ public readonly struct PairTypeKey(Type leftType, Type rightType)
     /// </summary>
     /// <returns></returns>
     public override int GetHashCode()
-#if NET7_0_OR_GREATER
+#if !NET45
         => HashCode.Combine(_leftType, _rightType); 
 #else
         => _leftType.GetHashCode() ^ _rightType.GetHashCode();
