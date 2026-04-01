@@ -21,41 +21,57 @@ public static class ReflectionType
     /// 是否泛型定义
     /// </summary>
     /// <param name="type"></param>
-    /// <param name="genericType">泛型</param>
+    /// <param name="definitionType">泛型</param>
     /// <returns></returns>
-    public static bool IsGenericType(Type type, Type genericType)
-        => type.IsGenericType && type.GetGenericTypeDefinition() == genericType;
+    public static bool IsGenericType(Type type, Type definitionType)
+        => type.IsGenericType && type.GetGenericTypeDefinition() == definitionType;
     #endregion
     #region HasGenericType
     /// <summary>
     /// 判断是否包含泛型定义
     /// </summary>
     /// <param name="type"></param>
-    /// <param name="genericType"></param>
+    /// <param name="definitionType"></param>
     /// <returns></returns>
-    public static bool HasGenericType(Type type, Type genericType)
+    public static bool HasGenericType(Type type, Type definitionType)
     {
-        if (IsGenericType(type, genericType))
+        if (IsGenericType(type, definitionType))
             return true;
         var interfaces = type.GetInterfaces();
         foreach (var subType in interfaces)
         {
-            if (IsGenericType(subType, genericType))
+            if (IsGenericType(subType, definitionType))
                 return true;
         }
         return false;
     }
     #endregion
+    /// <summary>
+    /// 获取泛型
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="definitionType"></param>
+    /// <returns></returns>
+    public static Type GetGenericType(Type type, Type definitionType)
+    {
+        var interfaces = type.GetInterfaces();
+        foreach (var @interface in interfaces)
+        {
+            if (IsGenericType(@interface, definitionType))
+                return @interface;
+        }
+        return null;
+    }
     #region GetGenericCloseInterfaces
     /// <summary>
     /// 获取泛型闭合接口
     /// </summary>
     /// <param name="type"></param>
-    /// <param name="genericInterface"></param>
+    /// <param name="definitionType"></param>
     /// <returns></returns>
-    public static IEnumerable<Type> GetGenericCloseInterfaces(Type type, Type genericInterface)
+    public static IEnumerable<Type> GetGenericCloseInterfaces(Type type, Type definitionType)
     {
-        if (IsGenericType(type, genericInterface))
+        if (IsGenericType(type, definitionType))
         {
             yield return type;
             yield break;
@@ -63,7 +79,7 @@ public static class ReflectionType
         var interfaces = type.GetInterfaces();
         foreach (var item in interfaces)
         {
-            if (IsGenericType(item, genericInterface))
+            if (IsGenericType(item, definitionType))
                 yield return item;
         }
     }

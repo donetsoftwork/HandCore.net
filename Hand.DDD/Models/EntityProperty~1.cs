@@ -4,27 +4,27 @@ namespace Hand.Models;
 /// 实体属性
 /// </summary>
 /// <typeparam name="TProperty"></typeparam>
-/// <param name="value"></param>
-public abstract class EntityProperty<TProperty>(TProperty value)
+/// <param name="original"></param>
+public abstract class EntityProperty<TProperty>(TProperty original)
     : IEntityProperty<TProperty>
     , IEquatable<EntityProperty<TProperty>>
 {
     /// <summary>
-    /// 属性实际值
+    /// 属性原始值
     /// </summary>
-    protected TProperty _value = value;
+    protected TProperty _original = original;
     /// <summary>
-    /// 属性实际值
+    /// 属性原始值
     /// </summary>
-    public TProperty Value
+    public TProperty Original
     {
-        get => _value;
-        set => _value = value;
+        get => _original;
+        set => _original = value;
     }
     /// <inheritdoc />
     public override string ToString()
     {
-        return _value?.ToString();
+        return _original?.ToString();
     }
     /// <inheritdoc />
     public override bool Equals(object obj)
@@ -38,20 +38,20 @@ public abstract class EntityProperty<TProperty>(TProperty value)
             return false;
         if (ReferenceEquals(this, other))
             return true;
-        var otherValue = other.Value;
-        if (_value is null)
+        var otherValue = other.Original;
+        if (_original is null)
         {
             if (otherValue is null)
                 return true;
             return false;
         }
-        return _value.Equals(otherValue);
+        return _original.Equals(otherValue);
     }
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        if(_value is null)
+        if(_original is null)
             return 0;
-        return _value.GetHashCode();
+        return _original.GetHashCode();
     }
 }

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -23,9 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Generators\Hand.Generators.GenerateProperty\Hand.Generators.GenerateProperty.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
     <ProjectReference Include="..\..\Hand.Core\Hand.Core.csproj" />
-    <ProjectReference Include="..\..\Hand.DDD\Hand.DDD.csproj" />
+    <ProjectReference Include="..\..\Hand.Reflection\Hand.Reflection.csproj" />
   </ItemGroup>
 
   <ItemGroup>

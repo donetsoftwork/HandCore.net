@@ -215,3 +215,12 @@ public class ProcessorTests(ITestOutputHelper output)
         return result;
     }
 }
+
+class Test
+{
+    //public Test()
+    //{
+    //    Id = 1;
+    //}
+    public int Id { get; init; }
+}
