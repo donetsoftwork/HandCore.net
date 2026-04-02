@@ -7,8 +7,8 @@ public class DefaultNameConverter : INameConverter
 {
     private DefaultNameConverter() { }
     /// <inheritdoc />
-    public string Convert(string name)
-        => name;
+    public string Convert(string name, int startIndex = 0)
+        => string.IsNullOrEmpty(name) ? string.Empty : name.Substring(startIndex);
     /// <inheritdoc />
     public string Convert(ReadOnlySpan<char> name)
         => name.ToString();

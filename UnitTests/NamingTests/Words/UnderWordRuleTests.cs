@@ -6,6 +6,7 @@ public class UnderWordRuleTests
 {
     [Theory]
     [InlineData("test", "_test")]
+    [InlineData("_test", "_test")]
     [InlineData(null, "_")]
     [InlineData("", "_")]
     public void Under(string? original, string? expected)
@@ -16,6 +17,8 @@ public class UnderWordRuleTests
     [Theory]
     [InlineData("Test", "_test")]
     [InlineData("test", "_test")]
+    [InlineData("_test", "_test")]
+    [InlineData("_Test", "_test")]
     [InlineData(null, "_")]
     [InlineData("", "_")]
     public void UnderLower(string? original, string? expected)

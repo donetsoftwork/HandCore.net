@@ -9,8 +9,9 @@ public interface INameConverter
     /// 转化
     /// </summary>
     /// <param name="name"></param>
+    /// <param name="startIndex"></param>
     /// <returns></returns>
-    string Convert(string name);
+    string Convert(string name, int startIndex = 0);
     /// <summary>
     /// 转化
     /// </summary>

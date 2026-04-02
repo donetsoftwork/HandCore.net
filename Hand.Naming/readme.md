@@ -23,7 +23,7 @@ class PascalWordRule : IWordRule
     /// <summary>
     /// 首字母大写
     /// </summary>
-    public static string FistToUpper(string original);
+    public static string FistToUpper(string original, int startIndex = 0);
 }
 ```
 
@@ -36,7 +36,7 @@ class CamelWordRule : IWordRule
     /// <summary>
     /// 首字母小写
     /// </summary>
-    public static string FistToLower(string original);
+    public static string FistToLower(string original, int startIndex = 0);
 }
 ```
 
@@ -56,14 +56,13 @@ class UnderWordRule : IWordRule
     /// <summary>
     /// 下划线开头
     /// </summary>
-    public static string Under(string original);
+    public static string Under(string original, int startIndex = 0);
         /// <summary>
     /// 下换线次字母小写
     /// </summary>
-    public static string UnderLower(string original);
+    public static string UnderLower(string original, int startIndex = 0);
 }
 ```
-
 
 ## 二、 命名转化规则
 ### 1. IPathRule接口
@@ -75,7 +74,7 @@ interface IPathRule
     /// <summary>
     /// 拆分
     /// </summary>
-    IEnumerable<string> Split‌(string fullPath);
+    IEnumerable<string> Split‌(string fullPath, int startIndex = 0);
 }
 ```
 
@@ -88,14 +87,14 @@ interface INameConverter
     /// <summary>
     /// 转化
     /// </summary>
-    string Convert(string name);
+    string Convert(string name, int startIndex = 0);
 }
 ```
 
 ### 3. DefaultPathConverter类
 >* 默认路径转化
 >* 按separators分割
->* 按destRule规则租个处理单词
+>* 按destRule规则逐个处理单词
 
 ```csharp
 /// <summary>
@@ -108,7 +107,7 @@ class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRule)
 ### 4. PascalPathConverter类
 >* 帕斯卡路径转化
 >* 按大写字母分割
->* 按destRule规则租个处理单词
+>* 按destRule规则逐个处理单词
 
 ```csharp
 /// <summary>

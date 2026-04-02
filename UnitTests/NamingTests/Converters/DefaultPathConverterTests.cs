@@ -26,6 +26,7 @@ public class DefaultPathConverterTests
     {
         var actual = _toPascal.Convert(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toPascal.Convert(fullPath.AsSpan()));
     }
     [Theory]
     [InlineData("abc_def", new string[] { "Abc", "Def" })]
@@ -41,6 +42,7 @@ public class DefaultPathConverterTests
     {
         var actual = _toPascal.Split(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toPascal.Split(fullPath.AsSpan()));
     }
     [Theory]
     [InlineData("abc_def", "abcDef")]
@@ -56,6 +58,7 @@ public class DefaultPathConverterTests
     {
         var actual = _toCamel.Convert(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toCamel.Convert(fullPath.AsSpan()));
     }
     [Theory]
     [InlineData("abc_def", new string[] { "abc", "Def" })]
@@ -71,6 +74,7 @@ public class DefaultPathConverterTests
     {
         var actual = _toCamel.Split(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toCamel.Split(fullPath.AsSpan()));
     }
     [Theory]
     [InlineData("abc_def", "abcdef")]
@@ -86,6 +90,7 @@ public class DefaultPathConverterTests
     {
         var actual = _toLower.Convert(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toLower.Convert(fullPath.AsSpan()));
     }
     [Theory]
     [InlineData("abc_def", new string[] { "abc", "def" })]
@@ -101,6 +106,7 @@ public class DefaultPathConverterTests
     {
         var actual = _toLower.Split(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toLower.Split(fullPath.AsSpan()));
     }
     [Theory]
     [InlineData("abc_def", "_abcDef")]
@@ -116,6 +122,7 @@ public class DefaultPathConverterTests
     {
         var actual = _toUnder.Convert(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toUnder.Convert(fullPath.AsSpan()));
     }
     [Theory]
     [InlineData("abc_def", new string[] { "_abc", "Def" })]
@@ -131,5 +138,6 @@ public class DefaultPathConverterTests
     {
         var actual = _toUnder.Split(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toUnder.Split(fullPath.AsSpan()));
     }
 }

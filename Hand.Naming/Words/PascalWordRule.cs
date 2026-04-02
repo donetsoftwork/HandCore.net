@@ -15,16 +15,20 @@ public class PascalWordRule : IWordRule
     /// 首字母大写
     /// </summary>
     /// <param name="original"></param>
+    /// <param name="startIndex"></param>
     /// <returns></returns>
-    public static string FistToUpper(string original)
+    public static string FistToUpper(string original, int startIndex = 0)
     {
         if (string.IsNullOrEmpty(original))
             return string.Empty;
+        var count = original.Length;
         var first = original[0];
         if (char.IsLower(first))
         {
-            var builder = new StringBuilder(original);
-            builder[0] = char.ToUpperInvariant(first);
+            var builder = new StringBuilder(count - startIndex);
+            builder.Append(char.ToUpperInvariant(first));
+            for (var i = startIndex + 1; i < count; i++)
+                builder.Append(original[i]);
             return builder.ToString();
         }
         return original;

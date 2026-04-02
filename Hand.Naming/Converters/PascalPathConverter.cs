@@ -21,15 +21,17 @@ public class PascalPathConverter(IWordRule destRule)
     #endregion
     #region INameConverter
     /// <inheritdoc />
-    public string Convert(string name)
+    public string Convert(string name, int startIndex = 0)
     {
         if (string.IsNullOrEmpty(name))
             return string.Empty;
-        var builder = new StringBuilder(name.Length);
         var first = true;
         var depth = 0;
-        foreach (char item in name)
+        var count = name.Length;
+        var builder = new StringBuilder(count - startIndex);
+        for (var i = startIndex; i < count; i++)
         {
+            var item = name[i];
             if (char.IsUpper(item) || first)
             {
                 _destRule.CheckFirst(builder, item, depth++);
@@ -68,15 +70,17 @@ public class PascalPathConverter(IWordRule destRule)
     #endregion
     #region IPathConverter
     /// <inheritdoc />
-    public IEnumerable<string> Split(string fullPath)
+    public IEnumerable<string> Split(string fullPath, int startIndex)
     {
         if (string.IsNullOrEmpty(fullPath))
             yield break;
         var first = true;
         var depth = 0;
-        var builder = new StringBuilder(fullPath.Length);
-        foreach (char item in fullPath)
+        var count = fullPath.Length;
+        var builder = new StringBuilder(count - startIndex);
+        for (var i = startIndex; i < count; i++)
         {
+            var item = fullPath[i];
             if (char.IsUpper(item) || first)
             {
                 if (builder.Length > 0)
@@ -92,7 +96,7 @@ public class PascalPathConverter(IWordRule destRule)
             {
                 builder.Append(item);
             }
-        }
+        }        
 
         if (builder.Length > 0)
             yield return builder.ToString();

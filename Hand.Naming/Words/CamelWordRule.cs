@@ -21,16 +21,20 @@ public class CamelWordRule : IWordRule
     /// 首字母小写
     /// </summary>
     /// <param name="original"></param>
+    /// <param name="startIndex"></param>
     /// <returns></returns>
-    public static string FistToLower(string original)
+    public static string FistToLower(string original, int startIndex = 0)
     {
         if (string.IsNullOrEmpty(original))
             return string.Empty;
-        var first = original[0];
+        var count = original.Length;
+        var first = original[startIndex];
         if (char.IsUpper(first))
         {
-            var builder = new StringBuilder(original);
-            builder[0] = char.ToLowerInvariant(first);
+            var builder = new StringBuilder(count - startIndex);
+            builder.Append(char.ToLowerInvariant(first));
+            for (var i = startIndex + 1; i < count; i++)
+                builder.Append(original[i]);
             return builder.ToString();
         }
         return original;

@@ -22,15 +22,17 @@ public class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRu
     #endregion
     #region INameConverter
     /// <inheritdoc />
-    public string Convert(string name)
+    public string Convert(string name, int startIndex)
     {
         if (string.IsNullOrEmpty(name))
             return string.Empty;
-        var builder = new StringBuilder(name.Length);
+        var count = name.Length;
+        var builder = new StringBuilder(count - startIndex);
         var first = true;
         var depth = 0;
-        foreach (char item in name)
+        for (var i = startIndex; i < count; i++)
         {
+            var item = name[i];
             if (Validate(item))
             {
                 first = true;
@@ -79,15 +81,17 @@ public class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRu
     #endregion
     #region IPathConverter
     /// <inheritdoc />
-    public IEnumerable<string> Split(string fullPath)
+    public IEnumerable<string> Split(string fullPath, int startIndex)
     {
         if (string.IsNullOrEmpty(fullPath))
             yield break;
-        var builder = new StringBuilder(fullPath.Length);
         var first = true;
         var depth = 0;
-        foreach (char item in fullPath)
+        var count = fullPath.Length;
+        var builder = new StringBuilder(count - startIndex);
+        for (var i = startIndex; i < count; i++)
         {
+            var item = fullPath[i];
             if (Validate(item))
             {
                 first = true;
@@ -108,7 +112,7 @@ public class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRu
             {
                 builder.Append(item);
             }
-        }
+        }        
 
         if (builder.Length > 0)
             yield return builder.ToString();

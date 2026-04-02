@@ -26,6 +26,7 @@ public class PascalPathConverterTests
     {
         var actual = _toPascal.Convert(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toPascal.Convert(fullPath.AsSpan()));
     }
     [Theory]
     [InlineData("abc_def", new string[] { "Abc_def" })]
@@ -41,6 +42,7 @@ public class PascalPathConverterTests
     {
         var actual = _toPascal.Split(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toPascal.Split(fullPath.AsSpan()));
     }
     [Fact]
     public void FieldToPascal()
@@ -48,6 +50,7 @@ public class PascalPathConverterTests
         var fieldName = "_id";
         var propertyName = _toPascal.Convert(fieldName.AsSpan(1));
         Assert.Equal("Id", propertyName);
+        Assert.Equal("Id", _toPascal.Convert(fieldName, 1));
     }
     [Theory]
     [InlineData("abc_def", "abc_def")]
@@ -63,6 +66,7 @@ public class PascalPathConverterTests
     {
         var actual = _toCamel.Convert(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toCamel.Convert(fullPath.AsSpan()));
     }
     [Theory]
     [InlineData("abc_def", new string[] { "abc_def" })]
@@ -78,6 +82,7 @@ public class PascalPathConverterTests
     {
         var actual = _toCamel.Split(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toCamel.Split(fullPath.AsSpan()));
     }
     [Fact]
     public void FieldToCamel()
@@ -85,6 +90,7 @@ public class PascalPathConverterTests
         var fieldName = "_id";        
         var parameterName = _toCamel.Convert(fieldName.AsSpan(1));
         Assert.Equal("id", parameterName);
+        Assert.Equal("id", _toCamel.Convert(fieldName, 1));
     }
     [Theory]
     [InlineData("abc_def", "abc_def")]
@@ -100,6 +106,7 @@ public class PascalPathConverterTests
     {
         var actual = _toLower.Convert(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toLower.Convert(fullPath.AsSpan()));
     }
     [Theory]
     [InlineData("abc_def", new string[] { "abc_def" })]
@@ -115,6 +122,7 @@ public class PascalPathConverterTests
     {
         var actual = _toLower.Split(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toLower.Split(fullPath.AsSpan()));
     }
     [Fact]
     public void FieldToLower()
@@ -122,6 +130,7 @@ public class PascalPathConverterTests
         var fieldName = "_id";
         var parameterName = _toLower.Convert(fieldName.AsSpan(1));
         Assert.Equal("id", parameterName);
+        Assert.Equal("id", _toLower.Convert(fieldName, 1));
     }
     [Theory]
     [InlineData("abc_def", "_abc_def")]
@@ -137,6 +146,7 @@ public class PascalPathConverterTests
     {
         var actual = _toUnder.Convert(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toUnder.Convert(fullPath.AsSpan()));
     }
     [Theory]
     [InlineData("abc_def", new string[] { "_abc_def" })]
@@ -152,5 +162,6 @@ public class PascalPathConverterTests
     {
         var actual = _toUnder.Split(fullPath);
         Assert.Equal(expected, actual);
+        Assert.Equal(expected, _toUnder.Split(fullPath.AsSpan()));
     }
 }

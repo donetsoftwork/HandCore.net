@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections;
+using System.Text;
 
 namespace Hand.Words;
 
@@ -27,14 +28,20 @@ public class UnderWordRule : IWordRule
     /// 下换线
     /// </summary>
     /// <param name="original"></param>
+    /// <param name="startIndex"></param>
     /// <returns></returns>
-    public static string Under(string original)
+    public static string Under(string original, int startIndex = 0)
     {
         if (string.IsNullOrEmpty(original))
             return "_";
-        var builder = new StringBuilder(original.Length + 1);
-        builder.Append(Prefix)
-            .Append(original);
+        var first = original[startIndex];
+        if (first == Prefix)
+            return original.Substring(startIndex);
+        var count = original.Length;
+        var builder = new StringBuilder(count + 1 - startIndex);
+        builder.Append(Prefix);
+        for (var i = startIndex; i < count; i++)
+            builder.Append(original[i]);
         return builder.ToString();
     }
     /// <summary>
@@ -47,6 +54,9 @@ public class UnderWordRule : IWordRule
         var count = original.Length;
         if (count == 0)
             return "_";
+        var first = original[0];
+        if (first == Prefix)
+            return original.ToString();
         var builder = new StringBuilder(count + 1);
         builder.Append(Prefix);
         for (var i = 0; i < count; i++)
@@ -57,17 +67,38 @@ public class UnderWordRule : IWordRule
     /// 下换线次字母小写
     /// </summary>
     /// <param name="original"></param>
+    /// <param name="startIndex"></param>
     /// <returns></returns>
-    public static string UnderLower(string original)
+    public static string UnderLower(string original, int startIndex = 0)
     {
         if (string.IsNullOrEmpty(original))
             return "_";
-        var builder = new StringBuilder(original.Length + 1)
-            .Append(Prefix)
-            .Append(original);
-        var first = original[0];
+        var count0 = original.Length;
+        var count = count0 + 1 - startIndex;
+        var builder = new StringBuilder(count)
+            .Append(Prefix);
+        var first = original[startIndex];
+        if (first == Prefix)
+        {
+            if (count == 1)
+            {
+                return "_";
+            }
+            else
+            {
+                first = original[++startIndex];
+            }
+        }
         if (char.IsUpper(first))
-            builder[1] = char.ToLowerInvariant(first);
+        {
+            builder.Append(char.ToLowerInvariant(first));
+        }
+        else
+        {
+            builder.Append(first);
+        }
+        for (var i = startIndex + 1; i < count0; i++)
+            builder.Append(original[i]);
         return builder.ToString();
     }
     /// <summary>
@@ -80,9 +111,23 @@ public class UnderWordRule : IWordRule
         var count = original.Length;
         if (count == 0)
             return "_";
+
         var builder = new StringBuilder(count + 1)
             .Append(Prefix);
         var first = original[0];
+        var start = 1;
+        if (first == Prefix)
+        {
+            if (count == 1)
+            {
+                return "_";
+            }
+            else
+            {
+                first = original[1];
+                start = 2;
+            }
+        }
         if (char.IsUpper(first))
         {
             builder.Append(char.ToLowerInvariant(first));
@@ -91,7 +136,7 @@ public class UnderWordRule : IWordRule
         {
             builder.Append(first);
         }
-        for (var i = 1; i < count; i++)
+        for (var i = start; i < count; i++)
             builder.Append(original[i]);
         return builder.ToString();
     }
