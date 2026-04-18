@@ -8,7 +8,7 @@ public class TaskFactoryTests(ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
-    public async void Action()
+    public async Task Action()
     {
         var sw = Stopwatch.StartNew();
         var task = Task.Factory.StartNew(() => Hello("张三", 1000));
@@ -19,7 +19,7 @@ public class TaskFactoryTests(ITestOutputHelper output)
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.Elapsed.TotalMilliseconds}");
     }
     [Fact]
-    public async void ActionTimeout()
+    public async Task ActionTimeout()
     {
         var factory = Task.Factory;
         var tokenSource = new CancellationTokenSource();
@@ -44,7 +44,7 @@ public class TaskFactoryTests(ITestOutputHelper output)
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.Elapsed.TotalMilliseconds}");
     }
     [Fact]
-    public async void ActionCancel()
+    public async Task ActionCancel()
     {
         var factory = Task.Factory;
         var tokenSource = new CancellationTokenSource();
@@ -69,7 +69,7 @@ public class TaskFactoryTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async void ActionCancel2()
+    public async Task ActionCancel2()
     {
         var factory = Task.Factory;
         var tokenSource = new CancellationTokenSource();

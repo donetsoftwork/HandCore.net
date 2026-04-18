@@ -8,7 +8,7 @@ public class CancellationTokenTests(ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
-    public async void ThrowIfCancellationRequested()
+    public async Task ThrowIfCancellationRequested()
     {
         int result = 0;
         var tokenSource = new CancellationTokenSource();
@@ -29,7 +29,7 @@ public class CancellationTokenTests(ITestOutputHelper output)
         _output.WriteLine($"Result: {result} Elapsed:{sw.Elapsed.TotalMilliseconds}");
     }
     [Fact]
-    public async void IsCancellationRequested()
+    public async Task IsCancellationRequested()
     {
         var tokenSource = new CancellationTokenSource();
         tokenSource.CancelAfter(TimeSpan.FromSeconds(10));

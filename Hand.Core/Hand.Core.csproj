@@ -12,6 +12,9 @@
 	<ItemGroup>
 		<Content Include="readme.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'&#xD;&#xA;             OR '$(TargetFramework)' == 'net4.6.2'&#xD;&#xA;             OR '$(TargetFramework)' == 'net4.7'&#xD;&#xA;             OR '$(TargetFramework)' == 'net4.8'">
+		<PackageReference Include="System.Memory" Version="4.6.3" />
+	</ItemGroup>
 	<ItemGroup>
 		<None Include="$(OutputPath)\netstandard2.0\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>

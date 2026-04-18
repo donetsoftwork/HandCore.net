@@ -1,4 +1,4 @@
-﻿namespace Hand.Converters;
+﻿namespace Hand.Naming;
 
 /// <summary>
 /// 命名转化接口

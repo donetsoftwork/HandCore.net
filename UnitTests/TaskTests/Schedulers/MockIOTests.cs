@@ -32,7 +32,7 @@ public class MockIOTests(ITestOutputHelper output)
         return new(id);
     }
     [Fact]
-    public async void Foreach()
+    public async Task Foreach()
     {
         _output.WriteLine($"begin {DateTime.Now:HH:mm:ss.fff}");
         Stopwatch sw = Stopwatch.StartNew();
@@ -49,7 +49,7 @@ public class MockIOTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async void WhenAll()
+    public async Task WhenAll()
     {
         _output.WriteLine($"begin {DateTime.Now:HH:mm:ss.fff}");
         Stopwatch sw = Stopwatch.StartNew();
@@ -67,7 +67,7 @@ public class MockIOTests(ITestOutputHelper output)
         Assert.True(sw.ElapsedMilliseconds < 200);
     }
     [Fact]
-    public async void StartTask()
+    public async Task StartTask()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 6 };
         var factory = new ConcurrentTaskFactory(options);
@@ -86,7 +86,7 @@ public class MockIOTests(ITestOutputHelper output)
         Assert.True(sw.ElapsedMilliseconds < 300);
     }
     [Fact]
-    public async void StartNew()
+    public async Task StartNew()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 7 };
         var factory = new ConcurrentTaskFactory(options);
@@ -105,7 +105,7 @@ public class MockIOTests(ITestOutputHelper output)
         Assert.True(sw.ElapsedMilliseconds < 300);
     }
     [Fact]
-    public async void Single()
+    public async Task Single()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
@@ -125,7 +125,7 @@ public class MockIOTests(ITestOutputHelper output)
         Assert.Equal(10, products.Length);
     }
     [Fact]
-    public async void Concurrent()
+    public async Task Concurrent()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 4 };
         var factory = new ConcurrentTaskFactory(options);

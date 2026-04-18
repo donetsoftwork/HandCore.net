@@ -1,4 +1,5 @@
-﻿using Hand.Paths;
+﻿using Hand.Naming;
+using Hand.Paths;
 using Hand.Words;
 using System.Text;
 

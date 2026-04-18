@@ -1,10 +1,10 @@
-﻿using Hand.Paths;
+﻿using Hand.Rule;
 
 namespace NamingTests.Paths;
 
 public class DefaultSplitRuleTests
 {
-    private readonly DefaultSplitRule _rule = new(['_', '-']);
+    private readonly IValidation<char> _rule = Logic.Included(['_', '-']);
 
     [Theory]
     [InlineData('_', true)]

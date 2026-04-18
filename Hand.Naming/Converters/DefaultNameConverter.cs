@@ -1,4 +1,6 @@
-﻿namespace Hand.Converters;
+﻿using Hand.Naming;
+
+namespace Hand.Converters;
 
 /// <summary>
 /// 默认命名转化

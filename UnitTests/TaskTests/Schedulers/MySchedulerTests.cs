@@ -6,20 +6,20 @@ namespace TaskTests.Schedulers;
 public class MySchedulerTests
 {
     [Fact]
-    public async void TestSquareAsyn()
+    public async Task TestSquareAsyn()
     {
         var reslut = await SquareAsyn(2);
         Assert.Equal(4, reslut);
     }
 
     [Fact]
-    public async void TestAsyncFunc()
+    public async Task TestAsyncFunc()
     {
         var reslut = await AsyncFunc(1, 1);
         Assert.Equal(4, reslut);
     }
     [Fact]
-    public async void TestScheduler()
+    public async Task TestScheduler()
     {
         var scheduler = new MyScheduler();
         var factory = new TaskFactory(scheduler);

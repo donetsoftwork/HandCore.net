@@ -8,7 +8,7 @@ namespace TaskTests.Schedulers;
 public class TaskTests
 {
     [Fact]
-    public async void New()
+    public async Task New()
     {
         var result = 0;
         

@@ -11,7 +11,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
-    public async void ActionState()
+    public async Task ActionState()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 3 };
         var factory = new ConcurrentTaskFactory(options);
@@ -24,7 +24,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.Elapsed.TotalMilliseconds}");
     }
     [Fact]
-    public async void ActionItemLife()
+    public async Task ActionItemLife()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1, ItemLife = TimeSpan.FromSeconds(1) };
         var factory = new ConcurrentTaskFactory(options);
@@ -45,7 +45,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         await Task.Delay(1000);
     }
     [Fact]
-    public async void TaskState()
+    public async Task TaskState()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 3 };
         var factory = new ConcurrentTaskFactory(options);
@@ -58,7 +58,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.Elapsed.TotalMilliseconds}");
     }
     [Fact]
-    public async void TaskItemLife()
+    public async Task TaskItemLife()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1, ItemLife = TimeSpan.FromSeconds(1) };
         var factory = new ConcurrentTaskFactory(options);
@@ -81,7 +81,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         await Task.Delay(2000);
     }
     [Fact]
-    public async void FuncResult()
+    public async Task FuncResult()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
@@ -91,7 +91,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         Assert.Equal(6, count);
     }
     [Fact]
-    public async void TaskResult()
+    public async Task TaskResult()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
@@ -102,7 +102,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         Assert.Equal(6, count);
     }
     [Fact]
-    public async void ActionCancel()
+    public async Task ActionCancel()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
@@ -127,7 +127,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         await Task.Delay(1000);
     }
     [Fact]
-    public async void ActionTimeout()
+    public async Task ActionTimeout()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
@@ -151,7 +151,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         await Task.Delay(1000);
     }
     [Fact]
-    public async void TaskCancel()
+    public async Task TaskCancel()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
@@ -161,7 +161,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         await Assert.ThrowsAsync<TaskCanceledException>(async () => await task);
     }
     [Fact]
-    public async void TaskCancel0()
+    public async Task TaskCancel0()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
@@ -186,7 +186,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         await Task.Delay(2000);
     }
     [Fact]
-    public async void TestTask()
+    public async Task TestTask()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
@@ -195,7 +195,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         Assert.Equal(6, result);
     }
     [Fact]
-    public async void Cancel()
+    public async Task Cancel()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
@@ -205,7 +205,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         await Assert.ThrowsAsync<TaskCanceledException>(async () => await task);
     }
     [Fact]
-    public async void TestConcurrent0()
+    public async Task TestConcurrent0()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var factory = new ConcurrentTaskFactory(options);
@@ -213,7 +213,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         await Task.Delay(5000);
     }
     [Fact]
-    public async void OneByone()
+    public async Task OneByone()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
@@ -221,7 +221,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         await Task.Delay(10000);
     }
     [Fact]
-    public async void TestConcurrent()
+    public async Task TestConcurrent()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var factory = new ConcurrentTaskFactory(options);
@@ -233,7 +233,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async void TaskOneByone()
+    public async Task TaskOneByone()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var factory = new ConcurrentTaskFactory(options);
@@ -241,7 +241,7 @@ public class ConcurrentTaskFactoryTests(ITestOutputHelper output)
         await Task.Delay(10000);
     }
     [Fact]
-    public async void TaskConcurrent()
+    public async Task TaskConcurrent()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var factory = new ConcurrentTaskFactory(options);

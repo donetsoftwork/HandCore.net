@@ -13,7 +13,7 @@ public class FriendTests(ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
     [Fact]
-    public async void TestRun()
+    public async Task TestRun()
     {
         var sw = Stopwatch.StartNew();
         var factory = new ConcurrentTaskFactory(new ReduceOptions { ConcurrencyLevel = 3 });

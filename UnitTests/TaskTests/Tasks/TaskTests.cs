@@ -8,7 +8,7 @@ public class TaskTests(ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
-    public async void RunAction()
+    public async Task RunAction()
     {
         var sw = Stopwatch.StartNew();
         var task = Task.Run(() => Hello("张三", 1000));
@@ -19,7 +19,7 @@ public class TaskTests(ITestOutputHelper output)
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.Elapsed.TotalMilliseconds}");
     }
     [Fact]
-    public async void ActionTimeout()
+    public async Task ActionTimeout()
     {
         var tokenSource = new CancellationTokenSource();
         var sw = Stopwatch.StartNew();
@@ -43,7 +43,7 @@ public class TaskTests(ITestOutputHelper output)
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.Elapsed.TotalMilliseconds}");
     }
     [Fact]
-    public async void RunAsync()
+    public async Task RunAsync()
     {
         var sw = Stopwatch.StartNew();
         var task = Task.Run(() => HelloAsync("张三", 1000));
@@ -55,7 +55,7 @@ public class TaskTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async void Async()
+    public async Task Async()
     {
         var sw = Stopwatch.StartNew();
         var task = HelloAsync("张三", 1000);

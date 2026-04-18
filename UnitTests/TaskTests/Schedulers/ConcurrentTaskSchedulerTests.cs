@@ -21,7 +21,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
         await Assert.ThrowsAsync<TimeoutException>(async () => await TimeoutHelper.ThrowIfTimeout(task, TimeSpan.FromSeconds(1)));
     }
     [Fact]
-    public async void TestTask()
+    public async Task TestTask()
     {
         var options = new ConcurrentOptions { ConcurrencyLevel = 10 };
         var scheduler = new QueueTaskScheduler();
@@ -33,7 +33,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
         Assert.Equal(6, result);
     }
     [Fact]
-    public async void TestConcurrent0()
+    public async Task TestConcurrent0()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var factory = new ConcurrentTaskFactory(options);
@@ -41,7 +41,7 @@ public class ConcurrentTaskSchedulerTests(ITestOutputHelper output)
         await Task.Delay(10000);
     }
     [Fact]
-    public async void TestConcurrent()
+    public async Task TestConcurrent()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var scheduler = new QueueTaskScheduler();

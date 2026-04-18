@@ -8,7 +8,7 @@ public class DictionaryProviderWhenAllTests(ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
     [Fact]
-    public async void EventHandler()
+    public async Task EventHandler()
     {
         var (bus, provider) = CreateEventBus();
         var handler = new Handler(_output);
@@ -22,7 +22,7 @@ public class DictionaryProviderWhenAllTests(ITestOutputHelper output)
         await Task.Delay(1000);
     }
     [Fact]
-    public async void TaskEventHandler()
+    public async Task TaskEventHandler()
     {
         //TaskInfo
         var (bus, provider) = CreateEventBus();
@@ -37,7 +37,7 @@ public class DictionaryProviderWhenAllTests(ITestOutputHelper output)
         await Task.Delay(1000);
     }
     [Fact]
-    public async void AsyncEventHandler()
+    public async Task AsyncEventHandler()
     {
         var (bus, provider) = CreateEventBus();
         var asyncHandler = new AsyncHandler(_output);
@@ -51,7 +51,7 @@ public class DictionaryProviderWhenAllTests(ITestOutputHelper output)
         await Task.Delay(1000);
     }
     [Fact]
-    public async void PublishAsync()
+    public async Task PublishAsync()
     {
         var (bus, provider) = CreateEventBus();
         var handler = new Handler(_output);

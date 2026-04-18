@@ -10,6 +10,11 @@ public class ActionProcessor<TData>
     : IProcessor
 {
     #region IProcessor
+    /// <summary>
+    /// 执行
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
     public bool Run()
     {
         throw new NotImplementedException();

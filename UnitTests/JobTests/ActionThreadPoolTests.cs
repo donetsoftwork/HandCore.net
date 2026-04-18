@@ -13,7 +13,7 @@ public class ActionThreadPoolTests(ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
     [Fact]
-    public async void Add()
+    public async Task Add()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var pool = options.CreateJob(ActionProcessor.Instance);
@@ -22,7 +22,7 @@ public class ActionThreadPoolTests(ITestOutputHelper output)
         await Task.Delay(1000);
     }
     [Fact]
-    public async void OneByOne()
+    public async Task OneByOne()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var pool = options.CreateJob(ActionProcessor.Instance);
@@ -35,7 +35,7 @@ public class ActionThreadPoolTests(ITestOutputHelper output)
         await Task.Delay(1000);
     }
     [Fact]
-    public async void Concurrent()
+    public async Task Concurrent()
     {
         var sw = Stopwatch.StartNew();
         Hello("Item");
@@ -52,7 +52,7 @@ public class ActionThreadPoolTests(ITestOutputHelper output)
         await Task.Delay(1000);
     }
     [Fact]
-    public async void Stop()
+    public async Task Stop()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var pool = options.CreateJob(ActionProcessor.Instance);

@@ -8,7 +8,7 @@ public class IdeaTests(ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
     [Fact]
-    public async void Pass()
+    public async Task Pass()
     {
         var deadlineTime = 1000;
         var idea = new Idea(deadlineTime, 5, 10, 50, 100, 500, 1000, 2000, 10000);
@@ -20,7 +20,7 @@ public class IdeaTests(ITestOutputHelper output)
         
     }
     [Fact]
-    public async void Fail()
+    public async Task Fail()
     {
         var deadlineTime = 1000;
         var idea = new Idea(deadlineTime, 5, 11, 51, 100, 501, 911, 2000, 10000);
@@ -31,7 +31,7 @@ public class IdeaTests(ITestOutputHelper output)
         _output.WriteLine("Total Span :" + sw.Elapsed.TotalMilliseconds);
     }
     [Fact]
-    public async void Fail2()
+    public async Task Fail2()
     {
         var deadlineTime = 1000;
         var idea = new Idea(deadlineTime, 99, 500, 1000, 5000, 8000, 9000, 10000);

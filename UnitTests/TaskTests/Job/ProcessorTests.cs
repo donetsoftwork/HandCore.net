@@ -9,7 +9,7 @@ public class ProcessorTests(ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
     [Fact]
-    public async void ActionState()
+    public async Task ActionState()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 3 };
         var processor = new Processor();
@@ -23,7 +23,7 @@ public class ProcessorTests(ITestOutputHelper output)
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.Elapsed.TotalMilliseconds}");
     }
     [Fact]
-    public async void TaskState()
+    public async Task TaskState()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 3 };
         var processor = new Processor();
@@ -37,7 +37,7 @@ public class ProcessorTests(ITestOutputHelper output)
         _output.WriteLine($"Thread{Environment.CurrentManagedThreadId} Total Span :{sw.Elapsed.TotalMilliseconds}");
     }
     [Fact]
-    public async void FuncResult()
+    public async Task FuncResult()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var processor = new Processor();
@@ -47,7 +47,7 @@ public class ProcessorTests(ITestOutputHelper output)
         Assert.Equal(6, count);
     }
     [Fact]
-    public async void TaskResult()
+    public async Task TaskResult()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var processor = new Processor();
@@ -59,7 +59,7 @@ public class ProcessorTests(ITestOutputHelper output)
         Assert.Equal(6, count);
     }
     [Fact]
-    public async void ActionCancel()
+    public async Task ActionCancel()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var processor = new Processor();
@@ -70,7 +70,7 @@ public class ProcessorTests(ITestOutputHelper output)
         await Assert.ThrowsAsync<TaskCanceledException>(() => task);
     }
     [Fact]
-    public async void TaskCancel()
+    public async Task TaskCancel()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var processor = new Processor();
@@ -82,7 +82,7 @@ public class ProcessorTests(ITestOutputHelper output)
         await Assert.ThrowsAsync<TaskCanceledException>(() => task);
     }
     [Fact]
-    public async void ActionOneByOne()
+    public async Task ActionOneByOne()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var processor = new Processor();
@@ -97,7 +97,7 @@ public class ProcessorTests(ITestOutputHelper output)
         await Task.WhenAll(tasks);
     }
     [Fact]
-    public async void ActionConcurrent()
+    public async Task ActionConcurrent()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var processor = new Processor();
@@ -112,7 +112,7 @@ public class ProcessorTests(ITestOutputHelper output)
         await Task.WhenAll(tasks);
     }
     [Fact]
-    public async void TaskOneByOne()
+    public async Task TaskOneByOne()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var processor = new Processor();
@@ -127,7 +127,7 @@ public class ProcessorTests(ITestOutputHelper output)
         await Task.WhenAll(tasks);
     }
     [Fact]
-    public async void TaskConcurrent()
+    public async Task TaskConcurrent()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 10 };
         var processor = new Processor();
@@ -143,7 +143,7 @@ public class ProcessorTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async void CurrentItem()
+    public async Task CurrentItem()
     {
         //var sw = Stopwatch.StartNew();
         //Hello("Item");
@@ -174,7 +174,7 @@ public class ProcessorTests(ITestOutputHelper output)
         await Task.WhenAll(tasks);
     }
     [Fact]
-    public async void TaskItemLife()
+    public async Task TaskItemLife()
     {
         var options = new ReduceOptions { ConcurrencyLevel = 1 };
         var processor = new Processor();

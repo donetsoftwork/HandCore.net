@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Hand.Paths;
+﻿namespace Hand.Paths;
 
 /// <summary>
 /// 路径转化规则

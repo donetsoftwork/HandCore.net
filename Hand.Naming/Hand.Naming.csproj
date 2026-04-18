@@ -5,17 +5,14 @@
 		<TargetFrameworks>net4.6.2;net4.7;net4.8;net7.0;net8.0;net9.0;net10.0;netstandard2.0;netstandard2.1</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RootNamespace>Hand</RootNamespace>
-		<Version>$(VersionBase).1-alpha</Version>
+		<Version>$(VersionBase).0-alpha</Version>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
 	<ItemGroup>
 		<Content Include="readme.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'
-             OR '$(TargetFramework)' == 'net4.6.2'
-             OR '$(TargetFramework)' == 'net4.7'
-             OR '$(TargetFramework)' == 'net4.8'">
+	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'&#xD;&#xA;             OR '$(TargetFramework)' == 'net4.6.2'&#xD;&#xA;             OR '$(TargetFramework)' == 'net4.7'&#xD;&#xA;             OR '$(TargetFramework)' == 'net4.8'">
 		<PackageReference Include="System.Memory" Version="4.6.3" />
 	</ItemGroup>
 	<ItemGroup>
@@ -23,5 +20,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Hand.Core\Hand.Core.csproj" />
+	  <ProjectReference Include="..\Hand.Validation\Hand.Validation.csproj" />
 	</ItemGroup>
 </Project>

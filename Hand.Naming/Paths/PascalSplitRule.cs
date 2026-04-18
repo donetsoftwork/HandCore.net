@@ -1,5 +1,4 @@
 ﻿using Hand.Rule;
-using Hand.Words;
 
 namespace Hand.Paths;
 

@@ -1,4 +1,6 @@
-﻿using Hand.Paths;
+﻿using Hand.Naming;
+using Hand.Paths;
+using Hand.Rule;
 using Hand.Words;
 using System.Text;
 
@@ -10,10 +12,23 @@ namespace Hand.Converters;
 /// <param name="separators"></param>
 /// <param name="destRule"></param>
 public class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRule)
-    : DefaultSplitRule(separators), INameConverter, IPathRule
+    : INameConverter, IPathRule
 {
     #region 配置
+    private readonly IEnumerable<char> _separators = separators;
+    private readonly IValidation<char> _validation = Logic.Included(separators);
     private readonly IWordRule _destRule = destRule;
+
+    /// <summary>
+    /// 路径分割符
+    /// </summary>
+    public IEnumerable<char> Separators
+        => _separators;
+    /// <summary>
+    /// 分割符验证器
+    /// </summary>
+    public IValidation<char> Validation
+        => _validation;
     /// <summary>
     /// 目标转化规则
     /// </summary>
@@ -33,7 +48,7 @@ public class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRu
         for (var i = startIndex; i < count; i++)
         {
             var item = name[i];
-            if (Validate(item))
+            if (_validation.Validate(item))
             {
                 first = true;
                 continue;
@@ -61,7 +76,7 @@ public class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRu
         var depth = 0;
         foreach (char item in name)
         {
-            if (Validate(item))
+            if (_validation.Validate(item))
             {
                 first = true;
                 continue;
@@ -92,7 +107,7 @@ public class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRu
         for (var i = startIndex; i < count; i++)
         {
             var item = fullPath[i];
-            if (Validate(item))
+            if (_validation.Validate(item))
             {
                 first = true;
                 continue;
@@ -129,7 +144,7 @@ public class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRu
         var depth = 0;
         foreach (char item in fullPath)
         {
-            if (Validate(item))
+            if (_validation.Validate(item))
             {
                 first = true;
                 continue;

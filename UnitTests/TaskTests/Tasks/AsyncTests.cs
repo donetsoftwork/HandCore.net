@@ -8,7 +8,7 @@ public class AsyncTests(ITestOutputHelper output)
     private readonly ITestOutputHelper _output = output;
 
     [Fact]
-    public async void Async()
+    public async Task Async()
     {
         var sw = Stopwatch.StartNew();
         var one = await One();
@@ -20,7 +20,7 @@ public class AsyncTests(ITestOutputHelper output)
         _output.WriteLine($"Async Total Time: {sw.ElapsedMilliseconds} ms");
     }
     [Fact]
-    public async void Parallel()
+    public async Task Parallel()
     {
         var sw = Stopwatch.StartNew();
         var oneTask = One();
@@ -35,7 +35,7 @@ public class AsyncTests(ITestOutputHelper output)
         _output.WriteLine($"Parallel Async Total Time: {sw.ElapsedMilliseconds} ms");
     }
     [Fact]
-    public async void WhenAll()
+    public async Task WhenAll()
     {
         var sw = Stopwatch.StartNew();
         var oneTask = One();
