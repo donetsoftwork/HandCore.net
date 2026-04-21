@@ -9,7 +9,7 @@ namespace Hand.Maping;
 /// <param name="prefix">前缀</param>
 /// <param name="comparison"></param>
 public class RemovePrefixProjection(string prefix, StringComparison comparison = StringComparison.Ordinal)
-    : ProjectionBase<string>
+    : ProjectionBase<string>, IProjection<string>
 {
     #region 配置
     /// <summary>
@@ -38,4 +38,11 @@ public class RemovePrefixProjection(string prefix, StringComparison comparison =
     /// <inheritdoc />
     public override string Convert(string source)
         => source.Substring(_prefixLength);
+    /// <inheritdoc />
+    string IConverter<string, string>.Convert(string source)
+    {
+        if (TryConvert(source, out var result))
+            return result;
+        return source;
+    }
 }

@@ -3,7 +3,7 @@
 /// <summary>
 /// 投影转化接口
 /// </summary>
-public interface IProjection<T>
+public interface IProjection<T> : IConverter<T, T>
 {
     /// <summary>
     /// 尝试转化

@@ -1,16 +1,16 @@
 ﻿using Hand.Maping;
-using Hand.Maping.Complexs;
 
 namespace ProjectionsTests;
 
 public class FirstReturnProjectionTests
 {
-    private FirstReturnProjection<string> _projection;
+    private IProjection<string> _projection;
     public FirstReturnProjectionTests()
     {
         var user = Projection.RemovePrefix("User", StringComparison.OrdinalIgnoreCase);
         var u = Projection.RemovePrefix("U");
-        _projection = new FirstReturnProjection<string>(user, u);
+        //_projection = new FirstReturnProjection<string>(user, u);
+        _projection = Projection.FirstReturn(user, u);
     }
 
     [Theory]

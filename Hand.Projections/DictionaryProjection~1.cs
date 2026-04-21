@@ -5,15 +5,22 @@ namespace Hand.Maping;
 /// <summary>
 /// 字典投影
 /// </summary>
-/// <typeparam name="TTey"></typeparam>
+/// <typeparam name="TKey"></typeparam>
 /// <param name="provider"></param>
-public class DictionaryProjection<TTey>(IDictionary<TTey, TTey> provider)
-    : IProjection<TTey>
+public class DictionaryProjection<TKey>(IDictionary<TKey, TKey> provider)
+    : IProjection<TKey>
 {
-    private readonly IDictionary<TTey, TTey> _provider = provider;
+    private readonly IDictionary<TKey, TKey> _provider = provider;
     #region IProjection<TTey, TValue>
     /// <inheritdoc />
-    public bool TryConvert(TTey source, out TTey result)
+    public bool TryConvert(TKey source, out TKey result)
         => _provider.TryGetValue(source, out result!);
     #endregion
+    /// <inheritdoc />
+    TKey IConverter<TKey, TKey>.Convert(TKey source)
+    {
+        if (_provider.TryGetValue(source, out var result))
+            return result;
+        return source;
+    }
 }

@@ -9,7 +9,7 @@ namespace Hand.Maping;
 /// <param name="prefix">前缀</param>
 /// <param name="comparison"></param>
 public class PrefixProjection(string prefix, StringComparison comparison = StringComparison.Ordinal)
-    : ProjectionBase<string>, IConverter<string, string>, IValidation<string>
+    : ProjectionBase<string>, IProjection<string>
 {
     #region 配置
     private readonly string _prefix = prefix;

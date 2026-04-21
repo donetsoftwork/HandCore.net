@@ -11,7 +11,7 @@ namespace Hand.Maping;
 /// <param name="start">开始位置</param>
 /// <param name="comparison"></param>
 public class ReplaceProjection(string target, string replacement, int start = 0, StringComparison comparison = StringComparison.Ordinal)
-    : ProjectionBase<string>, IConverter<string, string>
+    : ProjectionBase<string>, IProjection<string>
 {
     #region 配置
     private readonly string _target = target;

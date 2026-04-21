@@ -9,7 +9,7 @@ namespace Hand.Maping;
 /// <param name="suffix">后缀</param>
 /// <param name="comparison"></param>
 public class SuffixProjection(string suffix, StringComparison comparison = StringComparison.Ordinal)
-    : ProjectionBase<string>, IConverter<string, string>
+    : ProjectionBase<string>, IProjection<string>
 {
     #region 配置
     private readonly string _suffix = suffix;

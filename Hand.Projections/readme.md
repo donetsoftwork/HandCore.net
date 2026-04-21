@@ -1,6 +1,6 @@
 # 投影算法之扑风捉影
 
-## 一、IProjection\<S, T\>接口
+## 一、IProjection\<T\>接口
 >* TryConvert参数映射,不符合规则就不映射
 
 ## 二、基础投影

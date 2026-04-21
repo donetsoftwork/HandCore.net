@@ -52,4 +52,11 @@ public class ChainProjection<T>(LinkedList<IProjection<T>> chain)
         value = source;
         return false;
     }
+    /// <inheritdoc />
+    T IConverter<T, T>.Convert(T source)
+    {
+        if (TryConvert(source, out var result))
+            return result;
+        return source;
+    }
 }

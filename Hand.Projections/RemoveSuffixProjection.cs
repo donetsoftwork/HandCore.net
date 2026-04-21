@@ -9,7 +9,7 @@ namespace Hand.Maping;
 /// <param name="suffix">后缀</param>
 /// <param name="comparison"></param>
 public class RemoveSuffixProjection(string suffix, StringComparison comparison = StringComparison.Ordinal)
-    : ProjectionBase<string>
+    : ProjectionBase<string>, IProjection<string>
 {
     #region 配置
     /// <summary>
@@ -38,4 +38,11 @@ public class RemoveSuffixProjection(string suffix, StringComparison comparison =
     /// <inheritdoc />
     public override string Convert(string source)
         => source.Substring(0, source.Length - _suffixLength);
+    /// <inheritdoc />
+    string IConverter<string, string>.Convert(string source)
+    {
+        if (TryConvert(source, out var result))
+            return result;
+        return source;
+    }
 }

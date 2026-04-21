@@ -9,7 +9,7 @@ namespace Hand.Maping;
 /// <param name="validation"></param>
 /// <param name="converter"></param>
 public sealed class NamingProjection(IValidation<string> validation, INameConverter converter)
-    : IProjection<string>, IValidation<string>, IConverter<string, string>
+    : IProjection<string>, IValidation<string>
 {
     #region 配置
     /// <summary>

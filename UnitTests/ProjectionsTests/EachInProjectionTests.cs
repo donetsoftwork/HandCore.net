@@ -1,18 +1,19 @@
 ﻿using Hand.Maping;
-using Hand.Maping.Complexs;
 
 namespace ProjectionsTests;
 
 public class EachInProjectionTests
 {
-    private EachInProjection<string> _projection;
-    private EachInProjection<string> _failContinue;
+    private IProjection<string> _projection;
+    private IProjection<string> _failContinue;
     public EachInProjectionTests()
     {
         var user = Projection.RemovePrefix("User", StringComparison.OrdinalIgnoreCase);
         var u = Projection.RemovePrefix("U");
-        _projection = new EachInProjection<string>(false, user, u);
-        _failContinue = new EachInProjection<string>(true, user, u);
+        //_projection = new EachInProjection<string>(false, user, u);
+        //_failContinue = new EachInProjection<string>(true, user, u);
+        _projection = Projection.EachIn(false, user, u);
+        _failContinue = Projection.EachIn(true, user, u);
     }
 
     [Theory]

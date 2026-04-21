@@ -7,7 +7,7 @@ namespace Hand.Maping;
 /// 结尾字符去除投影
 /// </summary>
 public class TrimEndProjection(char[] ends)
-    : ProjectionBase<string>, IConverter<string, string>
+    : ProjectionBase<string>, IProjection<string>
 {
     #region 配置
     /// <summary>

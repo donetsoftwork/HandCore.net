@@ -8,7 +8,7 @@ namespace Hand.Maping;
 /// <typeparam name="TArgument"></typeparam>
 /// <param name="validation"></param>
 public class VerifyProjection<TArgument>(IValidation<TArgument> validation)
-    : ProjectionBase<TArgument>, IConverter<TArgument, TArgument>, IValidation<TArgument>
+    : ProjectionBase<TArgument>, IProjection<TArgument>
 {
     #region 配置
     private readonly IValidation<TArgument> _validation = validation;

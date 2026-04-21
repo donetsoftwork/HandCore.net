@@ -6,7 +6,7 @@ namespace Hand.Maping;
 /// 同类投影基类
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public abstract class ProjectionBase<T> : IProjection<T>, IValidation<T>
+public abstract class ProjectionBase<T> : IValidation<T>
 {
     /// <inheritdoc />
     public virtual bool TryConvert(T source, out T value)

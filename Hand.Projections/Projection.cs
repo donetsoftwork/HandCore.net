@@ -93,7 +93,7 @@ public static class Projection
     public static IProjection<string> Replace(string fragment, string replacement, int start = 0, StringComparison comparison = StringComparison.Ordinal)
         => new ReplaceProjection(fragment, replacement, start, comparison);
     /// <summary>
-    /// 前缀投影
+    /// 替换前缀投影
     /// </summary>
     /// <param name="prefix"></param>
     /// <param name="replacement"></param>
@@ -103,7 +103,7 @@ public static class Projection
     public static IProjection<string> ReplacePrefix(string prefix, string replacement, StringComparison comparison = StringComparison.Ordinal)
         => new ReplacePrefixProjection(prefix, replacement, comparison);
     /// <summary>
-    /// 后缀投影
+    /// 替换后缀投影
     /// </summary>
     /// <param name="suffix"></param>
     /// <param name="replacement"></param>
@@ -153,7 +153,23 @@ public static class Projection
     public static IProjection<string> ToProjection(this INameConverter converter, IValidation<string> validation)
         => new NamingProjection(validation, converter);
     #endregion
-    #region ToEachIn
+    #region EachIn
+    /// <summary>
+    /// 逐个投影
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="failContinue"></param>
+    /// <param name="projections"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IProjection<T> EachIn<T>(bool failContinue, params IProjection<T>[] projections)
+    {
+        return projections.Length switch
+        {
+            1 => projections[0],
+            _ => new EachInProjection<T>(failContinue, projections),
+        };
+    }
     /// <summary>
     /// 逐个投影
     /// </summary>
@@ -163,7 +179,7 @@ public static class Projection
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IProjection<T> ToEachIn<T>(this IEnumerable<IProjection<T>> projections, bool failContinue = true)
-        => ToEachIn(projections.ToArray(), failContinue);
+        => EachIn(failContinue, projections.ToArray());
     /// <summary>
     /// 逐个投影
     /// </summary>
@@ -173,15 +189,24 @@ public static class Projection
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IProjection<T> ToEachIn<T>(this IProjection<T>[] projections, bool failContinue = true)
+        => EachIn(failContinue, projections);
+    #endregion
+    #region FirstReturn
+    /// <summary>
+    /// 快速结束投影
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="projections"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IProjection<T> FirstReturn<T>(params IProjection<T>[] projections)
     {
         return projections.Length switch
         {
             1 => projections[0],
-            _ => new EachInProjection<T>(failContinue, projections),
+            _ => new FirstReturnProjection<T>(projections),
         };
     }
-    #endregion    
-    #region ToFirstReturn
     /// <summary>
     /// 快速结束投影
     /// </summary>
@@ -190,7 +215,7 @@ public static class Projection
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IProjection<T> ToFirstReturn<T>(this IEnumerable<IProjection<T>> projections)
-        => ToFirstReturn(projections.ToArray());
+        => FirstReturn(projections.ToArray());
     /// <summary>
     /// 快速结束投影
     /// </summary>
@@ -199,13 +224,7 @@ public static class Projection
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IProjection<T> ToFirstReturn<T>(this IProjection<T>[] projections)
-    {
-        return projections.Length switch
-        {
-            1 => projections[0],
-            _ => new FirstReturnProjection<T>(projections),
-        };
-    }
+        => FirstReturn(projections);
     #endregion
     #region Filter
     /// <summary>

@@ -34,17 +34,25 @@ public sealed class EachInProjection<T>(LinkedList<IProjection<T>> chain, bool f
     /// <inheritdoc />
     public override bool TryConvert(T source, out T value)
     {
+        var state = false;
         foreach (var item in _chain)
         {
             if (item.TryConvert(source, out value))
+            {
                 source = value;
+                state = true;
+            }                
             else if (_failContinue)
+            {
                 continue;
+            }
             else
-                return false;
+            {
+                return state;
+            }            
         }
         value = source;
-        return true;
+        return state;
     }
     #endregion
 }
