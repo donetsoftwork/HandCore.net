@@ -31,6 +31,9 @@ public class ReplaceProjection(string target, string replacement, int start = 0,
     public string Replacement 
         => _replacement;
     #endregion
+    /// <inheritdoc />
+    public override string Convert(string source)
+        => source.Replace(_target, _replacement);
     #region IValidation<string>
     /// <inheritdoc />
     public override bool Validate(string source)
@@ -38,7 +41,11 @@ public class ReplaceProjection(string target, string replacement, int start = 0,
     #endregion
     #region IConverter<string, string>
     /// <inheritdoc />
-    public override string Convert(string source)
-        => source.Replace(_target, _replacement);
+    string IConverter<string, string>.Convert(string source)
+    {
+        if (Validate(source))
+            return Convert(source);
+        return source;
+    }
     #endregion
 }

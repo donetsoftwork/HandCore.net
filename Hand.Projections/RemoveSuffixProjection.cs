@@ -41,8 +41,8 @@ public class RemoveSuffixProjection(string suffix, StringComparison comparison =
     /// <inheritdoc />
     string IConverter<string, string>.Convert(string source)
     {
-        if (TryConvert(source, out var result))
-            return result;
+        if (Validate(source))
+            return Convert(source);
         return source;
     }
 }

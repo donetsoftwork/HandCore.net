@@ -38,11 +38,13 @@ public class RemovePrefixProjection(string prefix, StringComparison comparison =
     /// <inheritdoc />
     public override string Convert(string source)
         => source.Substring(_prefixLength);
+    #region IConverter<string, string>
     /// <inheritdoc />
     string IConverter<string, string>.Convert(string source)
     {
-        if (TryConvert(source, out var result))
-            return result;
+        if (Validate(source))
+            return Convert(source);
         return source;
     }
+    #endregion
 }

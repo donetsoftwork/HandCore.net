@@ -1,4 +1,5 @@
-﻿using Hand.Rule.Logics;
+﻿using Hand.Comparers;
+using Hand.Rule.Logics;
 using System;
 #if !NET7_0
 using System.Collections.Frozen;
@@ -261,4 +262,36 @@ public static class Logic
     public static IValidation<TMember> Included<TMember>(params IEnumerable<TMember> members)
         => Included(EqualityComparer<TMember>.Default, members);
     #endregion
+    /// <summary>
+    /// 过滤投影
+    /// </summary>
+    /// <param name="validation"></param>
+    /// <param name="source"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IDictionary<TKey, TValue> Filter<TKey, TValue>(this IValidation<TKey> validation, IDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
+        where TKey : notnull
+    {
+        int count = source.Count;
+        if (count == 0)
+            return source;
+        var result = new Dictionary<TKey, TValue>(count, comparer);
+        foreach (var key in source.Keys)
+        {
+            if (validation.Validate(key))
+                result[key] = source[key];
+        }
+        return result;
+    }
+    /// <summary>
+    /// 过滤投影
+    /// </summary>
+    /// <param name="validation"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IDictionary<TKey, TValue> Filter<TKey, TValue>(this IValidation<TKey> validation, IDictionary<TKey, TValue> source)
+        where TKey : notnull
+        => Filter(validation, source, CompareConverter.GetComparer(source));
 }

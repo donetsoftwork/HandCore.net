@@ -166,6 +166,7 @@ public static class Projection
     {
         return projections.Length switch
         {
+            0 => Default<T>(),
             1 => projections[0],
             _ => new EachInProjection<T>(failContinue, projections),
         };
@@ -203,6 +204,7 @@ public static class Projection
     {
         return projections.Length switch
         {
+            0 => Default<T>(),
             1 => projections[0],
             _ => new FirstReturnProjection<T>(projections),
         };
@@ -226,6 +228,13 @@ public static class Projection
     public static IProjection<T> ToFirstReturn<T>(this IProjection<T>[] projections)
         => FirstReturn(projections);
     #endregion
+    /// <summary>
+    /// 默认投影
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static IProjection<T> Default<T>()
+        => new DefaultProjection<T>();
     #region Filter
     /// <summary>
     /// 过滤投影

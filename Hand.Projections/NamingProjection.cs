@@ -38,10 +38,17 @@ public sealed class NamingProjection(IValidation<string> validation, INameConver
     /// <inheritdoc />
     public bool Validate(string argument)
         => _validation.Validate(argument);
-    #endregion
-    #region IConverter<string, string>
+    #endregion    
     /// <inheritdoc />
     public string Convert(string source)
         => _converter.Convert(source);
+    #region IConverter<string, string>
+    /// <inheritdoc />
+    string IConverter<string, string>.Convert(string source)
+    {
+        if (_validation.Validate(source))
+            return _converter.Convert(source);
+        return source;
+    }
     #endregion
 }

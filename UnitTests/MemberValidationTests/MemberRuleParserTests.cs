@@ -1,4 +1,5 @@
-﻿using Hand.Rule;
+﻿using Hand;
+using Hand.Rule;
 using Hand.Rule.Logics;
 
 namespace MemberValidationTests;

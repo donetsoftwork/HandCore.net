@@ -41,9 +41,17 @@ public class PrefixProjection(string prefix, StringComparison comparison = Strin
     public override bool Validate(string source)
         => _validation.Not(source);
     #endregion
-    #region IConverter<string, string>
+   
     /// <inheritdoc />
     public override string Convert(string source)
         => _prefix + source;
+    #region IConverter<string, string>
+    /// <inheritdoc />
+    string IConverter<string, string>.Convert(string source)
+    {
+        if (Validate(source))
+            return Convert(source);
+        return source;
+    }
     #endregion
 }

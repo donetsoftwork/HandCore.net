@@ -1,8 +1,9 @@
+using Hand.Rule;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Hand.Rule;
+namespace Hand;
 
 /// <summary>
 /// 规则解析器
@@ -14,10 +15,22 @@ namespace Hand.Rule;
 public class MemberRuleParser(string include, string exclude, char[] separators, IEqualityComparer<string> memberComparer)
 {
     #region 配置
-    private readonly string _includePrefix = include;
-    private readonly string _excludePrefix = exclude;
-    private readonly char[] _separators = separators;
-    private readonly IEqualityComparer<string> _memberComparer = memberComparer;
+    /// <summary>
+    /// 包含标记
+    /// </summary>
+    protected readonly string _includePrefix = include;
+    /// <summary>
+    /// 排除标记
+    /// </summary>
+    protected readonly string _excludePrefix = exclude;
+    /// <summary>
+    /// 分割符
+    /// </summary>
+    protected readonly char[] _separators = separators;
+    /// <summary>
+    /// 成员比较
+    /// </summary>
+    protected readonly IEqualityComparer<string> _memberComparer = memberComparer;
 
     /// <summary>
     /// 包含标记
@@ -68,9 +81,17 @@ public class MemberRuleParser(string include, string exclude, char[] separators,
     /// <param name="skip"></param>
     /// <returns></returns>
     public static IValidation<string> ToIncluded(string text, char[] separators, IEqualityComparer<string> comparer, int skip = 0)
+        => ToIncluded(text.Split(separators, StringSplitOptions.RemoveEmptyEntries), comparer, skip);
+    /// <summary>
+    /// 转化为被包含验证规则
+    /// </summary>
+    /// <param name="parts"></param>
+    /// <param name="comparer"></param>
+    /// <param name="skip"></param>
+    /// <returns></returns>
+    public static IValidation<string> ToIncluded(string[] parts, IEqualityComparer<string> comparer, int skip = 0)
     {
-        var items = skip > 0 ? text.Split(separators, StringSplitOptions.RemoveEmptyEntries).Skip(skip).Distinct() :
-            text.Split(separators, StringSplitOptions.RemoveEmptyEntries).Distinct();
+        var items = skip > 0 ? parts.Skip(skip).Distinct() : parts.Distinct();
         return Logic.Included(comparer, items);
     }
     /// <summary>
@@ -84,7 +105,6 @@ public class MemberRuleParser(string include, string exclude, char[] separators,
         /// <summary>
         /// 默认实例
         /// </summary>
-
         internal static readonly MemberRuleParser Instance = new("Include:", "Exclude:", [' '], StringComparer.Ordinal);
     }
     #endregion
