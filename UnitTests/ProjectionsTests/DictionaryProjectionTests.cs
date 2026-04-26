@@ -4,7 +4,7 @@ namespace ProjectionsTests;
 
 public class DictionaryProjectionTests
 {
-    private DictionaryProjection<string> _projection = new(new Dictionary<string, string>
+    private readonly DictionaryProjection<string> _projection = new(new Dictionary<string, string>
     {
         { "feet", "foot" },
         { "mice", "mouse" }

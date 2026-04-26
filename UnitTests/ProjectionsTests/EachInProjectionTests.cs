@@ -4,8 +4,8 @@ namespace ProjectionsTests;
 
 public class EachInProjectionTests
 {
-    private IProjection<string> _projection;
-    private IProjection<string> _failContinue;
+    private readonly IProjection<string> _projection;
+    private readonly IProjection<string> _failContinue;
     public EachInProjectionTests()
     {
         var user = Projection.RemovePrefix("User", StringComparison.OrdinalIgnoreCase);

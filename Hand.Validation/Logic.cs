@@ -269,7 +269,6 @@ public static class Logic
     /// <param name="source"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Filter<TKey, TValue>(this IValidation<TKey> validation, IDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
         where TKey : notnull
     {

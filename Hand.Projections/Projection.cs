@@ -161,7 +161,6 @@ public static class Projection
     /// <param name="failContinue"></param>
     /// <param name="projections"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IProjection<T> EachIn<T>(bool failContinue, params IProjection<T>[] projections)
     {
         return projections.Length switch
@@ -178,7 +177,6 @@ public static class Projection
     /// <param name="projections"></param>
     /// <param name="failContinue"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IProjection<T> ToEachIn<T>(this IEnumerable<IProjection<T>> projections, bool failContinue = true)
         => EachIn(failContinue, projections.ToArray());
     /// <summary>
@@ -199,7 +197,6 @@ public static class Projection
     /// <typeparam name="T"></typeparam>
     /// <param name="projections"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IProjection<T> FirstReturn<T>(params IProjection<T>[] projections)
     {
         return projections.Length switch
@@ -215,7 +212,6 @@ public static class Projection
     /// <typeparam name="T"></typeparam>
     /// <param name="projections"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IProjection<T> ToFirstReturn<T>(this IEnumerable<IProjection<T>> projections)
         => FirstReturn(projections.ToArray());
     /// <summary>
@@ -224,7 +220,6 @@ public static class Projection
     /// <typeparam name="T"></typeparam>
     /// <param name="projections"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IProjection<T> ToFirstReturn<T>(this IProjection<T>[] projections)
         => FirstReturn(projections);
     #endregion
@@ -233,6 +228,7 @@ public static class Projection
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IProjection<T> Default<T>()
         => new DefaultProjection<T>();
     #region Filter
@@ -243,7 +239,6 @@ public static class Projection
     /// <param name="source"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Filter<TKey, TValue>(this IEnumerable<IProjection<TKey>> projections, IDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
         where TKey : notnull
     {
@@ -257,7 +252,6 @@ public static class Projection
     /// <param name="projections"></param>
     /// <param name="source"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Filter<TKey, TValue>(this IEnumerable<IProjection<TKey>> projections, IDictionary<TKey, TValue> source)
         where TKey : notnull
         => Filter(projections, source, CompareConverter.GetComparer(source));
@@ -268,7 +262,6 @@ public static class Projection
     /// <param name="source"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Filter<TKey, TValue>(this IProjection<TKey> projection, IDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
         where TKey : notnull
     {
@@ -285,7 +278,6 @@ public static class Projection
     /// <param name="projection"></param>
     /// <param name="source"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Filter<TKey, TValue>(this IProjection<TKey> projection, IDictionary<TKey, TValue> source)
         where TKey : notnull
         => Filter(projection, source, CompareConverter.GetComparer(source));
@@ -298,7 +290,6 @@ public static class Projection
     /// <param name="source"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Through<TKey, TValue>(this IEnumerable<IProjection<TKey>> projections, IDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
         where TKey : notnull
     {
@@ -312,7 +303,6 @@ public static class Projection
     /// <param name="projections"></param>
     /// <param name="source"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Through<TKey, TValue>(this IEnumerable<IProjection<TKey>> projections, IDictionary<TKey, TValue> source)
         where TKey : notnull
         => Through(projections, source, CompareConverter.GetComparer(source));
@@ -323,7 +313,6 @@ public static class Projection
     /// <param name="source"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Through<TKey, TValue>(this IProjection<TKey> projection, IDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
         where TKey : notnull
     {
@@ -342,7 +331,6 @@ public static class Projection
     /// <param name="projection"></param>
     /// <param name="source"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Through<TKey, TValue>(this IProjection<TKey> projection, IDictionary<TKey, TValue> source)
         where TKey : notnull
         => Through(projection, source, CompareConverter.GetComparer(source));
@@ -355,7 +343,6 @@ public static class Projection
     /// <param name="source"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Cross<TKey, TValue>(this IEnumerable<IProjection<TKey>> projections, IDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
         where TKey : notnull
     {
@@ -369,7 +356,6 @@ public static class Projection
     /// <param name="projections"></param>
     /// <param name="source"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Cross<TKey, TValue>(this IEnumerable<IProjection<TKey>> projections, IDictionary<TKey, TValue> source)
         where TKey : notnull
         => Cross(projections, source, CompareConverter.GetComparer(source));
@@ -380,7 +366,6 @@ public static class Projection
     /// <param name="source"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Cross<TKey, TValue>(this IProjection<TKey> projection, IDictionary<TKey, TValue> source, IEqualityComparer<TKey> comparer)
         where TKey : notnull
     {
@@ -397,7 +382,6 @@ public static class Projection
     /// <param name="projection"></param>
     /// <param name="source"></param>
     /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IDictionary<TKey, TValue> Cross<TKey, TValue>(this IProjection<TKey> projection, IDictionary<TKey, TValue> source)
         where TKey : notnull
         => Cross(projection, source, CompareConverter.GetComparer(source));

@@ -1,7 +1,7 @@
 namespace Hand.Concurrent;
 
 /// <summary>
-/// 并发控制器
+/// 并发控制
 /// </summary>
 /// <param name="limit">并发上限</param>
 /// <param name="count">并发数量</param>

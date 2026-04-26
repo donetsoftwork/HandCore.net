@@ -4,7 +4,7 @@ namespace ProjectionsTests;
 
 public class FirstReturnProjectionTests
 {
-    private IProjection<string> _projection;
+    private readonly IProjection<string> _projection;
     public FirstReturnProjectionTests()
     {
         var user = Projection.RemovePrefix("User", StringComparison.OrdinalIgnoreCase);
