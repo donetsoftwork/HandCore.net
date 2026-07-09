@@ -39,7 +39,7 @@ public class TransactionSource(DbConnection connection, DbTransaction transactio
     public int? CommandTimeout
         => _commandTimeout;
     /// <inheritdoc/>
-    IDbTransaction ISqlSource.Transaction
+    IDbTransaction? ISqlSource.Transaction
         => null;
     /// <inheritdoc/>
     CommandBehavior ISqlSource.SingleBehavior

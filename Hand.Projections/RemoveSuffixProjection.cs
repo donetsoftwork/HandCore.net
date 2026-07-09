@@ -37,7 +37,37 @@ public class RemoveSuffixProjection(string suffix, StringComparison comparison =
     #endregion
     /// <inheritdoc />
     public override string Convert(string source)
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        => source[..^_suffixLength];
+#else
         => source.Substring(0, source.Length - _suffixLength);
+#endif
+#if NET7_0_OR_GREATER
+    /// <summary>
+    /// 转化为Span
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public virtual ReadOnlySpan<char> ConvertSpan(ReadOnlySpan<char> source)
+        => source[..^_suffixLength];
+#endif
+    /// <summary>
+    /// 转化
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="suffix"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static string Convert(string source, string suffix, StringComparison comparison = StringComparison.Ordinal)
+    {
+        if (source.EndsWith(suffix, comparison))
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+            return source[..^suffix.Length];
+#else
+            return source.Substring(suffix.Length);
+#endif
+        return source;
+    }
     /// <inheritdoc />
     string IConverter<string, string>.Convert(string source)
     {

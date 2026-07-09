@@ -27,7 +27,7 @@ public class SqlSource(DbDataSource dataSource, int? commandTimeout = null)
     public int? CommandTimeout
         => _commandTimeout;
     /// <inheritdoc/>
-    IDbTransaction ISqlSource.Transaction
+    IDbTransaction? ISqlSource.Transaction
         => null;
     /// <inheritdoc/>
     CommandBehavior ISqlSource.SingleBehavior
@@ -107,7 +107,7 @@ public class SqlSource(DbDataSource dataSource, int? commandTimeout = null)
     /// <inheritdoc/>
     public async Task<DbDataReader> ExecuteReaderAsync(DbCommand command, CommandBehavior behavior, CancellationToken token)
     {
-        await command.Connection.OpenAsync(token)
+        await command.Connection!.OpenAsync(token)
             .ConfigureAwait(false);
         return await command.ExecuteReaderAsync(behavior, token)
             .ConfigureAwait(false);
@@ -115,7 +115,7 @@ public class SqlSource(DbDataSource dataSource, int? commandTimeout = null)
     /// <inheritdoc/>
     public async Task<int> ExecuteNonQueryAsync(DbCommand command, CancellationToken token)
     {
-        await command.Connection.OpenAsync(token)
+        await command.Connection!.OpenAsync(token)
             .ConfigureAwait(false);
         return await command.ExecuteNonQueryAsync(token)
             .ConfigureAwait(false);

@@ -26,8 +26,6 @@ public class Observable<T>(ICollection<IObserver<T>> list)
     /// <returns></returns>
     public virtual IDisposable Subscribe(IObserver<T> observer)
     {
-        if (_observers == null || observer == null)
-            return null;
         if (!_observers.Contains(observer))
             _observers.Add(observer);
         return CreateUnSubscriber(_observers, observer);

@@ -20,5 +20,5 @@ public interface IStack<TItem>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool TryPop(out TItem item);
+    bool TryPop(out TItem? item);
 }

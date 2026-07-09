@@ -35,15 +35,18 @@ public class TaskCallBack<TResult>
     bool IJobState.IsCancel
         => Task.IsCanceled;
     /// <inheritdoc />
-    Exception IJobState.Exception
+    Exception? IJobState.Exception
         => Task.Exception;
     #endregion
     /// <summary>
     /// 成功回调
     /// </summary>
     /// <param name="result"></param>
-    public virtual void OnSuccess(TResult result)
-        => _source.SetResult(result);
+    public virtual void OnSuccess(TResult? result)
+    {
+        if (result is not null)
+            _source.SetResult(result);
+    }
     /// <inheritdoc />
     public virtual void OnFail()
         => _source.SetCanceled();

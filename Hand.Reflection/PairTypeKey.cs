@@ -45,8 +45,30 @@ public readonly struct PairTypeKey(Type leftType, Type rightType)
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public override bool Equals(object other)
+    public override bool Equals(object? other)
         => other is PairTypeKey key && Equals(key);
+    #endregion
+    /// <summary>
+    /// 解构
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    public void Deconstruct(out Type left, out Type right)
+    {
+        left = _leftType;
+        right = _rightType;
+    }
+    #region operator
+    /// <summary>
+    /// 相等运算符，行为与 Equals 一致
+    /// </summary>
+    public static bool operator ==(PairTypeKey left, PairTypeKey right)
+        => left.Equals(right);
+    /// <summary>
+    /// 不等运算符，行为与 Equals 一致
+    /// </summary>
+    public static bool operator !=(PairTypeKey left, PairTypeKey right)
+        => !left.Equals(right);
     #endregion
     #region CheckNullable
     /// <summary>
@@ -60,12 +82,12 @@ public readonly struct PairTypeKey(Type leftType, Type rightType)
         bool isNullable = false;
         if (ReflectionType.IsNullable(leftType))
         {
-            leftType = Nullable.GetUnderlyingType(leftType);
+            leftType  = Nullable.GetUnderlyingType(leftType)!;
             isNullable = true;
         }
         if (ReflectionType.IsNullable(rightType))
         {
-            rightType = Nullable.GetUnderlyingType(rightType);
+            rightType = Nullable.GetUnderlyingType(rightType)!;
             return true;
         }
         return isNullable;

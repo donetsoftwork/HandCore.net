@@ -1,23 +1,25 @@
+using Hand.Collections;
+using Hand.Storage;
+
 namespace Hand.Cache;
 
 /// <summary>
-/// 
+/// 泛型缓存
 /// </summary>
-public interface IGenericCacher
+public interface IGenericCacher<TKey>
+    : IGenericGet<TKey>, IStore<TKey>
 {
     /// <summary>
-    /// 设置缓存
+    /// 判断是否存在
     /// </summary>
-    /// <param name="source"></param>
-    /// <param name="dest"></param>
-    void SetCache<TSource, TDest>(TSource source, TDest dest);
-    /// <summary>
-    /// 读取缓存
-    /// </summary>
-    /// <typeparam name="TSource"></typeparam>
-    /// <typeparam name="TDest"></typeparam>
-    /// <param name="source"></param>
-    /// <param name="dest"></param>
+    /// <param name="key"></param>
     /// <returns></returns>
-    bool TryGetCache<TSource, TDest>(TSource source, out TDest dest);
+    bool Contains(in TKey key);
+    /// <summary>
+    /// 尝试获取
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="cached"></param>
+    /// <returns></returns>
+    bool TryGetCache<TValue>(in TKey key, out TValue cached);
 }

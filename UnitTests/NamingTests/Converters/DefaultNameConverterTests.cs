@@ -11,7 +11,7 @@ public class DefaultNameConverterTests
     [InlineData("", "")]
     public void Validate(string? item, string? expected)
     {
-        var actual = DefaultNameConverter.Instance.Convert(item);
+        var actual = DefaultNameConverter.Instance.Convert(item ?? string.Empty);
         Assert.Equal(expected, actual);
         Assert.Equal(expected, DefaultNameConverter.Instance.Convert(item.AsSpan()));
     }

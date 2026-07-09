@@ -1,5 +1,6 @@
-﻿using Hand.Naming;
-using Hand.Paths;
+﻿using Hand.Paths;
+using Hand.Rule;
+using Hand.Text;
 using Hand.Words;
 using System.Text;
 
@@ -10,43 +11,26 @@ namespace Hand.Converters;
 /// </summary>
 /// <param name="destRule"></param>
 public class PascalPathConverter(IWordRule destRule)
-    : PascalSplitRule, INameConverter, IPathRule
+    : StringConverter<string>, IStringSpliter
 {
     #region 配置
+    private readonly IValidation<char> _validation = PascalSplitRule.Validation;
     private readonly IWordRule _destRule = destRule;
+
+    /// <summary>
+    /// 分割符验证器
+    /// </summary>
+    public IValidation<char> Validation
+        => _validation;
     /// <summary>
     /// 目标转化规则
     /// </summary>
     public IWordRule DestRule
         => _destRule;
     #endregion
-    #region INameConverter
+    #region ISpanConverter<char, string>
     /// <inheritdoc />
-    public string Convert(string name, int startIndex = 0)
-    {
-        if (string.IsNullOrEmpty(name))
-            return string.Empty;
-        var first = true;
-        var depth = 0;
-        var count = name.Length;
-        var builder = new StringBuilder(count - startIndex);
-        for (var i = startIndex; i < count; i++)
-        {
-            var item = name[i];
-            if (char.IsUpper(item) || first)
-            {
-                _destRule.CheckFirst(builder, item, depth++);
-                first = false;
-            }
-            else
-            {
-                builder.Append(item);
-            }
-        }
-        return builder.ToString();
-    }
-    /// <inheritdoc />
-    public string Convert(ReadOnlySpan<char> name)
+    public override string Convert(ReadOnlySpan<char> name)
     {
         var count = name.Length;
         if (count == 0)
@@ -69,39 +53,7 @@ public class PascalPathConverter(IWordRule destRule)
         return builder.ToString();
     }
     #endregion
-    #region IPathConverter
-    /// <inheritdoc />
-    public IEnumerable<string> Split(string fullPath, int startIndex)
-    {
-        if (string.IsNullOrEmpty(fullPath))
-            yield break;
-        var first = true;
-        var depth = 0;
-        var count = fullPath.Length;
-        var builder = new StringBuilder(count - startIndex);
-        for (var i = startIndex; i < count; i++)
-        {
-            var item = fullPath[i];
-            if (char.IsUpper(item) || first)
-            {
-                if (builder.Length > 0)
-                {
-                    var path = builder.ToString();
-                    yield return path;
-                    builder.Clear();
-                }
-                _destRule.CheckFirst(builder, item, depth++);
-                first = false;
-            }
-            else
-            {
-                builder.Append(item);
-            }
-        }        
-
-        if (builder.Length > 0)
-            yield return builder.ToString();
-    }
+    #region IStringSpliter    
     /// <inheritdoc />
     public IEnumerable<string> Split(ReadOnlySpan<char> fullPath)
     {

@@ -67,12 +67,12 @@ public class LinkedListAdaptQueue<TItem>(LinkedList<TItem> target)
         }
     }
     /// <inheritdoc />
-    public bool TryDequeue(out TItem item)
+    public bool TryDequeue(out TItem? item)
     {
         if (_target.Count > 0)
         {
             var state = false;
-            LinkedListNode<TItem> first = null;
+            LinkedListNode<TItem>? first = null;
 #if NET9_0_OR_GREATER
             lock (_targetLock)
 #else
@@ -88,7 +88,7 @@ public class LinkedListAdaptQueue<TItem>(LinkedList<TItem> target)
             }
             if (state)
             {
-                item = first.Value;
+                item = first!.Value;
                 return true;
             }
         }

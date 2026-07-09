@@ -34,7 +34,7 @@ public class ConcurrentStackAdapter<TItem>(ConcurrentStack<TItem> target)
     public void Push(TItem item)
         => _target.Push(item);
     /// <inheritdoc />
-    public bool TryPop(out TItem item)
+    public bool TryPop(out TItem? item)
         => TryPop(out item);
     #endregion
     /// <summary>
@@ -42,6 +42,6 @@ public class ConcurrentStackAdapter<TItem>(ConcurrentStack<TItem> target)
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public bool TryPeek(out TItem item)
+    public bool TryPeek(out TItem? item)
         => _target.TryPeek(out item);
 }

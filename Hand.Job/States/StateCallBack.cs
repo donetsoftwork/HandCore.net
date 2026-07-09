@@ -16,7 +16,7 @@ public class StateCallBack
     private bool _isSuccess = false;
     private bool _isFail = false;
     private bool _isCancel = false;
-    private Exception _exception;
+    private Exception? _exception;
     /// <inheritdoc />
     public bool IsSuccess
         => _isSuccess;
@@ -27,7 +27,7 @@ public class StateCallBack
     public bool IsCancel
         => _isCancel || _exception is OperationCanceledException;
     /// <inheritdoc />
-    public Exception Exception
+    public Exception? Exception
         => _exception;
     #endregion
     /// <inheritdoc />

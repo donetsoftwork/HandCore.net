@@ -1,7 +1,7 @@
 namespace Hand.Creational;
 
 /// <summary>
-/// 工厂接口
+/// 构造器接口
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public interface ICreator<out T>

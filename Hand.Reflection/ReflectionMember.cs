@@ -14,7 +14,7 @@ public static class ReflectionMember
     /// <param name="declareType"></param>
     /// <param name="filter"></param>
     /// <returns></returns>
-    public static PropertyInfo GetPropery(Type declareType, Func<PropertyInfo, bool> filter)
+    public static PropertyInfo? GetPropery(Type declareType, Func<PropertyInfo, bool> filter)
     {
         var properties = declareType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
         foreach (var propery in properties)
@@ -74,10 +74,34 @@ public static class ReflectionMember
     /// <summary>
     /// 获取构造函数
     /// </summary>
+    /// <param name="instanceType"></param>
+    /// <param name="parameterCountDesc"></param>
+    /// <returns></returns>
+    public static ConstructorInfo? GetConstructor(Type instanceType, bool parameterCountDesc)
+    {
+        return SortByParameterCount(instanceType.GetConstructors(), parameterCountDesc)
+            .FirstOrDefault();
+    }
+    /// <summary>
+    /// 排序
+    /// </summary>
+    /// <param name="list"></param>
+    /// <param name="parameterCountDesc"></param>
+    /// <returns></returns>
+    public static IEnumerable<TMethod> SortByParameterCount<TMethod>(IEnumerable<TMethod> list, bool parameterCountDesc)
+         where TMethod : MethodBase
+    {
+        if (parameterCountDesc)
+            return list.OrderByDescending(c => c.GetParameters().Length);
+        return list.OrderBy(c => c.GetParameters().Length);
+    }
+    /// <summary>
+    /// 获取构造函数
+    /// </summary>
     /// <param name="declareType"></param>
     /// <param name="parameterType"></param>
     /// <returns></returns>
-    public static ConstructorInfo GetConstructorByParameterType(Type declareType, Type parameterType)
+    public static ConstructorInfo? GetConstructorByParameterType(Type declareType, Type parameterType)
         => GetConstructor(
             declareType,
             parameters => parameters.Length == 1
@@ -88,7 +112,7 @@ public static class ReflectionMember
     /// <param name="declareType"></param>
     /// <param name="filter"></param>
     /// <returns></returns>
-    public static ConstructorInfo GetConstructor(Type declareType, Func<ParameterInfo[], bool> filter)
+    public static ConstructorInfo? GetConstructor(Type declareType, Func<ParameterInfo[], bool> filter)
     {
         var constructors = declareType.GetConstructors();
         foreach (var constructor in constructors)

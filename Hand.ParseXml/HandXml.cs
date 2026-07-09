@@ -1,0 +1,217 @@
+﻿using Hand.Creational;
+using Hand.Maping;
+using Hand.ParseXml.Cachers;
+using Hand.ParseXml.Contracts;
+using Hand.ParseXml.Nodes;
+
+namespace Hand.ParseXml;
+
+/// <summary>
+/// Xml读取配置
+/// </summary>
+/// <param name="builders"></param>
+/// <param name="defaultValues"></param>
+public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaultValues)
+{
+    /// <summary>
+    /// Xml读取配置
+    /// </summary>
+    public HandXml()
+        : this(MemberBuilderProvider.Instance, DefaultValueBuilder.Instance)
+    {
+    }
+    #region 配置
+    private readonly IMemberBuilderProvider _builders = builders;
+    private readonly DefaultValueBuilder _defaultValues = defaultValues;
+    private readonly XmlConvertCacher _converters = new();
+
+    /// <summary>
+    /// 构造器提供者
+    /// </summary>
+    public IMemberBuilderProvider Builders
+        => _builders;
+    /// <summary>
+    /// 转化器
+    /// </summary>
+    internal XmlConvertCacher Converters 
+        => _converters;
+    /// <summary>
+    /// 默认值提供者
+    /// </summary>
+    public DefaultValueBuilder DefaultValues
+        => _defaultValues;
+    #endregion
+    /// <summary>
+    /// 基础类型读取器
+    /// </summary>
+    /// <typeparam name="TPrimitive"></typeparam>
+    /// <param name="original"></param>
+    /// <returns></returns>
+    public IXmlParser<TPrimitive> Primitive<TPrimitive>(IXmlParser<string> original)
+    {
+        if (original is IXmlParser<TPrimitive> reader)
+            return reader;
+        return new PrimitiveReader<TPrimitive>(original, _converters.Get<TPrimitive>(), _defaultValues.Get<TPrimitive>());
+    }
+    #region Attribute
+    /// <summary>
+    /// 属性读取器
+    /// </summary>
+    /// <param name="attributeName"></param>
+    /// <returns></returns>
+    public AttributeReader Attribute(string attributeName)
+        => new(attributeName, _defaultValues.Get<string>());
+    /// <summary>
+    /// 属性读取器
+    /// </summary>
+    /// <typeparam name="TAttribute"></typeparam>
+    /// <param name="attributeName"></param>
+    /// <returns></returns>
+    public IXmlParser<TAttribute> Attribute<TAttribute>(string attributeName)
+        => Primitive<TAttribute>(new AttributeReader(attributeName, _defaultValues.Get<string>()));
+    #endregion
+    #region Content
+    /// <summary>
+    /// 文本读取器
+    /// </summary>
+    /// <returns></returns>
+    public ContentReader Content()
+        => new(_defaultValues.Get<string>());
+    /// <summary>
+    /// 文本读取器
+    /// </summary>
+    /// <typeparam name="TContent"></typeparam>
+    /// <returns></returns>
+    public IXmlParser<TContent> Content<TContent>()
+        => Primitive<TContent>(new ContentReader(_defaultValues.Get<string>()));
+    #endregion
+    #region Entity
+    /// <summary>
+    /// 实体解析器
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <param name="creator"></param>
+    /// <param name="content"></param>
+    /// <returns></returns>
+    public EntityParser<TEntity> Entity<TEntity>(ICreator<IMemberBuilder<TEntity>> creator, IMemberParser? content = null)
+        => new(this, creator, content);
+    /// <summary>
+    /// 实体解析器
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <param name="creator"></param>
+    /// <param name="contentName"></param>
+    /// <returns></returns>
+    public EntityParser<TEntity> Entity<TEntity>(ICreator<IMemberBuilder<TEntity>> creator, string contentName)
+        => new(this, creator, Content().Member(contentName));
+    /// <summary>
+    /// 实体解析器
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <typeparam name="TBuilder"></typeparam>
+    /// <param name="content"></param>
+    /// <returns></returns>
+    public EntityParser<TEntity> Entity<TEntity, TBuilder>(IMemberParser? content = null)
+        where TBuilder : IMemberBuilder<TEntity>, new()
+        => new(this, new DelegateCreator<IMemberBuilder<TEntity>>(() => new TBuilder()), content);
+    /// <summary>
+    /// 实体解析器
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <typeparam name="TBuilder"></typeparam>
+    /// <param name="contentName"></param>
+    /// <returns></returns>
+    public EntityParser<TEntity> Entity<TEntity, TBuilder>(string contentName)
+        where TBuilder : IMemberBuilder<TEntity>, new()
+        => new(this, new DelegateCreator<IMemberBuilder<TEntity>>(() => new TBuilder()), Content().Member(contentName));
+    /// <summary>
+    /// 实体解析器
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <param name="content"></param>
+    /// <returns></returns>
+    /// <exception cref="NotSupportedException"></exception>
+    public EntityParser<TEntity> Entity<TEntity>(IMemberParser? content = null)
+        => new(this, _builders.Get<TEntity>() ?? throw new NotSupportedException("请先配置构造器或传入构造器"), content);
+    /// <summary>
+    /// 实体解析器
+    /// </summary>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <param name="contentName"></param>
+    /// <returns></returns>
+    /// <exception cref="NotSupportedException"></exception>
+    public EntityParser<TEntity> Entity<TEntity>(string contentName)
+        => new(this, _builders.Get<TEntity>() ?? throw new NotSupportedException("请先配置构造器或传入构造器"), Content().Member(contentName));
+    #endregion
+    #region Single
+    /// <summary>
+    /// 获取单个节点
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="element"></param>
+    /// <param name="parser"></param>
+    /// <returns></returns>
+    public FirstReader<TResult> First<TResult>(string element, IXmlParser<TResult> parser)
+        => new(element, parser, _defaultValues.Get<TResult>());
+    /// <summary>
+    /// 获取单个节点
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="parser"></param>
+    /// <returns></returns>
+    public FirstReader<TResult> First<TResult>(IXmlParser<TResult> parser)
+        => new(typeof(TResult).Name, parser, _defaultValues.Get<TResult>());
+    /// <summary>
+    /// 获取单个节点
+    /// </summary>
+    /// <param name="element"></param>
+    /// <returns></returns>
+    public FirstReader<string> First(string element)
+        => new(element, Content(), _defaultValues.Get<string>());
+    /// <summary>
+    /// 获取单个节点
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="element"></param>
+    /// <returns></returns>
+    public FirstReader<TResult> First<TResult>(string element)
+        => new(element, Content<TResult>(), _defaultValues.Get<TResult>());
+    #endregion
+    #region Convert
+    /// <summary>
+    /// 配置转化器
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TConverter"></typeparam>
+    /// <param name="converter"></param>
+    public HandXml Use<TValue, TConverter>(TConverter converter)
+        where TConverter : IConverter<string, TValue>
+    {
+        _converters.Save(typeof(TValue), converter);
+        return this;
+    }
+    /// <summary>
+    /// 配置转化器
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="converter"></param>
+    public HandXml Use<TValue>(Converter<string, TValue> converter)
+    {
+        _converters.Save(typeof(TValue), new DelegateConverter<string, TValue>(converter));
+        return this;
+    }
+    #endregion
+
+    /// <summary>
+    /// 默认实例
+    /// </summary>
+    public static HandXml Default
+        => Inner.Default;
+    /// <summary>
+    /// 内部缓存
+    /// </summary>
+    static class Inner
+    {
+        public static readonly HandXml Default = new();
+    }
+}

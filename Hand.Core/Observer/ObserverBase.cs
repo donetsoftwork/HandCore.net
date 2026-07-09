@@ -10,7 +10,7 @@ public abstract class ObserverBase<T> : IObserver<T>
     /// <summary>
     /// 取消订阅对象
     /// </summary>
-    protected IDisposable _unsubscriber;
+    protected IDisposable? _unsubscriber;
     #endregion
     #region IObserver<T>
     void IObserver<T>.OnCompleted()

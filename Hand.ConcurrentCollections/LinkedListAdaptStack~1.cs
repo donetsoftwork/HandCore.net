@@ -43,12 +43,12 @@ public class LinkedListAdaptStack<TItem>(LinkedList<TItem> target)
         }
     }
     /// <inheritdoc />
-    public bool TryPop(out TItem item)
+    public bool TryPop(out TItem? item)
     {
         if (_target.Count > 0)
         {
             var state = false;
-            LinkedListNode<TItem> last = null;
+            LinkedListNode<TItem>? last = null;
 #if NET9_0_OR_GREATER
             lock (_targetLock)
 #else
@@ -64,7 +64,7 @@ public class LinkedListAdaptStack<TItem>(LinkedList<TItem> target)
             }
             if (state)
             {
-                item = last.Value;
+                item = last!.Value;
                 return true;
             }
         }

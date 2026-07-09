@@ -33,4 +33,23 @@ public static class HandCoreServices
             members = recognizer.Recognize(members);
         return members;
     }
+    ///// <summary>
+    ///// 转化数组
+    ///// </summary>
+    ///// <typeparam name="TSource"></typeparam>
+    ///// <typeparam name="TResult"></typeparam>
+    ///// <param name="source"></param>
+    ///// <param name="convertor"></param>
+    ///// <returns></returns>
+    //public static TResult[] ArrayConvert<TSource, TResult>(this  TSource[] source, Converter<TSource, TResult> convertor)
+    //{
+    //    var count = source.Length;
+    //    var results = new TResult[count];
+    //    var i = 0;
+    //    foreach (var item in source)
+    //    {
+    //        results[i++] = convertor(item);
+    //    }
+    //    return results;
+    //}
 }

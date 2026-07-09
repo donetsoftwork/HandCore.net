@@ -24,7 +24,6 @@ public class EventHandlerServiceProvider(IServiceProvider provider)
     /// <typeparam name="TEvent"></typeparam>
     /// <returns></returns>
     public IEnumerable<ITaskEventHandler<TEvent>> GetTaskHandlers<TEvent>()
-        where TEvent : notnull
     {
         return _provider.GetServices<ITaskEventHandler<TEvent>>();
     }
@@ -34,7 +33,6 @@ public class EventHandlerServiceProvider(IServiceProvider provider)
     /// <typeparam name="TEvent"></typeparam>
     /// <returns></returns>
     public IEnumerable<IEventHandler<TEvent>> GetHandlers<TEvent>()
-        where TEvent : notnull
     {
         return _provider.GetServices<IEventHandler<TEvent>>();
     }

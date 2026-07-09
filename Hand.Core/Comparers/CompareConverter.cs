@@ -20,6 +20,8 @@ public static class CompareConverter
         {
             StringComparison.Ordinal => StringComparer.Ordinal,
             StringComparison.OrdinalIgnoreCase => StringComparer.OrdinalIgnoreCase,
+            StringComparison.InvariantCulture => StringComparer.InvariantCulture,
+            StringComparison.InvariantCultureIgnoreCase => StringComparer.InvariantCultureIgnoreCase,
             StringComparison.CurrentCulture => StringComparer.CurrentCulture,
             StringComparison.CurrentCultureIgnoreCase => StringComparer.CurrentCultureIgnoreCase,
             _ => StringComparer.Ordinal,
@@ -36,6 +38,10 @@ public static class CompareConverter
             return StringComparison.Ordinal;
         else if (comparer == StringComparer.OrdinalIgnoreCase)
             return StringComparison.OrdinalIgnoreCase;
+        else if (comparer == StringComparer.InvariantCulture)
+            return StringComparison.InvariantCulture;
+        else if (comparer == StringComparer.InvariantCultureIgnoreCase)
+            return StringComparison.InvariantCultureIgnoreCase;
         else if (comparer == StringComparer.CurrentCulture)
             return StringComparison.CurrentCulture;
         else if (comparer == StringComparer.CurrentCultureIgnoreCase)
@@ -51,9 +57,8 @@ public static class CompareConverter
     /// <param name="owner"></param>
     /// <returns></returns>
     public static IEqualityComparer<TKey> GetComparer<TKey, TValue>(IDictionary<TKey, TValue> owner)
+        where TKey : notnull
     {
-        if (owner is null)
-            return EqualityComparer<TKey>.Default;
         if (owner is Dictionary<TKey, TValue> dictionary)
             return dictionary.Comparer;
 #if NET7_0_OR_GREATER
@@ -70,8 +75,6 @@ public static class CompareConverter
     /// <returns></returns>
     public static IEqualityComparer<T> GetComparer<T>(ISet<T> owner)
     {
-        if (owner is null)
-            return EqualityComparer<T>.Default;
         if (owner is HashSet<T> hashSet)
             return hashSet.Comparer;
         return EqualityComparer<T>.Default;

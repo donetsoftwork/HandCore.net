@@ -51,7 +51,7 @@ public class ServiceDictionaryProvider(IDictionary provider)
     /// </summary>
     /// <param name="key"></param>
     /// <returns></returns>
-    public TService GetService<TService>(object key)
+    public TService? GetService<TService>(object key)
     {
         var collection = _provider[key];
         if(collection is not null && collection is IEnumerable<TService> service)

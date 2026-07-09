@@ -1,6 +1,5 @@
-﻿using Hand.Naming;
-using Hand.Paths;
-using Hand.Rule;
+﻿using Hand.Rule;
+using Hand.Text;
 using Hand.Words;
 using System.Text;
 
@@ -12,7 +11,7 @@ namespace Hand.Converters;
 /// <param name="separators"></param>
 /// <param name="destRule"></param>
 public class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRule)
-    : INameConverter, IPathRule
+    : StringConverter<string>, IStringSpliter
 {
     #region 配置
     private readonly IEnumerable<char> _separators = separators;
@@ -35,38 +34,9 @@ public class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRu
     public IWordRule DestRule
         => _destRule;
     #endregion
-    #region INameConverter
+    #region IStringConverter<string>
     /// <inheritdoc />
-    public string Convert(string name, int startIndex)
-    {
-        if (string.IsNullOrEmpty(name))
-            return string.Empty;
-        var count = name.Length;
-        var builder = new StringBuilder(count - startIndex);
-        var first = true;
-        var depth = 0;
-        for (var i = startIndex; i < count; i++)
-        {
-            var item = name[i];
-            if (_validation.Validate(item))
-            {
-                first = true;
-                continue;
-            }
-            if (first)
-            {
-                _destRule.CheckFirst(builder, item, depth++);
-                first = false;
-            }
-            else
-            {
-                builder.Append(item);
-            }
-        }
-        return builder.ToString();
-    }
-    /// <inheritdoc />
-    public string Convert(ReadOnlySpan<char> name)
+    public override string Convert(ReadOnlySpan<char> name)
     {
         var count = name.Length;
         if (count == 0)
@@ -94,44 +64,7 @@ public class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRu
         return builder.ToString();
     }
     #endregion
-    #region IPathConverter
-    /// <inheritdoc />
-    public IEnumerable<string> Split(string fullPath, int startIndex)
-    {
-        if (string.IsNullOrEmpty(fullPath))
-            yield break;
-        var first = true;
-        var depth = 0;
-        var count = fullPath.Length;
-        var builder = new StringBuilder(count - startIndex);
-        for (var i = startIndex; i < count; i++)
-        {
-            var item = fullPath[i];
-            if (_validation.Validate(item))
-            {
-                first = true;
-                continue;
-            }
-            if (first)
-            {
-                if (builder.Length > 0)
-                {
-                    var path = builder.ToString();
-                    yield return path;
-                    builder.Clear();
-                }
-                _destRule.CheckFirst(builder, item, depth++);
-                first = false;
-            }
-            else
-            {
-                builder.Append(item);
-            }
-        }        
-
-        if (builder.Length > 0)
-            yield return builder.ToString();
-    }
+    #region IStringSpliter
     /// <inheritdoc />
     public IEnumerable<string> Split(ReadOnlySpan<char> fullPath)
     {

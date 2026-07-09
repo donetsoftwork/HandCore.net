@@ -8,7 +8,7 @@ namespace Hand.Cache;
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
 /// <param name="provider"></param>
-public class DictionaryCacher<TKey, TValue>(IDictionary<TKey, TValue> provider)
+public sealed class DictionaryCacher<TKey, TValue>(IDictionary<TKey, TValue> provider)
     : ICacher<TKey, TValue>
     where TKey : notnull
 {
@@ -25,15 +25,17 @@ public class DictionaryCacher<TKey, TValue>(IDictionary<TKey, TValue> provider)
     /// </summary>
     private readonly IDictionary<TKey, TValue> _provider = provider;
     #endregion
-    #region ISettings<TKey, TValue>
+    #region ICacher<TKey, TValue>
     /// <inheritdoc />
     public bool ContainsKey(in TKey key)
         => _provider.ContainsKey(key);
     /// <inheritdoc />
     public bool TryGetCache(in TKey key, out TValue cached)
-        => _provider.TryGetValue(key, out cached);
+        => _provider.TryGetValue(key, out cached!);
+    #region IStore<TKey, TValue>
     /// <inheritdoc />
     public void Save(in TKey key, TValue value)
         => _provider[key] = value;
+    #endregion
     #endregion
 }

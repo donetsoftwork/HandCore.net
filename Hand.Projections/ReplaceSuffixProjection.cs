@@ -27,5 +27,31 @@ public class ReplaceSuffixProjection(string suffix, string replacement, StringCo
     #endregion
     /// <inheritdoc />
     public override string Convert(string source)
+    #if NET7_0_OR_GREATER
+        => string.Concat(ConvertSpan(source), _replacement);
+#else
         => base.Convert(source) + _replacement;
+#endif
+    /// <summary>
+    /// 转化
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="suffix"></param>
+    /// <param name="replacement"></param>
+    /// <param name="comparison"></param>
+    /// <returns></returns>
+    public static string Convert(string source, string suffix, string replacement, StringComparison comparison = StringComparison.Ordinal)
+    {
+        if(source.EndsWith(suffix, comparison))
+        {
+#if NET7_0_OR_GREATER
+            return string.Concat(source.AsSpan()[..^suffix.Length], replacement);
+#elif NETSTANDARD2_1_OR_GREATER
+            return source[(source.Length - suffix.Length)..] + replacement;
+#else
+            return source.Substring(0, source.Length - suffix.Length) + replacement;
+#endif
+        }
+        return source;
+    }
 }

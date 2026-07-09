@@ -20,5 +20,5 @@ public interface IJobState
     /// <summary>
     /// 异常
     /// </summary>
-    public Exception Exception { get; }
+    public Exception? Exception { get; }
 }

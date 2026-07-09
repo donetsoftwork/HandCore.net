@@ -41,7 +41,7 @@ public class ConcurrentQueueAdapter<TItem>(ConcurrentQueue<TItem> target)
     public void Enqueue(TItem item)
         => _target.Enqueue(item);
     /// <inheritdoc />
-    public bool TryDequeue(out TItem item)
+    public bool TryDequeue(out TItem? item)
         => _target.TryDequeue(out item);
     #endregion
     /// <summary>
@@ -49,6 +49,6 @@ public class ConcurrentQueueAdapter<TItem>(ConcurrentQueue<TItem> target)
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public bool TryPeek(out TItem item)
+    public bool TryPeek(out TItem? item)
         => _target.TryPeek(out item);
 }

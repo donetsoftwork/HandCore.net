@@ -10,7 +10,7 @@ public interface IPool<TResource>
     /// 获取对象
     /// </summary>
     /// <returns></returns>
-    TResource Get();
+    TResource? Get();
     /// <summary>
     /// 归还对象
     /// </summary>

@@ -1,0 +1,26 @@
+﻿using Hand.Maping;
+
+namespace Hand.Utf8;
+
+/// <summary>
+/// UTF-8 ushort转换器
+/// </summary>
+/// <param name="standardFormat"></param>
+/// <param name="defaultValue"></param>
+public class UShortConverter(char standardFormat, ushort defaultValue = default)
+    : Parser(standardFormat)
+    , ISpanConverter<byte, ushort>
+{
+    #region 配置
+    private readonly ushort _defaultValue = defaultValue;
+    /// <summary>
+    /// 默认值
+    /// </summary>
+    public ushort DefaultValue
+        => _defaultValue;
+    #endregion
+
+    /// <inheritdoc />
+    public ushort Convert(ReadOnlySpan<byte> source)
+        => TryParse(source, out ushort result) ? result : _defaultValue;
+}

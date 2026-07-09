@@ -24,13 +24,13 @@ public class ThreadJobService<TItem>(IQueue<TItem> queue, IQueueProcessor<TItem>
     /// <summary>
     /// Token
     /// </summary>
-    private CancellationTokenSource _source = null;
+    private CancellationTokenSource? _source = null;
     private bool _started = false;
     /// <summary>
     /// 最近活动时间
     /// </summary>
     protected DateTime _lastTime = DateTime.Now;
-    private TItem _lastItem = default;
+    private TItem? _lastItem = default;
     /// <summary>
     /// 是否已启动
     /// </summary>
@@ -44,7 +44,7 @@ public class ThreadJobService<TItem>(IQueue<TItem> queue, IQueueProcessor<TItem>
     /// <summary>
     /// 最近执行元素
     /// </summary>
-    public TItem LastItem
+    public TItem? LastItem
         => _lastItem;
     /// <summary>
     /// 队列

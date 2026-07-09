@@ -1,18 +1,18 @@
 <Project>
-
-  <PropertyGroup>
-    <VersionBase>0.3.1</VersionBase>    
-    <LangVersion>Latest</LangVersion>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Authors>jiangxiangji</Authors>
-    <Company>HandCore</Company>
-    <Copyright>Copyright (c) HandCore All Rights Reserved</Copyright>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/donetsoftwork/HandCore.net</RepositoryUrl>
-    <PackageProjectUrl>https://donetsoftwork.github.io/HandCore.net</PackageProjectUrl>
-    <!-- SourceLink settings -->
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <PackageOutputPath>D:\nuget</PackageOutputPath>
-  </PropertyGroup>
+	<PropertyGroup>
+		<VersionBase>0.3.1</VersionBase>
+		<Nullable>enable</Nullable>
+		<LangVersion>Latest</LangVersion>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<Authors>jiangxiangji</Authors>
+		<Company>HandCore</Company>
+		<Copyright>Copyright (c) HandCore All Rights Reserved</Copyright>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryUrl>https://github.com/donetsoftwork/HandCore.net</RepositoryUrl>
+		<PackageProjectUrl>https://donetsoftwork.github.io/HandCore.net</PackageProjectUrl>
+		<!-- SourceLink settings -->
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<PackageOutputPath>D:\nuget</PackageOutputPath>
+	</PropertyGroup>
 </Project>

@@ -24,7 +24,7 @@ public class PascalPathConverterTests
     [InlineData("", "")]
     public void ConvertToPascal(string? fullPath, string? expected)
     {
-        var actual = _toPascal.Convert(fullPath);
+        var actual = _toPascal.Convert(fullPath ?? string.Empty);
         Assert.Equal(expected, actual);
         Assert.Equal(expected, _toPascal.Convert(fullPath.AsSpan()));
     }
@@ -36,9 +36,8 @@ public class PascalPathConverterTests
     [InlineData("abcDef", new string[] { "Abc", "Def" })]
     [InlineData("abc", new string[] { "Abc" })]
     [InlineData("_id", new string[] { "_id" })]
-    [InlineData(null, new string[0])]
     [InlineData("", new string[0])]
-    public void SplitToPascal(string? fullPath, IEnumerable<string> expected)
+    public void SplitToPascal(string fullPath, IEnumerable<string> expected)
     {
         var actual = _toPascal.Split(fullPath);
         Assert.Equal(expected, actual);
@@ -50,7 +49,7 @@ public class PascalPathConverterTests
         var fieldName = "_id";
         var propertyName = _toPascal.Convert(fieldName.AsSpan(1));
         Assert.Equal("Id", propertyName);
-        Assert.Equal("Id", _toPascal.Convert(fieldName, 1));
+        //Assert.Equal("Id", _toPascal.Convert(fieldName, 1));
     }
     [Theory]
     [InlineData("abc_def", "abc_def")]
@@ -60,9 +59,8 @@ public class PascalPathConverterTests
     [InlineData("abcDef", "abcDef")]
     [InlineData("abc", "abc")]
     [InlineData("_id", "_id")]
-    [InlineData(null, "")]
     [InlineData("", "")]
-    public void ConvertToCamel(string? fullPath, string? expected)
+    public void ConvertToCamel(string fullPath, string? expected)
     {
         var actual = _toCamel.Convert(fullPath);
         Assert.Equal(expected, actual);
@@ -76,9 +74,8 @@ public class PascalPathConverterTests
     [InlineData("abcDef", new string[] { "abc", "Def" })]
     [InlineData("abc", new string[] { "abc" })]
     [InlineData("_id", new string[] { "_id" })]
-    [InlineData(null, new string[0])]
     [InlineData("", new string[0])]
-    public void SplitToCamel(string? fullPath, IEnumerable<string> expected)
+    public void SplitToCamel(string fullPath, IEnumerable<string> expected)
     {
         var actual = _toCamel.Split(fullPath);
         Assert.Equal(expected, actual);
@@ -90,7 +87,7 @@ public class PascalPathConverterTests
         var fieldName = "_id";        
         var parameterName = _toCamel.Convert(fieldName.AsSpan(1));
         Assert.Equal("id", parameterName);
-        Assert.Equal("id", _toCamel.Convert(fieldName, 1));
+        //Assert.Equal("id", _toCamel.Convert(fieldName, 1));
     }
     [Theory]
     [InlineData("abc_def", "abc_def")]
@@ -100,9 +97,8 @@ public class PascalPathConverterTests
     [InlineData("abcDef", "abcdef")]
     [InlineData("abc", "abc")]
     [InlineData("_id", "_id")]
-    [InlineData(null, "")]
     [InlineData("", "")]
-    public void ConvertToLower(string? fullPath, string? expected)
+    public void ConvertToLower(string fullPath, string? expected)
     {
         var actual = _toLower.Convert(fullPath);
         Assert.Equal(expected, actual);
@@ -116,9 +112,8 @@ public class PascalPathConverterTests
     [InlineData("abcDef", new string[] { "abc", "def" })]
     [InlineData("abc", new string[] { "abc" })]
     [InlineData("_id", new string[] { "_id" })]
-    [InlineData(null, new string[0])]
     [InlineData("", new string[0])]
-    public void SplitToLower(string? fullPath, IEnumerable<string> expected)
+    public void SplitToLower(string fullPath, IEnumerable<string> expected)
     {
         var actual = _toLower.Split(fullPath);
         Assert.Equal(expected, actual);
@@ -130,7 +125,7 @@ public class PascalPathConverterTests
         var fieldName = "_id";
         var parameterName = _toLower.Convert(fieldName.AsSpan(1));
         Assert.Equal("id", parameterName);
-        Assert.Equal("id", _toLower.Convert(fieldName, 1));
+        //Assert.Equal("id", _toLower.Convert(fieldName, 1));
     }
     [Theory]
     [InlineData("abc_def", "_abc_def")]
@@ -140,9 +135,8 @@ public class PascalPathConverterTests
     [InlineData("abcDef", "_abcDef")]
     [InlineData("abc", "_abc")]
     [InlineData("_id", "_id")]
-    [InlineData(null, "")]
     [InlineData("", "")]
-    public void ConvertToUnder(string? fullPath, string? expected)
+    public void ConvertToUnder(string fullPath, string? expected)
     {
         var actual = _toUnder.Convert(fullPath);
         Assert.Equal(expected, actual);
@@ -156,9 +150,8 @@ public class PascalPathConverterTests
     [InlineData("abcDef", new string[] { "_abc", "Def" })]
     [InlineData("abc", new string[] { "_abc" })]
     [InlineData("_id", new string[] { "_id" })]
-    [InlineData(null, new string[0])]
     [InlineData("", new string[0])]
-    public void SplitToUnder(string? fullPath, IEnumerable<string> expected)
+    public void SplitToUnder(string fullPath, IEnumerable<string> expected)
     {
         var actual = _toUnder.Split(fullPath);
         Assert.Equal(expected, actual);

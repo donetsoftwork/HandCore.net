@@ -27,6 +27,14 @@ public class ReplacePrefixProjectionTests
         projection.TryConvert(source, out var result);
         Assert.Equal(expected, result);
     }
+    [Theory]
+    [InlineData("User", "Customer", "Id", "Id")]
+    [InlineData("User", "Customer", "UserName", "CustomerName")]
+    public void Convert2(string prefix, string replacement, string source, string expected)
+    {
+        var result = ReplacePrefixProjection.Convert(source, prefix, replacement);
+        Assert.Equal(expected, result);
+    }
     [Fact]
     public void Cross()
     {

@@ -27,7 +27,7 @@ public interface ISqlSource
     /// <summary>
     /// 事务
     /// </summary>
-    IDbTransaction Transaction { get; }
+    IDbTransaction? Transaction { get; }
     /// <summary>
     /// 单结果
     /// </summary>

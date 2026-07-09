@@ -7,6 +7,7 @@
   </Configurations>
   <Folder Name="/Benchmarks/">
     <Project Path="Benchmarks/JobBench/JobBench.csproj" />
+    <Project Path="Benchmarks/ParseJsonBench/ParseJsonBench.csproj" Id="269c5278-ec3c-4cb5-9107-f42857795d3a" />
     <Project Path="Benchmarks/ParseXmlBench/ParseXmlBench.csproj">
       <Platform Solution="*|ARM64" Project="ARM64" />
       <Platform Solution="Debug|x86" Project="x86" />
@@ -33,6 +34,7 @@
     <Project Path="UnitTests/JobTests/JobTests.csproj" />
     <Project Path="UnitTests/MemberValidationTests/MemberValidationTests.csproj" />
     <Project Path="UnitTests/NamingTests/NamingTests.csproj" />
+    <Project Path="UnitTests/ParseJsonTests/ParseJsonTests.csproj" />
     <Project Path="UnitTests/ParseXmlTests/ParseXmlTests.csproj" />
     <Project Path="UnitTests/ProjectionsTests/ProjectionsTests.csproj" />
     <Project Path="UnitTests/ReflectionTests/ReflectionTests.csproj" />
@@ -49,6 +51,7 @@
   <Project Path="Hand.Builders/Hand.Builders.csproj" />
   <Project Path="Hand.Collections/Hand.Collections.csproj" />
   <Project Path="Hand.ConcurrentCollections/Hand.ConcurrentCollections.csproj" />
+  <Project Path="Hand.Convert/Hand.Convert.csproj" Id="cc9ed8be-856a-48c6-a39c-080213c8e334" />
   <Project Path="Hand.Core/Hand.Core.csproj" />
   <Project Path="Hand.Data/Hand.Data.csproj" />
   <Project Path="Hand.Dataflow/Hand.Dataflow.csproj" />
@@ -58,6 +61,7 @@
   <Project Path="Hand.Job/Hand.Job.csproj" />
   <Project Path="Hand.MemberValidation/Hand.MemberValidation.csproj" />
   <Project Path="Hand.Naming/Hand.Naming.csproj" />
+  <Project Path="Hand.ParseJson/Hand.ParseJson.csproj" Id="44c83d6b-3eae-47c3-ad8d-9454c9194413" />
   <Project Path="Hand.ParseXml/Hand.ParseXml.csproj">
     <Platform Solution="*|x64" Project="x64" />
   </Project>

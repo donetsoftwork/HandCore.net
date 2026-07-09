@@ -52,7 +52,7 @@ public static class ReflectionType
     /// <param name="type"></param>
     /// <param name="definitionType"></param>
     /// <returns></returns>
-    public static Type GetGenericType(Type type, Type definitionType)
+    public static Type? GetGenericType(Type type, Type definitionType)
     {
         var interfaces = type.GetInterfaces();
         foreach (var @interface in interfaces)
@@ -174,7 +174,7 @@ public static class ReflectionType
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public static Type GetElementType(Type type)
+    public static Type? GetElementType(Type type)
     {
         if (type.IsArray)
             return type.GetElementType();

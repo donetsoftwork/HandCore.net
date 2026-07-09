@@ -1,5 +1,4 @@
-﻿using Hand.Naming;
-using Hand.Rule;
+﻿using Hand.Rule;
 
 namespace Hand.Maping;
 
@@ -8,7 +7,7 @@ namespace Hand.Maping;
 /// </summary>
 /// <param name="validation"></param>
 /// <param name="converter"></param>
-public sealed class NamingProjection(IValidation<string> validation, INameConverter converter)
+public sealed class NamingProjection(IValidation<string> validation, IConverter<string,string> converter)
     : IProjection<string>, IValidation<string>
 {
     #region 配置
@@ -19,7 +18,7 @@ public sealed class NamingProjection(IValidation<string> validation, INameConver
     /// <summary>
     /// 转化器
     /// </summary>
-    private readonly INameConverter _converter = converter;
+    private readonly IConverter<string, string> _converter = converter;
     #endregion
     #region IProjection<string>
     /// <inheritdoc />

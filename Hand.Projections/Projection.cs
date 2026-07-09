@@ -1,6 +1,5 @@
 ﻿using Hand.Comparers;
 using Hand.Maping.Complexs;
-using Hand.Naming;
 using Hand.Rule;
 using System;
 using System.Collections.Generic;
@@ -141,7 +140,7 @@ public static class Projection
     /// <param name="converter"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IProjection<string> Naming(IValidation<string> validation, INameConverter converter)
+    public static IProjection<string> Naming(IValidation<string> validation, IConverter<string, string> converter)
         => new NamingProjection(validation, converter);
     /// <summary>
     /// 命名规则投影
@@ -150,7 +149,7 @@ public static class Projection
     /// <param name="validation"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IProjection<string> ToProjection(this INameConverter converter, IValidation<string> validation)
+    public static IProjection<string> ToProjection(this IConverter<string, string> converter, IValidation<string> validation)
         => new NamingProjection(validation, converter);
     #endregion
     #region EachIn

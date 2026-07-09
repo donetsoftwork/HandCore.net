@@ -11,7 +11,7 @@ public abstract class PreviewBase<TItem>
     /// 是否为空
     /// </summary>
     protected bool _isEmpty = true;
-    private TItem _first;
+    private TItem? _first;
     private bool _hasSecond = false;
     /// <summary>
     /// 是否为空

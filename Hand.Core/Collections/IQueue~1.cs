@@ -20,5 +20,5 @@ public interface IQueue<TItem>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool TryDequeue(out TItem item);
+    bool TryDequeue(out TItem? item);
 }

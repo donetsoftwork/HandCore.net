@@ -1,21 +1,24 @@
-﻿using Hand.Naming;
+﻿using Hand.Text;
 
 namespace Hand.Converters;
 
 /// <summary>
 /// 默认命名转化
 /// </summary>
-public class DefaultNameConverter : INameConverter
+public class DefaultNameConverter : StringConverter<string>
 {
     private DefaultNameConverter() { }
     /// <inheritdoc />
-    public string Convert(string name, int startIndex = 0)
-        => string.IsNullOrEmpty(name) ? string.Empty : name.Substring(startIndex);
+    public override string Convert(string name)
+        => name;
     /// <inheritdoc />
-    public string Convert(ReadOnlySpan<char> name)
+    public override string Convert(char[] source)
+        => new(source);
+    /// <inheritdoc />
+    public override string Convert(ReadOnlySpan<char> name)
         => name.ToString();
     /// <summary>
     /// 单例
     /// </summary>
-    public static readonly INameConverter Instance = new DefaultNameConverter();
+    public static readonly IStringConverter<string> Instance = new DefaultNameConverter();
 }

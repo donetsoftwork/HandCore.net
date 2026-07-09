@@ -8,6 +8,7 @@ namespace Hand.Models;
 public abstract class EntityProperty<TProperty>(TProperty original)
     : IEntityProperty<TProperty>
     , IEquatable<EntityProperty<TProperty>>
+    where TProperty : notnull
 {
     /// <summary>
     /// 属性原始值
@@ -24,10 +25,10 @@ public abstract class EntityProperty<TProperty>(TProperty original)
     /// <inheritdoc />
     public override string ToString()
     {
-        return _original?.ToString();
+        return _original?.ToString() ?? string.Empty;
     }
     /// <inheritdoc />
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
         => obj is EntityProperty<TProperty> entityProperty && Equals(entityProperty);
 #nullable enable
     /// <inheritdoc />

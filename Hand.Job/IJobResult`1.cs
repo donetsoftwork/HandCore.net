@@ -10,5 +10,5 @@ public interface IJobResult<out TResult>
     /// <summary>
     /// 结果
     /// </summary>
-    TResult Result { get; }
+    TResult? Result { get; }
 }

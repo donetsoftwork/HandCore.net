@@ -75,7 +75,7 @@ public abstract class PoolBase<TResource>
         => _maxSize;
     #endregion
     /// <inheritdoc />
-    public virtual TResource Get()
+    public virtual TResource? Get()
     {
         if (CheckActiveCount())
             return default;

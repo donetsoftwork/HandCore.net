@@ -10,11 +10,11 @@ public class ResultCallBack<TResult>
     : StateCallBack, IJobResult<TResult>
 {
     #region 配置
-    private TResult _result = default;
+    private TResult? _result = default;
     /// <summary>
     /// 结果
     /// </summary>
-    public TResult Result
+    public TResult? Result
         => _result;
     #endregion
     /// <summary>
