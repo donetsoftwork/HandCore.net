@@ -1,0 +1,69 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Benchmarks/">
+    <Project Path="Benchmarks/JobBench/JobBench.csproj" />
+    <Project Path="Benchmarks/ParseXmlBench/ParseXmlBench.csproj">
+      <Platform Solution="*|ARM64" Project="ARM64" />
+      <Platform Solution="Debug|x86" Project="x86" />
+      <Platform Solution="Release|x64" Project="x64" />
+      <Build Solution="*|ARM64" Project="false" />
+      <Build Solution="*|x64" Project="false" />
+      <Build Solution="*|x86" Project="false" />
+      <Build Solution="Release|Any CPU" Project="false" />
+    </Project>
+  </Folder>
+  <Folder Name="/Events/">
+    <File Path="Events/readme.md" />
+    <Project Path="Events/Hand.EventAsyncBuses/Hand.EventAsyncBuses.csproj" />
+    <Project Path="Events/Hand.EventBuses/Hand.EventBuses.csproj" />
+    <Project Path="Events/Hand.EventDictionaryProvider/Hand.EventDictionaryProvider.csproj" />
+    <Project Path="Events/Hand.EventServiceProvider/Hand.EventServiceProvider.csproj" />
+  </Folder>
+  <Folder Name="/UnitTests/">
+    <Project Path="UnitTests/BuilderTests/BuilderTests.csproj" />
+    <Project Path="UnitTests/ConcurrentCollectionTests/ConcurrentCollectionTests.csproj" />
+    <Project Path="UnitTests/EventBusTests/EventBusTests.csproj" />
+    <Project Path="UnitTests/Hand.EnumerationTests/Hand.EnumerationTests.csproj" />
+    <Project Path="UnitTests/Hand.ValidationTests/Hand.ValidationTests.csproj" />
+    <Project Path="UnitTests/JobTests/JobTests.csproj" />
+    <Project Path="UnitTests/MemberValidationTests/MemberValidationTests.csproj" />
+    <Project Path="UnitTests/NamingTests/NamingTests.csproj" />
+    <Project Path="UnitTests/ParseXmlTests/ParseXmlTests.csproj" />
+    <Project Path="UnitTests/ProjectionsTests/ProjectionsTests.csproj" />
+    <Project Path="UnitTests/ReflectionTests/ReflectionTests.csproj" />
+    <Project Path="UnitTests/TaskTests/TaskTests.csproj" />
+  </Folder>
+  <Folder Name="/解决方案项/">
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="LICENSE.txt" />
+    <File Path="package.props" />
+    <File Path="readme.md" />
+  </Folder>
+  <Project Path="Hand.AutoCache/Hand.AutoCache.csproj" />
+  <Project Path="Hand.Builders/Hand.Builders.csproj" />
+  <Project Path="Hand.Collections/Hand.Collections.csproj" />
+  <Project Path="Hand.ConcurrentCollections/Hand.ConcurrentCollections.csproj" />
+  <Project Path="Hand.Core/Hand.Core.csproj" />
+  <Project Path="Hand.Data/Hand.Data.csproj" />
+  <Project Path="Hand.Dataflow/Hand.Dataflow.csproj" />
+  <Project Path="Hand.DDD/Hand.DDD.csproj" />
+  <Project Path="Hand.Disposables/Hand.Disposables.csproj" />
+  <Project Path="Hand.Enumerations/Hand.Enumerations.csproj" />
+  <Project Path="Hand.Job/Hand.Job.csproj" />
+  <Project Path="Hand.MemberValidation/Hand.MemberValidation.csproj" />
+  <Project Path="Hand.Naming/Hand.Naming.csproj" />
+  <Project Path="Hand.ParseXml/Hand.ParseXml.csproj">
+    <Platform Solution="*|x64" Project="x64" />
+  </Project>
+  <Project Path="Hand.Projections/Hand.Projections.csproj" />
+  <Project Path="Hand.Reflection/Hand.Reflection.csproj" />
+  <Project Path="Hand.Services/Hand.Services.csproj" />
+  <Project Path="Hand.Tasks/Hand.Tasks.csproj" />
+  <Project Path="Hand.Validation/Hand.Validation.csproj" />
+</Solution>
