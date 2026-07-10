@@ -1,5 +1,6 @@
-﻿using Hand.ParseXml.Contracts;
+﻿using Hand.Convert;
 using Hand.Structural;
+using System.Xml;
 
 namespace Hand.ParseXml.Nodes;
 
@@ -9,8 +10,8 @@ namespace Hand.ParseXml.Nodes;
 /// <typeparam name="TValue"></typeparam>
 /// <param name="xml"></param>
 /// <param name="original"></param>
-public abstract class WrapParser<TValue>(HandXml xml, IXmlParser<TValue> original)
-    : IWrapper<IXmlParser<TValue>>
+public abstract class WrapParser<TValue>(HandXml xml, IParser<XmlReader, TValue> original)
+    : IWrapper<IParser<XmlReader, TValue>>
 {
     #region 配置
     /// <summary>
@@ -20,14 +21,14 @@ public abstract class WrapParser<TValue>(HandXml xml, IXmlParser<TValue> origina
     /// <summary>
     /// 原始解析器
     /// </summary>
-    protected readonly IXmlParser<TValue> _original = original;
+    protected readonly IParser<XmlReader, TValue> _original = original;
     /// <inheritdoc />
     public HandXml Xml
         => _xml;
     /// <summary>
     /// 原始解析器
     /// </summary>
-    public IXmlParser<TValue> Original
+    public IParser<XmlReader, TValue> Original
         => _original;
     #endregion
 }

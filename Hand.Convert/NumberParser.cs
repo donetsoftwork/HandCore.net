@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using Hand.Convert;
+using System.Globalization;
 
 namespace Hand;
 
@@ -8,6 +9,30 @@ namespace Hand;
 /// <param name="style"></param>
 /// <param name="provider"></param>
 public class NumberParser(NumberStyles style, IFormatProvider provider)
+    : IParser<string, byte>
+    , IParser<string, sbyte>
+    , IParser<string, short>
+    , IParser<string, ushort>
+    , IParser<string, int>
+    , IParser<string, uint>
+    , IParser<string, long>
+    , IParser<string, ulong>
+    , IParser<string, double>
+    , IParser<string, float>
+    , IParser<string, decimal>
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+    , ISpanParser<char, byte>
+    , ISpanParser<char, sbyte>
+    , ISpanParser<char, short>
+    , ISpanParser<char, ushort>
+    , ISpanParser<char, int>
+    , ISpanParser<char, uint>
+    , ISpanParser<char, long>
+    , ISpanParser<char, ulong>
+    , ISpanParser<char, double>
+    , ISpanParser<char, float>
+    , ISpanParser<char, decimal>
+#endif
 {
     /// <summary>
     /// 数值解析器
@@ -37,8 +62,6 @@ public class NumberParser(NumberStyles style, IFormatProvider provider)
     public IFormatProvider Provider 
         => _provider;
     #endregion
-
-
     /// <summary>
     /// 尝试解析为byte类型
     /// </summary>

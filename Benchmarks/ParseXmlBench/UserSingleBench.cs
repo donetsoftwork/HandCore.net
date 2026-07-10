@@ -12,26 +12,22 @@ public class UserSingleBench
     //private static readonly IMemberBuilderProvider _builderProvider = MemberBuilderProvider.Instance/*.UseCreator(new UserCreater())*/;
     //private static readonly HandXml _xmlConfig = new(_builderProvider, DefaultValueBuilder.Instance);
 
-    private static readonly FirstReader<User> _parser = HandXml.Default.Entity<User>()
+    private static readonly EntityParser<User> _parser = HandXml.Default.Entity<User>()
         .WithItem<int>(nameof(User.Id))
         .WithItem(nameof(User.Name))
-        .WithItem<int>(nameof(User.Age))
-        .First();
-    private static readonly FirstReader<User> _parser1 = HandXml.Default.Entity<User, UserBuilder>()
+        .WithItem<int>(nameof(User.Age));
+    private static readonly EntityParser<User> _parser1 = HandXml.Default.Entity<User, UserBuilder>()
         .WithItem<int>(nameof(User.Id))
         .WithItem(nameof(User.Name))
-        .WithItem<int>(nameof(User.Age))
-        .First();
-    private static readonly FirstReader<User> _parser2 = HandXml.Default.Entity(UserBuilder.Creater)
+        .WithItem<int>(nameof(User.Age));
+    private static readonly EntityParser<User> _parser2 = HandXml.Default.Entity(UserBuilder.Creater)
         .WithItem<int>(nameof(User.Id))
         .WithItem(nameof(User.Name))
-        .WithItem<int>(nameof(User.Age))
-        .First();
-    private static readonly FirstReader<User> _parser3 = HandXml.Default.Entity(UserBuilder2.Creater)
+        .WithItem<int>(nameof(User.Age));
+    private static readonly EntityParser<User> _parser3 = HandXml.Default.Entity(UserBuilder2.Creater)
         .WithItem<int>(nameof(User.Id))
         .WithItem(nameof(User.Name))
-        .WithItem<int>(nameof(User.Age))
-        .First();
+        .WithItem<int>(nameof(User.Age));
     private static readonly UserParser _customParser = new(HandXml.Default);
     private static readonly string text = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <User>

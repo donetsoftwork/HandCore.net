@@ -4,30 +4,28 @@
 ### 1. 性能对比
 #### 1.1 性能测试结果如下
 >* Deserialize是反序列化结果
->* GetResult是基于反射的对象构建方法,比反序列化快31%
+>* GetResult是基于反射的对象构建方法,比反序列化快33%
 >* GetResult2是定制对象构建组件,避免了反射,比GetResult快一点
 >* Custom继承重写EntityParser,避免字典查找,比GetResult2更快一点
 
-| Method      | Mean       | Error   | StdDev  | Median     | Ratio | Gen0   | Gen1   | Allocated | Alloc Ratio |
-|------------ |-----------:|--------:|--------:|-----------:|------:|-------:|-------:|----------:|------------:|
-| Deserialize | 1,349.1 ns | 6.44 ns | 6.89 ns | 1,349.2 ns |  1.00 | 0.7240 | 0.0300 |   12.2 KB |        1.00 |
-| GetResult   |   924.9 ns | 5.21 ns | 6.00 ns |   924.7 ns |  0.69 | 0.6750 | 0.0250 |  11.38 KB |        0.93 |
-| GetResult2  |   802.2 ns | 2.22 ns | 2.38 ns |   803.5 ns |  0.59 | 0.6500 |      - |  10.95 KB |        0.90 |
-| Custom      |   767.9 ns | 1.94 ns | 2.08 ns |   767.7 ns |  0.57 | 0.6500 |      - |  10.95 KB |        0.90 |
+| Method      | Mean       | Error   | StdDev  | Ratio | Gen0   | Gen1   | Allocated | Alloc Ratio |
+|------------ |-----------:|--------:|--------:|------:|-------:|-------:|----------:|------------:|
+| Deserialize | 1,355.5 ns | 4.44 ns | 4.75 ns |  1.00 | 0.7240 | 0.0300 |   12.2 KB |        1.00 |
+| GetResult   |   912.7 ns | 5.07 ns | 5.84 ns |  0.67 | 0.6750 | 0.0250 |  11.38 KB |        0.93 |
+| GetResult2  |   798.3 ns | 0.40 ns | 0.42 ns |  0.59 | 0.6500 |      - |  10.95 KB |        0.90 |
+| Custom      |   779.4 ns | 6.46 ns | 7.43 ns |  0.57 | 0.6500 |      - |  10.95 KB |        0.90 
 
 ### 1.2 相关代码如下
 ~~~csharp
     private static readonly XmlSerializer _serializer = new(typeof(User));
-    private static readonly FirstReader<User> _parser = HandXml.Default.Entity<User>()
+    private static readonly EntityParser<User> _parser = HandXml.Default.Entity<User>()
         .WithItem<int>(nameof(User.Id))
         .WithItem(nameof(User.Name))
-        .WithItem<int>(nameof(User.Age))
-        .First();
-    private static readonly FirstReader<User> _parser2 = HandXml.Default.Entity(UserBuilder.Creater)
+        .WithItem<int>(nameof(User.Age));
+    private static readonly EntityParser<User> _parser2 = HandXml.Default.Entity(UserBuilder.Creater)
         .WithItem<int>(nameof(User.Id))
         .WithItem(nameof(User.Name))
-        .WithItem<int>(nameof(User.Age))
-        .First();
+        .WithItem<int>(nameof(User.Age));
     private static readonly UserParser _customParser = new(HandXml.Default);
 
     [Benchmark(Baseline = true)]
@@ -131,15 +129,15 @@ public class UserParser(HandXml xml)
         switch (name)
         {
             case nameof(User.Id):
-                if (_id.TryParser(reader, out var idResult))
+                if (_id.TryParse(reader, out var idResult))
                     entity.Id = idResult;
                 break;
             case nameof(User.Name):
-                if (_name.TryParser(reader, out var nameResult))
+                if (_name.TryParse(reader, out var nameResult))
                     entity.Name = nameResult;
                 break;
             case nameof(User.Age):
-                if (_age.TryParser(reader, out var ageResult))
+                if (_age.TryParse(reader, out var ageResult))
                     entity.Age = ageResult;
                 break;
         }
@@ -149,7 +147,8 @@ public class UserParser(HandXml xml)
 
 ### 1.3 性能分析
 >* ParseXml开箱即用性能就比XmlSerializer好不少
->* 通过定制对象构建组件或重新能进一步提高性能
+>* 通过定制对象构建组件或扩展重写能进一步提高性能
+>* 定制对象构建组件和扩展重写解析器可以通过SG来生成,之后会开发相应的源码生成器
 
 ### 2. 通用性对比
 #### 2.1 XmlSerializer通过Attribute标记映射
@@ -218,8 +217,8 @@ public record User(int Id, string Name);
 
         var userParser = HandXml.Default.Entity<User>()
             .WithItem<int>(nameof(User.Id))
-            .WithItem(nameof(User.Name))
-            .First();
+            .WithItem(nameof(User.Name));
+
         User result = userParser.Get(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
@@ -237,7 +236,7 @@ public record User(int Id, string Name);
             .WithAttribute<int>(nameof(User.Id))
             .WithAttribute(nameof(User.Name))
             .First("User");
-        User result = userParser.Get(text);
+        User result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
         Assert.Equal(name, result.Name);
@@ -253,7 +252,7 @@ public record User(int Id, string Name);
         var userParser = HandXml.Default.Entity<User>(nameof(User.Name))
             .WithAttribute<int>(nameof(User.Id))
             .First("User");
-        User result = userParser.Get(text);
+        User result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
         Assert.Equal(name, result.Name);
@@ -263,7 +262,7 @@ public record User(int Id, string Name);
 ### 2.3 通用性分析
 
 | 特性        | XmlSerializer     | ParseXml                       |
-| ----------- |: ---------------- | :----------------------------- |
+|------------ |:----------------- |:------------------------------ |
 | 同类Xml格式 | 只支持一种格式    | 支持多种                       |
 | 映射对象    | 只映射属性        | 映射属性、字段和构造函数参数   |
 | 映射Xml结构 | 支持属性和子节点  | 支持属性、子节点和当前节点     |
@@ -272,18 +271,18 @@ public record User(int Id, string Name);
 ## 二、ParseXml主要功能
 ### 1. 读取单个节点
 #### 1.1 读取原始值
->* 使用Single方法读取单个节点原始值
+>* 使用First方法读取单个节点原始值
 
 ~~~csharp
 var summaryReader = HandXml.Default.First("summary");
-string summary = summaryReader.Get(xmlReader);
+string summary = summaryReader.Parse(xmlReader);
 ~~~
 
 #### 1.2 读取强类型值
->* 使用Single泛型方法读取单个节点强类型值
+>* 使用First泛型方法读取单个节点强类型值
 ~~~csharp
 var idParser = HandXml.Default.First<int>("Id");
-int id = idParser.Get(xmlReader);
+int id = idParser.Parse(xmlReader);
 ~~~
 
 ### 2. 读取单个属性
@@ -300,7 +299,7 @@ using var stringReader = new StringReader(text);
 using var xmlReader = XmlReader.Create(stringReader);
 var nameReader = HandXml.Default.Attribute("name")
     .First("member");
-string name = nameReader.Get(xmlReader);
+string name = nameReader.Parse(xmlReader);
 ~~~
 
 #### 2.2 读取强类型值
@@ -313,7 +312,7 @@ using var stringReader = new StringReader(text);
 using var xmlReader = XmlReader.Create(stringReader);
 var idReader = HandXml.Default.Attribute<int>("Id")
     .First("User");
-int result = idReader.Get(xmlReader);
+int result = idReader.Parse(xmlReader);
 ~~~
 
 ### 3. 解析到实体
@@ -331,14 +330,12 @@ var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
 	    <Name>Jxj</Name>
 	    <Age>20</Age>
     </User>";
- using var stringReader = new StringReader(text);
- using var xmlReader = XmlReader.Create(stringReader);
+
  var userParser = HandXml.Default.Entity<User>()
      .WithItem<int>(nameof(User.Id))
      .WithItem(nameof(User.Name))
-     .WithItem<int>(nameof(User.Age))
-     .First();
- User result = userParser.Get(xmlReader);
+     .WithItem<int>(nameof(User.Age));
+ User result = userParser.Get(text);
 ~~~
 
 #### 3.2 从属性解析
@@ -349,15 +346,13 @@ var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
 ~~~csharp
 var text = @$"<?xml version=""1.0"" encoding=""utf-8""?>
     <User Id=""123"" Name=""Jxj"" Age=""20"" />";
-using var stringReader = new StringReader(text);
-using var xmlReader = XmlReader.Create(stringReader);
-var config = HandXml.Default;
-var userParser = config.Entity<User>()
+
+var userParser = HandXml.Default.Entity<User>()
     .WithAttribute<int>(nameof(User.Id))
     .WithAttribute(nameof(User.Name))
     .WithAttribute<int>(nameof(User.Age))
     .First("User");
-User result = userParser.Get(xmlReader);
+User result = userParser.Parse(text);
 ~~~
 
 #### 3.3 从本节点解析
@@ -366,14 +361,12 @@ User result = userParser.Get(xmlReader);
 ~~~csharp
 var text = @$"<?xml version=""1.0"" encoding=""utf-8""?>
     <User Id=""123"" Age=""age"">Jxj</User>";
-using var stringReader = new StringReader(text);
-using var xmlReader = XmlReader.Create(stringReader);
-var config = HandXml.Default;
-var userParser = config.Entity<User>(nameof(User.Name))
+
+var userParser = HandXml.Default.Entity<User>(nameof(User.Name))
     .WithAttribute<int>(nameof(User.Id))
     .WithAttribute<int>(nameof(User.Age))
     .First("User");
-User result = userParser.Get(xmlReader);
+User result = userParser.Parse(text);
 ~~~
 
 ### 4. 解析集合
@@ -395,14 +388,12 @@ var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
         <Name><![CDATA[<B>王二</B>]]></Name>
     </User>
     </Users>";
-using var stringReader = new StringReader(text);
-using var xmlReader = XmlReader.Create(stringReader);
-var config = HandXml.Default;
-var elementReader = config.Entity<User>()
+
+var repeatReader = HandXml.Default.Entity<User>()
     .WithItem<int>(nameof(User.Id))
     .WithItem(nameof(User.Name))
     .Repeat(nameof(User));
-User[] result = elementReader.Get(xmlReader)
+User[] result = repeatReader.Get(text)
     .ToArray();
 ~~~
 
@@ -412,16 +403,15 @@ User[] result = elementReader.Get(xmlReader)
 ~~~csharp
 var text = @$"<?xml version=""1.0"" encoding=""utf-8""?>
     <User Id=""123"">Jxj</User>";
-using var stringReader = new StringReader(text);
-using var xmlReader = XmlReader.Create(stringReader);
+
 var idReader = HandXml.Default.Attribute<long>("Id")
     .Convert(id => new UserId(id))
     .First("User");
-UserId result = idReader.Get(xmlReader);
+UserId result = idReader.Get(text);
 ~~~
 
 ### 6. 复杂类型
->* 通过WithItem可以一个解析器绑定到主解析器的成员上
+>* 通过WithItem可以把一个解析器绑定到主解析器的成员上
 >* 通过WithRepeate可以把集合解析器绑定到主解析器的成员上
 
 #### 6.1 复杂类型的Case
@@ -448,7 +438,7 @@ Rss rss = rssParser.Get(xmlReader);
 >* node为调用该解析器的子节点名
 >* member为子解析器解析结果绑定实体成员名
 >* TItem为子解析器解析结果和实体成员共同的类型
->* 如果类型不一致结果会被抛弃
+>* 如果类型不一致结果会抛异常或被抛弃
 
 ~~~csharp
 EntityParser<TEntity> WithItem<TItem>(IXmlParser<TItem> item, string node, string member);
@@ -566,7 +556,7 @@ interface IXmlParser<TResult>
     /// <param name="reader"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-    bool TryParser(XmlReader reader, out TResult result);
+    bool TryParse(XmlReader reader, out TResult result);
 }
 ~~~
 
@@ -576,7 +566,7 @@ interface IXmlParser<TResult>
 >* 通过完美的组件化可以模拟和解析复杂的Xml文件
 
 | 类                              | 作用                                                                       |
-| ------- ------- ------- ------  | :------------------------------------------------------------------------- |
+|-------------------------------- | :------------------------------------------------------------------------- |
 | AttributeReader                 | 读取属性的原始文本                                                         |
 | ContentReader                   | 读取节点的原始文本                                                         |
 | PrimitiveReader                 | 调用AttributeReader或ContentReader,使用Converters把文本转化为需要的类型    |
@@ -587,12 +577,11 @@ interface IXmlParser<TResult>
 
 ~~~csharp
 class PrimitiveReader<TPrimitive>(IXmlParser<string> original, IConverter<string, TPrimitive> converter, TPrimitive defaultValue);
-ConvertParser<TSource, TDest>(HandXml xml, IXmlParser<TSource> original, IConverter<TSource, TDest> converter, TDest defaultValue);
+class ConvertParser<TSource, TDest>(HandXml xml, IXmlParser<TSource> original, IConverter<TSource, TDest> converter, TDest defaultValue);
 class FirstReader<TResult>(string element, IXmlParser<TResult> original, TResult defaultValue);
 class RepeatReader<TResult>(HandXml xml, string name, IXmlParser<TResult> item);
 class EntityParser<TEntity>(HandXml xml, ICreator<IMemberBuilder<TEntity>> creator, IMemberParser? content, bool hasItem = false);
 ~~~
-
 
 ## 五、ParseXml的可扩展性
 ### 1. EntityParser\<TEntity\>的扩展性
@@ -635,15 +624,15 @@ public class UserParser(HandXml xml)
         switch (name)
         {
             case nameof(User.Id):
-                if (_id.TryParser(reader, out var idResult))
+                if (_id.TryParse(reader, out var idResult))
                     entity.Id = idResult;
                 break;
             case nameof(User.Name):
-                if (_name.TryParser(reader, out var nameResult))
+                if (_name.TryParse(reader, out var nameResult))
                     entity.Name = nameResult;
                 break;
             case nameof(User.Age):
-                if (_age.TryParser(reader, out var ageResult))
+                if (_age.TryParse(reader, out var ageResult))
                     entity.Age = ageResult;
                 break;
         }
@@ -651,7 +640,7 @@ public class UserParser(HandXml xml)
 }
 ~~~
 
-
+nuget安装: dotnet add package Hand.ParseXml --version 0.3.1.2-alpha
 源码托管地址: https://github.com/donetsoftwork/HandCore.net/tree/master/Hand.ParseXml ，欢迎大家直接查看源码。
 gitee同步更新:https://gitee.com/donetsoftwork/HandCore.net/tree/master/Hand.ParseXml
 

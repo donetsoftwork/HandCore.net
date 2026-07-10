@@ -1,8 +1,10 @@
-﻿using Hand.Creational;
+﻿using Hand.Convert;
+using Hand.Creational;
 using Hand.Maping;
 using Hand.ParseXml.Cachers;
 using Hand.ParseXml.Contracts;
 using Hand.ParseXml.Nodes;
+using System.Xml;
 
 namespace Hand.ParseXml;
 
@@ -47,9 +49,9 @@ public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaul
     /// <typeparam name="TPrimitive"></typeparam>
     /// <param name="original"></param>
     /// <returns></returns>
-    public IXmlParser<TPrimitive> Primitive<TPrimitive>(IXmlParser<string> original)
+    public IParser<XmlReader, TPrimitive> Primitive<TPrimitive>(IParser<XmlReader, string> original)
     {
-        if (original is IXmlParser<TPrimitive> reader)
+        if (original is IParser<XmlReader, TPrimitive> reader)
             return reader;
         return new PrimitiveReader<TPrimitive>(original, _converters.Get<TPrimitive>(), _defaultValues.Get<TPrimitive>());
     }
@@ -67,7 +69,7 @@ public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaul
     /// <typeparam name="TAttribute"></typeparam>
     /// <param name="attributeName"></param>
     /// <returns></returns>
-    public IXmlParser<TAttribute> Attribute<TAttribute>(string attributeName)
+    public IParser<XmlReader, TAttribute> Attribute<TAttribute>(string attributeName)
         => Primitive<TAttribute>(new AttributeReader(attributeName, _defaultValues.Get<string>()));
     #endregion
     #region Content
@@ -82,7 +84,7 @@ public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaul
     /// </summary>
     /// <typeparam name="TContent"></typeparam>
     /// <returns></returns>
-    public IXmlParser<TContent> Content<TContent>()
+    public IParser<XmlReader, TContent> Content<TContent>()
         => Primitive<TContent>(new ContentReader(_defaultValues.Get<string>()));
     #endregion
     #region Entity
@@ -151,7 +153,7 @@ public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaul
     /// <param name="element"></param>
     /// <param name="parser"></param>
     /// <returns></returns>
-    public FirstReader<TResult> First<TResult>(string element, IXmlParser<TResult> parser)
+    public FirstReader<TResult> First<TResult>(string element, IParser<XmlReader, TResult> parser)
         => new(element, parser, _defaultValues.Get<TResult>());
     /// <summary>
     /// 获取单个节点
@@ -159,7 +161,7 @@ public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaul
     /// <typeparam name="TResult"></typeparam>
     /// <param name="parser"></param>
     /// <returns></returns>
-    public FirstReader<TResult> First<TResult>(IXmlParser<TResult> parser)
+    public FirstReader<TResult> First<TResult>(IParser<XmlReader, TResult> parser)
         => new(typeof(TResult).Name, parser, _defaultValues.Get<TResult>());
     /// <summary>
     /// 获取单个节点

@@ -1,7 +1,6 @@
 ﻿using Hand.ParseJson;
 using ParseJsonTests.Supports;
 using System.Text;
-using System.Text.Json;
 
 namespace ParseJsonTests;
 
@@ -11,12 +10,12 @@ public class ConvertTests
     public void Single()
     {
         var expected = 123;
-        string jsonContent = "{\"id\": 123}";
-        var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(jsonContent));
+        string json = "{\"id\": 123}";
+
         var config = HandJson.Default;
         var idReader = config.First<int>("id")
             .Convert(id => new UserId(id));
-        var result = idReader.Get(reader);
+        var result = idReader.Parse(json);
         Assert.Equal(expected, result.Original);
     }
 

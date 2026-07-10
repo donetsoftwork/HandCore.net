@@ -1,4 +1,5 @@
-﻿using Hand.Creational;
+﻿using Hand.Convert;
+using Hand.Creational;
 using Hand.Maping;
 using Hand.ParseXml.Contracts;
 using Hand.Storage;
@@ -122,7 +123,7 @@ public class EntityParser<TEntity>(HandXml xml, ICreator<IMemberBuilder<TEntity>
         return builder.Build();
     }
     /// <inheritdoc />
-    public bool TryParser(XmlReader reader, out TEntity result)
+    public bool TryParse(XmlReader reader, out TEntity result)
     {
         result = Get(reader);
         return true;
@@ -230,7 +231,7 @@ public class EntityParser<TEntity>(HandXml xml, ICreator<IMemberBuilder<TEntity>
     /// <param name="node"></param>
     /// <param name="member"></param>
     /// <returns></returns>
-    public EntityParser<TEntity> WithItem<TItem>(IXmlParser<TItem> item, string node, string member)
+    public EntityParser<TEntity> WithItem<TItem>(IParser<XmlReader, TItem> item, string node, string member)
     {
         AddItem(node, item.Member(member));
         return this;
@@ -242,7 +243,7 @@ public class EntityParser<TEntity>(HandXml xml, ICreator<IMemberBuilder<TEntity>
     /// <param name="item"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public EntityParser<TEntity> WithItem<TItem>(IXmlParser<TItem> item, string name)
+    public EntityParser<TEntity> WithItem<TItem>(IParser<XmlReader, TItem> item, string name)
         => WithItem(item, name, name);
     #endregion
     #region WithRepeat

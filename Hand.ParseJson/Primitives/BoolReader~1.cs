@@ -1,4 +1,5 @@
-﻿using Hand.ParseJson.Nodes;
+﻿using Hand.ParseJson.Cachers;
+using Hand.ParseJson.Nodes;
 using Hand.Utf8;
 using System.Text.Json;
 
@@ -19,9 +20,9 @@ public class BoolReader<TValue>(TValue trueValue, TValue falseValue, TValue defa
     private readonly TValue _trueValue = trueValue;
     private readonly TValue _falseValue = falseValue;
     /// <summary>
-    /// 转化器
+    /// 解析器
     /// </summary>
-    protected readonly BoolConverter _converter = new(default, trueValue is not null && trueValue.Equals(defaultValue));
+    protected static readonly Parser _parser = PrimitiveReaderCacher.Parser;
 
     /// <summary>
     /// true值
@@ -32,27 +33,61 @@ public class BoolReader<TValue>(TValue trueValue, TValue falseValue, TValue defa
     /// </summary>
     public TValue FalseValue => _falseValue;
     /// <summary>
-    /// 转化器
+    /// 解析器
     /// </summary>
-    public BoolConverter Converter 
-        => _converter;
+    public Parser Parser
+        => _parser;
     #endregion
 
-    /// <inheritdoc />
-    protected override TValue GetValue(ref Utf8JsonReader reader)
-        => reader.TokenType switch
-        {
-            JsonTokenType.True => _trueValue,
-            JsonTokenType.False => _falseValue,
-            JsonTokenType.Null => _defaultValue,
-            _ => GetDefaultValue(ref reader)
-        };
+    ///// <inheritdoc />
+    //protected override TValue GetValue(ref Utf8JsonReader reader)
+    //    => reader.TokenType switch
+    //    {
+    //        JsonTokenType.True => _trueValue,
+    //        JsonTokenType.False => _falseValue,
+    //        JsonTokenType.Null => _defaultValue,
+    //        _ => GetDefaultValue(ref reader)
+    //    };
 
-    /// <summary>
-    /// 获取默认值
-    /// </summary>
-    /// <param name="reader"></param>
-    /// <returns></returns>
-    public virtual TValue GetDefaultValue(ref Utf8JsonReader reader)
-        => _converter.Convert(GetOriginalValue(ref reader)) ? _trueValue : _falseValue;
+    ///// <summary>
+    ///// 获取默认值
+    ///// </summary>
+    ///// <param name="reader"></param>
+    ///// <returns></returns>
+    //public virtual TValue GetDefaultValue(ref Utf8JsonReader reader)
+    //    => _parser.Convert(GetOriginalValue(ref reader)) ? _trueValue : _falseValue;
+    /// <inheritdoc />
+    public override bool TryParser(ref Utf8JsonReader reader, out TValue result)
+    {
+        if (reader.Read())
+        {
+            switch (reader.TokenType)
+            {
+                case JsonTokenType.True:
+                    result = _trueValue;
+                    return true;
+                case JsonTokenType.False:
+                    result = _falseValue;
+                    return true;
+                case JsonTokenType.Null:
+                    result = _defaultValue;
+                    return false;
+            }
+            if (TryParser(GetOriginalValue(ref reader), out result))
+                return true;
+        }
+        result = _defaultValue;
+        return false;
+    }
+    /// <inheritdoc />
+    protected override bool TryParser(ReadOnlySpan<byte> bytes, out TValue result)
+    {
+        if(_parser.TryParse(bytes, out bool state))
+        {
+            result = state ? _trueValue : _falseValue;
+            return true;
+        }
+        result = _defaultValue;
+        return false;
+    }
 }

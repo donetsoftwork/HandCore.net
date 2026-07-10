@@ -1,4 +1,5 @@
 ﻿using Hand.Configuration;
+using Hand.Convert;
 using Hand.Maping;
 using Hand.ParseXml.Contracts;
 using Hand.ParseXml.Nodes;
@@ -20,7 +21,7 @@ public static class ParseXmlServices
     /// <param name="parser"></param>
     /// <param name="xml"></param>
     /// <returns></returns>
-    public static TResult Parse<TResult>(this IDataGet<XmlReader, TResult> parser, string xml)
+    public static TResult Get<TResult>(this IDataGet<XmlReader, TResult> parser, string xml)
     {
         using var stringReader = new StringReader(xml);
         using var xmlReader = XmlReader.Create(stringReader);
@@ -33,11 +34,9 @@ public static class ParseXmlServices
     /// <param name="parser"></param>
     /// <param name="xml"></param>
     /// <returns></returns>
-    public static TResult Get<TResult>(this IXmlParser<TResult> parser, string xml)
+    public static TResult Parse<TResult>(this IParser<XmlReader, TResult> parser, string xml)
     {
-        using var stringReader = new StringReader(xml);
-        using var xmlReader = XmlReader.Create(stringReader);
-        _ = parser.TryParser(xmlReader, out var result);
+        _ = TryParse(parser, xml, out var result);
         return result;
     }
     /// <summary>
@@ -47,10 +46,24 @@ public static class ParseXmlServices
     /// <param name="parser"></param>
     /// <param name="reader"></param>
     /// <returns></returns>
-    public static TResult Get<TResult>(this IXmlParser<TResult> parser, XmlReader reader)
+    public static TResult Parse<TResult>(this IParser<XmlReader, TResult> parser, XmlReader reader)
     {
-        _ = parser.TryParser(reader, out var result);
+        _ = parser.TryParse(reader, out var result);
         return result;
+    }
+    /// <summary>
+    /// 解析xml
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="parser"></param>
+    /// <param name="xml"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public static bool TryParse<TResult>(this IParser<XmlReader, TResult> parser, string xml, out TResult result)
+    {
+        using var stringReader = new StringReader(xml);
+        using var xmlReader = XmlReader.Create(stringReader);
+        return parser.TryParse(xmlReader, out result);
     }
     /// <summary>
     /// 成员
@@ -60,7 +73,7 @@ public static class ParseXmlServices
     /// <param name="name"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static MemberParser<TMember> Member<TMember>(this IXmlParser<TMember> reader, string name)
+    public static MemberParser<TMember> Member<TMember>(this IParser<XmlReader, TMember> reader, string name)
         => new(name, reader);
     #region First
     /// <summary>
@@ -70,7 +83,7 @@ public static class ParseXmlServices
     /// <param name="element"></param>
     /// <param name="original"></param>
     /// <returns></returns>
-    public static FirstReader<TResult> First<TResult>(this IXmlParser<TResult> original, string element)
+    public static FirstReader<TResult> First<TResult>(this IParser<XmlReader, TResult> original, string element)
     {
         if (original is IDefault<TResult> @default)
             return new FirstReader<TResult>(element, original, @default.DefaultValue);
@@ -85,7 +98,7 @@ public static class ParseXmlServices
     /// <param name="original"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static FirstReader<TResult> First<TResult>(this IXmlParser<TResult> original)
+    public static FirstReader<TResult> First<TResult>(this IParser<XmlReader, TResult> original)
         => First(original, typeof(TResult).Name);
     #endregion
     #region Repeat
@@ -116,7 +129,7 @@ public static class ParseXmlServices
     /// <param name="item"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static RepeatReader<TResult> Repeat<TResult>(this IXmlParser<TResult> item, string element)
+    public static RepeatReader<TResult> Repeat<TResult>(this IParser<XmlReader, TResult> item, string element)
     {
         if(item is IEntityParser entity)
             return new RepeatReader<TResult>(entity.Xml, element, item);
@@ -129,17 +142,9 @@ public static class ParseXmlServices
     /// <param name="item"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static RepeatReader<TResult> Repeat<TResult>(this IXmlParser<TResult> item)
+    public static RepeatReader<TResult> Repeat<TResult>(this IParser<XmlReader, TResult> item)
         => Repeat(item, typeof(TResult).Name);
     #endregion
-    ///// <summary>
-    ///// 转换为复杂类型解析器
-    ///// </summary>
-    ///// <typeparam name="TComplex"></typeparam>
-    ///// <param name="entity"></param>
-    ///// <returns></returns>
-    //public static ComplexParser<TComplex> ToComplex<TComplex>(this IEntityParser<TComplex> entity)
-    //    => new(entity);
     #region Convert
     /// <summary>
     /// 转换为其他类型解析器
@@ -175,7 +180,7 @@ public static class ParseXmlServices
     /// <param name="node"></param>
     /// <param name="converter"></param>
     /// <returns></returns>
-    public static ConvertParser<TSource, TDest> Convert<TSource, TDest>(this IXmlParser<TSource> node, IConverter<TSource, TDest> converter)
+    public static ConvertParser<TSource, TDest> Convert<TSource, TDest>(this IParser<XmlReader, TSource> node, IConverter<TSource, TDest> converter)
     {
         var xml = node is IEntityParser entity ? entity.Xml : HandXml.Default;
         var defaultValue = xml.DefaultValues.Get<TDest>();
@@ -190,7 +195,7 @@ public static class ParseXmlServices
     /// <param name="convert"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ConvertParser<TSource, TDest> Convert<TSource, TDest>(this IXmlParser<TSource> node, Converter<TSource, TDest> convert)
+    public static ConvertParser<TSource, TDest> Convert<TSource, TDest>(this IParser<XmlReader, TSource> node, Converter<TSource, TDest> convert)
         => Convert(node, new DelegateConverter<TSource, TDest>(convert));
     /// <summary>
     /// 转换为数组解析器

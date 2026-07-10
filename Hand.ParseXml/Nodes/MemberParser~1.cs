@@ -1,4 +1,5 @@
-﻿using Hand.Creational;
+﻿using Hand.Convert;
+using Hand.Creational;
 using Hand.ParseXml.Contracts;
 using System.Xml;
 
@@ -10,12 +11,12 @@ namespace Hand.ParseXml.Nodes;
 /// <typeparam name="TMember"></typeparam>
 /// <param name="name"></param>
 /// <param name="original"></param>
-public class MemberParser<TMember>(string name, IXmlParser<TMember> original)
+public class MemberParser<TMember>(string name, IParser<XmlReader, TMember> original)
     : IMemberParser
 {
     #region 配置
     private readonly string _name = name;
-    private readonly IXmlParser<TMember> _original = original;
+    private readonly IParser<XmlReader, TMember> _original = original;
 
     /// <summary>
     /// 成员名
@@ -25,14 +26,14 @@ public class MemberParser<TMember>(string name, IXmlParser<TMember> original)
     /// <summary>
     /// 原始解析器
     /// </summary>
-    public IXmlParser<TMember> Original 
+    public IParser<XmlReader, TMember> Original 
         => _original;
     #endregion
 
     /// <inheritdoc />
     public void Save(IMemberStore entity, XmlReader reader)
     {
-        if (_original.TryParser(reader, out var value))
+        if (_original.TryParse(reader, out var value))
             entity.Save(_name, value);
     }
 }

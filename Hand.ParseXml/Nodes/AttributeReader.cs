@@ -18,11 +18,8 @@ public class AttributeReader(string name, string defaultValue = "")
         => _name;
     #endregion
 
-    ///// <inheritdoc />
-    //public override string Get(XmlReader reader)
-    //    => reader.GetAttribute(_name) ?? _defaultValue;
     /// <inheritdoc />
-    public override bool TryParser(XmlReader reader, out string result)
+    public override bool TryParse(XmlReader reader, out string result)
     {
         var value = reader.GetAttribute(_name);
         if(value is null)

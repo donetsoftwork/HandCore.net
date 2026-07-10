@@ -1,6 +1,5 @@
 ﻿using Hand.ParseXml;
 using ParseXmlTests.Supports;
-using System.Xml;
 
 namespace ParseXmlTests;
 
@@ -22,8 +21,7 @@ public class EntityParserTests
         var userParser = HandXml.Default.Entity<User>()
             .WithItem<int>(nameof(User.Id))
             .WithItem(nameof(User.Name))
-            .WithItem<int>(nameof(User.Age))
-            .First();
+            .WithItem<int>(nameof(User.Age));
         User result = userParser.Get(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
@@ -47,7 +45,7 @@ public class EntityParserTests
             .WithItem<int>(nameof(User.Id))
             .WithItem(nameof(User.Name))
             .WithItem<int>(nameof(User.Age));
-        var result = userParser.Get(text);
+        var result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
         Assert.Equal(name, result.Name);
@@ -67,7 +65,7 @@ public class EntityParserTests
             .WithAttribute(nameof(User.Name))
             .WithAttribute<int>(nameof(User.Age))
             .First("User");
-        User result = userParser.Get(text);
+        User result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
         Assert.Equal(name, result.Name);
@@ -86,7 +84,7 @@ public class EntityParserTests
             .WithAttribute<int>(nameof(User.Id))
             .WithAttribute<int>(nameof(User.Age))
             .First("User");
-        User result = userParser.Get(text);
+        User result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
         Assert.Equal(name, result.Name);
@@ -106,7 +104,7 @@ public class EntityParserTests
             .WithAttribute<int>(nameof(User.Id))
             .WithAttribute<int>(nameof(User.Age))
             .First("User");
-        var result = userParser.Get(text);
+        var result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
         Assert.Equal(name, result.Name);
@@ -127,7 +125,7 @@ public class EntityParserTests
 
         var userParser = new UserParser(HandXml.Default)
             .First();
-        var result = userParser.Get(text);
+        var result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
         Assert.Equal(name, result.Name);

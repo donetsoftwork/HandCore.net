@@ -29,12 +29,12 @@ public class FirstReader<TResult>(string name, IJsonParser<TResult> original, TR
     public IJsonParser<TResult> Original 
         => _original;
     #endregion
-    /// <inheritdoc />
-    protected override TResult GetValue(ref Utf8JsonReader reader)
-    {
-        // 该方法不会执行,只是实现基类
-        return _defaultValue;
-    }
+    ///// <inheritdoc />
+    //protected override TResult GetValue(ref Utf8JsonReader reader)
+    //{
+    //    // 该方法不会执行,只是实现基类
+    //    return _defaultValue;
+    //}
     /// <inheritdoc />
     public override bool TryParser(ref Utf8JsonReader reader, out TResult result)
     {
@@ -47,6 +47,13 @@ public class FirstReader<TResult>(string name, IJsonParser<TResult> original, TR
                 break;
             }
         } while (reader.Read());
+        result = _defaultValue;
+        return false;
+    }
+    /// <inheritdoc />
+    protected override bool TryParser(ReadOnlySpan<byte> bytes, out TResult result)
+    {
+        // 只实现基类,并不实际调用
         result = _defaultValue;
         return false;
     }

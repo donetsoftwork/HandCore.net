@@ -1,4 +1,5 @@
-﻿using Hand.Maping;
+﻿using Hand.Convert;
+using Hand.Maping;
 
 namespace Hand.Utf8;
 
@@ -8,6 +9,7 @@ namespace Hand.Utf8;
 /// <param name="defaultValue"></param>
 public class CharConverter(char defaultValue)
     : ISpanConverter<byte, char>
+    , ISpanParser<byte, char>
 {
     #region 配置
     private readonly char _defaultValue = defaultValue;
@@ -24,5 +26,17 @@ public class CharConverter(char defaultValue)
         if (string.IsNullOrEmpty(str))
             return _defaultValue;
         return str[0];
+    }
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<byte> resource, out char result)
+    {
+        var str = StringConverter.GetString(resource);
+        if (string.IsNullOrEmpty(str))
+        {
+            result = _defaultValue;
+            return false;
+        }
+        result = str[0];
+        return true;
     }
 }

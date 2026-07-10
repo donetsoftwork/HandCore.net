@@ -1,12 +1,11 @@
 ﻿using BenchmarkDotNet.Attributes;
 using Hand.ParseXml;
 using ParseXmlBench.Supports;
-using System.Xml;
 using System.Xml.Serialization;
 
 namespace ParseXmlBench;
 
-[MemoryDiagnoser, SimpleJob(launchCount: 2, warmupCount: 10, iterationCount: 10, invocationCount: 1000000)]
+[MemoryDiagnoser, SimpleJob(launchCount: 2, warmupCount: 10, iterationCount: 10, invocationCount: 500000)]
 public class UserListBench
 {
     private static readonly XmlSerializer _serializer = new(typeof(User[]));
@@ -55,42 +54,31 @@ public class UserListBench
     public User[]? Deserialize()
     {
         using var stringReader = new StringReader(text);
-        using var xmlReader = XmlReader.Create(stringReader);
-        return (User[]?)_serializer.Deserialize(xmlReader);
+        return (User[]?)_serializer.Deserialize(stringReader);
     }
     [Benchmark]
     public User[] GetResult()
-    {
-        using var stringReader = new StringReader(text);
-        using var xmlReader = XmlReader.Create(stringReader);
-        return [.. _parser.Get(xmlReader)];
+    {;
+        return [.. _parser.Get(text)];
     }
     [Benchmark]
     public User[] GetResult1()
     {
-        using var stringReader = new StringReader(text);
-        using var xmlReader = XmlReader.Create(stringReader);
-        return [.. _parser1.Get(xmlReader)];
+        return [.. _parser1.Get(text)];
     }
     [Benchmark]
     public User[] GetResult2()
     {
-        using var stringReader = new StringReader(text);
-        using var xmlReader = XmlReader.Create(stringReader);
-        return [.. _parser2.Get(xmlReader)];
+        return [.. _parser2.Get(text)];
     }
     [Benchmark]
     public User[] GetResult3()
     {
-        using var stringReader = new StringReader(text);
-        using var xmlReader = XmlReader.Create(stringReader);
-        return [.. _parser3.Get(xmlReader)];
+        return [.. _parser3.Get(text)];
     }
     [Benchmark]
     public User[] Custom()
     {
-        using var stringReader = new StringReader(text);
-        using var xmlReader = XmlReader.Create(stringReader);
-        return [.. _customParser.Get(xmlReader)];
+        return [.. _customParser.Get(text)];
     }
 }

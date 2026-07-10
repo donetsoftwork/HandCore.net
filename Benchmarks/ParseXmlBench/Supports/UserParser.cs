@@ -1,6 +1,6 @@
-﻿using Hand.Creational;
+﻿using Hand.Convert;
+using Hand.Creational;
 using Hand.ParseXml;
-using Hand.ParseXml.Contracts;
 using Hand.ParseXml.Nodes;
 using System.Xml;
 
@@ -10,9 +10,9 @@ public class UserParser(HandXml xml)
     : EntityParser<User>(xml, UserBuilder2.Creater, null, true)
 {
     #region 配置
-    private readonly IXmlParser<int> _id = xml.Content<int>();
+    private readonly IParser<XmlReader, int> _id = xml.Content<int>();
     private readonly ContentReader _name = xml.Content();
-    private readonly IXmlParser<int> _age = xml.Content<int>();
+    private readonly IParser<XmlReader, int> _age = xml.Content<int>();
     #endregion
     /// <inheritdoc />
     public override void ReadAttributes(IMemberStore entity, XmlReader reader) { }
@@ -35,15 +35,15 @@ public class UserParser(HandXml xml)
         switch (name)
         {
             case nameof(User.Id):
-                if (_id.TryParser(reader, out var idResult))
+                if (_id.TryParse(reader, out var idResult))
                     entity.Id = idResult;
                 break;
             case nameof(User.Name):
-                if (_name.TryParser(reader, out var nameResult))
+                if (_name.TryParse(reader, out var nameResult))
                     entity.Name = nameResult;
                 break;
             case nameof(User.Age):
-                if (_age.TryParser(reader, out var ageResult))
+                if (_age.TryParse(reader, out var ageResult))
                     entity.Age = ageResult;
                 break;
         }

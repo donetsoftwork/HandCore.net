@@ -43,12 +43,13 @@ public static class ParseJsonServices
     /// <typeparam name="TResult"></typeparam>
     /// <param name="parser"></param>
     /// <param name="json"></param>
+    /// <param name="result"></param>
     /// <returns></returns>
-    public static TResult Get<TResult>(this IJsonParser<TResult> parser, string json)
+    public static bool TryParser<TResult>(this IJsonParser<TResult> parser, string json, out TResult result)
     {
         byte[]? tempArray = null;
         var count = json.Length;
-        // For performance, avoid obtaining actual byte count unless memory usage is higher than the threshold.
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         Span<byte> utf8 =
             // Use stack memory
             count <= StackallocCharThreshold ? stackalloc byte[StackallocByteThreshold] :
@@ -57,7 +58,14 @@ public static class ParseJsonServices
             // Use a normal alloc since the pool would create a normal alloc anyway based on the threshold (per current implementation)
             // and by using a normal alloc we can avoid the Clear().
             new byte[StringConverter.GetByteCount(json)];
-
+#else
+        Span<byte> utf8 =
+            // Use a pooled array
+            count <= ArrayPoolMaxSizeBeforeUsingNormalAlloc ? tempArray = ArrayPool<byte>.Shared.Rent(count * MaxExpansionFactorWhileTranscoding) :
+            // Use a normal alloc since the pool would create a normal alloc anyway based on the threshold (per current implementation)
+            // and by using a normal alloc we can avoid the Clear().
+            new byte[StringConverter.GetByteCount(json)];
+#endif
         try
         {
 #if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
@@ -67,8 +75,7 @@ public static class ParseJsonServices
 #endif
 
             var reader = new Utf8JsonReader(utf8.Slice(0, actualByteCount));
-            _ = parser.TryParser(ref reader, out var result);
-            return result;
+            return parser.TryParser(ref reader, out result);
         }
         finally
         {
@@ -84,9 +91,21 @@ public static class ParseJsonServices
     /// </summary>
     /// <typeparam name="TResult"></typeparam>
     /// <param name="parser"></param>
+    /// <param name="json"></param>
+    /// <returns></returns>
+    public static TResult Parse<TResult>(this IJsonParser<TResult> parser, string json)
+    {
+        _ = TryParser(parser, json, out var result);
+        return result;
+    }
+    /// <summary>
+    /// 获取解析结果
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="parser"></param>
     /// <param name="reader"></param>
     /// <returns></returns>
-    public static TResult Get<TResult>(this IJsonParser<TResult> parser, Utf8JsonReader reader)
+    public static TResult Parse<TResult>(this IJsonParser<TResult> parser, Utf8JsonReader reader)
     {
         _ = parser.TryParser(ref reader, out var result);
         return result;

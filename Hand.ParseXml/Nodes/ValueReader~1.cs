@@ -1,6 +1,5 @@
 ﻿using Hand.Configuration;
-using Hand.ParseXml.Contracts;
-using Hand.Storage;
+using Hand.Convert;
 using System.Xml;
 
 namespace Hand.ParseXml.Nodes;
@@ -10,7 +9,7 @@ namespace Hand.ParseXml.Nodes;
 /// </summary>
 /// <typeparam name="TValue"></typeparam>
 public abstract class ValueReader<TValue>(TValue defaultValue)
-    : IXmlParser<TValue>, IDefault<TValue>
+    : IParser<XmlReader, TValue>, IDefault<TValue>
 {
     #region 配置
     /// <summary>
@@ -24,8 +23,6 @@ public abstract class ValueReader<TValue>(TValue defaultValue)
         => _defaultValue;
     #endregion
 
-    ///// <inheritdoc />
-    //public abstract TValue Get(XmlReader reader);
     /// <inheritdoc />
-    public abstract bool TryParser(XmlReader reader, out TValue result);
+    public abstract bool TryParse(XmlReader reader, out TValue result);
 }

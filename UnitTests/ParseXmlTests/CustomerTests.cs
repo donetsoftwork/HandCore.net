@@ -23,7 +23,7 @@ public class CustomerTests
             .WithItem<int>(nameof(Customer.CustomerId))
             .WithItem(nameof(Customer.CustomerName))
             .WithItem<int>(nameof(Customer.CustomerAge));
-        var result = userParser.Get(text);
+        var result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.CustomerId);
         Assert.Equal(name, result.CustomerName);
@@ -47,7 +47,7 @@ public class CustomerTests
             .WithItem("Name", nameof(Customer.CustomerName))
             .WithItem<int>("Age", nameof(Customer.CustomerAge))
             .First("User");
-        var result = userParser.Get(text);
+        var result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.CustomerId);
         Assert.Equal(name, result.CustomerName);
@@ -67,7 +67,7 @@ public class CustomerTests
             .WithAttribute("Name", nameof(Customer.CustomerName))
             .WithAttribute<int>("Age", nameof(Customer.CustomerAge))
             .First("User");
-        var result = userParser.Get(text);
+        var result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.CustomerId);
         Assert.Equal(name, result.CustomerName);

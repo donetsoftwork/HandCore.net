@@ -17,7 +17,7 @@ public class ConvertTests
         var idReader = HandXml.Default.Attribute<long>("Id")
             .Convert(id => new UserId(id))
             .First("User");
-        UserId result = idReader.Get(text);
+        UserId result = idReader.Parse(text);
         Assert.Equal(expected, result.Original);
     }
 

@@ -41,26 +41,26 @@ public class UserSingleBench
     [Benchmark]
     public User GetResult()
     {
-        return _parser.Get(_text);
+        return _parser.Parse(_text);
     }
     [Benchmark]
     public User GetResult1()
     {
-        return _parser1.Get(_text);
+        return _parser1.Parse(_text);
     }
     [Benchmark]
     public User GetResult2()
     {
-        return _parser2.Get(_text);
+        return _parser2.Parse(_text);
     }
     [Benchmark]
     public User GetResult3()
     {
-        return _parser3.Get(_text);
+        return _parser3.Parse(_text);
     }
     [Benchmark]
     public User Custom()
     {
-        return _customParser.Get(_text);
+        return _customParser.Parse(_text);
     }
 }

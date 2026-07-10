@@ -1,11 +1,15 @@
-﻿namespace Hand.Text;
+﻿using Hand.Maping;
+
+namespace Hand.Text;
 
 /// <summary>
-/// 字符串转换器
+/// 文本转换器
 /// </summary>
 /// <typeparam name="TDest"></typeparam>
 public abstract class StringConverter<TDest>
-    : IStringConverter<TDest>
+    : IConverter<string, TDest>
+    , IConverter<char[], TDest>
+    , ISpanConverter<char, TDest>
 {
     /// <inheritdoc />
     public virtual TDest Convert(string source)

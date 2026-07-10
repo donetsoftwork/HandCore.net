@@ -19,7 +19,7 @@ public class SingleReaderTests
         using var xmlReader = XmlReader.Create(stringReader);
         var config = HandXml.Default;
         var summaryReader = config.First("summary");
-        string summary = summaryReader.Get(xmlReader);
+        string summary = summaryReader.Parse(xmlReader);
         Assert.Equal(expected, summary.Trim());
     }
     [Fact]
@@ -35,7 +35,7 @@ public class SingleReaderTests
         using var xmlReader = XmlReader.Create(stringReader);
         var config = HandXml.Default;
         var summaryReader = config.First("summary", config.Content());
-        var result = summaryReader.Get(xmlReader);
+        var result = summaryReader.Parse(xmlReader);
         Assert.Equal(expected, result.Trim());
     }
     [Fact]
@@ -52,7 +52,7 @@ public class SingleReaderTests
         using var xmlReader = XmlReader.Create(stringReader);
         var config = HandXml.Default;
         var idParser = config.First<int>("Id");
-        var result = idParser.Get(xmlReader);
+        var result = idParser.Parse(xmlReader);
         Assert.Equal(id, result);
     }
     [Fact]
@@ -68,7 +68,7 @@ public class SingleReaderTests
         using var xmlReader = XmlReader.Create(stringReader);
         var nameReader = HandXml.Default.Attribute("name")
             .First("member");
-        string name = nameReader.Get(xmlReader);
+        string name = nameReader.Parse(xmlReader);
         Assert.Equal(expected, name);
     }
     [Fact]
@@ -82,7 +82,7 @@ public class SingleReaderTests
         using var xmlReader = XmlReader.Create(stringReader);
         var idReader = HandXml.Default.Attribute<int>("Id")
             .First("User");
-        int result = idReader.Get(xmlReader);
+        int result = idReader.Parse(xmlReader);
         Assert.Equal(expected, result);
     }
 }

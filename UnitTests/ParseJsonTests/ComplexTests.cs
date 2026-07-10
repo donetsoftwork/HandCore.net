@@ -12,8 +12,8 @@ public class ComplexTests
     {
         var userId = 123;
         var roleId = 1;
-        string jsonContent = @$"{{""User"": {{ ""Id"": {userId}, ""Name"": ""Jxj"",  ""State"": true}}, ""Role"": {{ ""Id"": {roleId}, ""Name"": ""Admin""}}}}";
-        var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(jsonContent));
+        string json = @$"{{""User"": {{ ""Id"": {userId}, ""Name"": ""Jxj"",  ""State"": true}}, ""Role"": {{ ""Id"": {roleId}, ""Name"": ""Admin""}}}}";
+        var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(json));
         var config = HandJson.Default;
         var userParser = config.Entity<User>()
             .WithProperty<int>(nameof(User.Id))
@@ -26,7 +26,7 @@ public class ComplexTests
         var complexParser = config.Entity<Complex>()
             .WithProperty(userParser, nameof(Complex.User))
             .WithProperty(roleParser, nameof(Complex.Role));
-        var result = complexParser.Get(reader);
+        var result = complexParser.Parse(reader);
         Assert.NotNull(result);
         var user = result.User;
         Assert.NotNull(user);

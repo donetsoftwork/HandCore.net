@@ -7,14 +7,14 @@
 
 ~~~csharp
 var summaryReader = HandXml.Default.First("summary");
-string summary = summaryReader.Get(xmlReader);
+string summary = summaryReader.Parse(xmlReader);
 ~~~
 
 ### 2. 读取强类型值
 >* 使用Single泛型方法读取单个节点强类型值
 ~~~csharp
 var idParser = HandXml.Default.First<int>("Id");
-int id = idParser.Get(xmlReader);
+int id = idParser.Parse(xmlReader);
 ~~~
 
 ## 二、读取单个属性
@@ -27,11 +27,10 @@ var text = @"<member name = ""F:GenerateConvertTests.Supports.ColumnType.Identit
     自增列
     </summary>
 </member>";
-using var stringReader = new StringReader(text);
-using var xmlReader = XmlReader.Create(stringReader);
+
 var nameReader = HandXml.Default.Attribute("name")
     .First("member");
-string name = nameReader.Get(xmlReader);
+string name = nameReader.Parse(text);
 ~~~
 
 ### 2. 读取强类型值
@@ -40,11 +39,10 @@ string name = nameReader.Get(xmlReader);
 ~~~csharp
 var text = @$"<?xml version=""1.0"" encoding=""utf-8""?>
     <User Id=""123"">Jxj</User>";
-using var stringReader = new StringReader(text);
-using var xmlReader = XmlReader.Create(stringReader);
+
 var idReader = HandXml.Default.Attribute<int>("Id")
     .First("User");
-int result = idReader.Get(xmlReader);
+int result = idReader.Parse(text);
 ~~~
 
 ## 三、解析到实体
@@ -62,14 +60,12 @@ var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
 	    <Name>Jxj</Name>
 	    <Age>20</Age>
     </User>";
- using var stringReader = new StringReader(text);
- using var xmlReader = XmlReader.Create(stringReader);
+
  var userParser = HandXml.Default.Entity<User>()
      .WithItem<int>(nameof(User.Id))
      .WithItem(nameof(User.Name))
-     .WithItem<int>(nameof(User.Age))
-     .First();
- User result = userParser.Get(xmlReader);
+     .WithItem<int>(nameof(User.Age));
+ User result = userParser.Get(text);
 ~~~
 
 ### 2. 从属性解析
@@ -80,15 +76,14 @@ var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
 ~~~csharp
 var text = @$"<?xml version=""1.0"" encoding=""utf-8""?>
     <User Id=""123"" Name=""Jxj"" Age=""20"" />";
-using var stringReader = new StringReader(text);
-using var xmlReader = XmlReader.Create(stringReader);
+
 var config = HandXml.Default;
 var userParser = config.Entity<User>()
     .WithAttribute<int>(nameof(User.Id))
     .WithAttribute(nameof(User.Name))
     .WithAttribute<int>(nameof(User.Age))
     .First("User");
-User result = userParser.Get(xmlReader);
+User result = userParser.Parse(text);
 ~~~
 
 ### 3. 从本节点解析原始值
@@ -97,14 +92,13 @@ User result = userParser.Get(xmlReader);
 ~~~csharp
 var text = @$"<?xml version=""1.0"" encoding=""utf-8""?>
     <User Id=""123"" Age=""age"">Jxj</User>";
-using var stringReader = new StringReader(text);
-using var xmlReader = XmlReader.Create(stringReader);
+
 var config = HandXml.Default;
 var userParser = config.Entity<User>(nameof(User.Name))
     .WithAttribute<int>(nameof(User.Id))
     .WithAttribute<int>(nameof(User.Age))
     .First("User");
-User result = userParser.Get(xmlReader);
+User result = userParser.Parse(text);
 ~~~
 
 ## 四、解析集合
@@ -126,14 +120,13 @@ var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
         <Name><![CDATA[<B>王二</B>]]></Name>
     </User>
     </Users>";
-using var stringReader = new StringReader(text);
-using var xmlReader = XmlReader.Create(stringReader);
+
 var config = HandXml.Default;
-var elementReader = config.Entity<User>()
+var repeatReader = config.Entity<User>()
     .WithItem<int>(nameof(User.Id))
     .WithItem(nameof(User.Name))
     .Repeat(nameof(User));
-User[] result = elementReader.Get(xmlReader)
+User[] result = repeatReader.Get(text)
     .ToArray();
 ~~~
 
@@ -143,12 +136,11 @@ User[] result = elementReader.Get(xmlReader)
 ~~~csharp
 var text = @$"<?xml version=""1.0"" encoding=""utf-8""?>
     <User Id=""123"">Jxj</User>";
-using var stringReader = new StringReader(text);
-using var xmlReader = XmlReader.Create(stringReader);
+
 var idReader = HandXml.Default.Attribute<long>("Id")
     .Convert(id => new UserId(id))
     .First("User");
-UserId result = idReader.Get(xmlReader);
+UserId result = idReader.Parse(text);
 ~~~
 
 ## 六、复杂类型
@@ -179,10 +171,10 @@ Rss rss = rssParser.Get(xmlReader);
 >* node为调用该解析器的子节点名
 >* member为子解析器解析结果绑定实体成员名
 >* TItem为子解析器解析结果和实体成员共同的类型
->* 如果类型不一致结果会被抛弃
+>* 如果类型不一致结果会抛异常或被抛弃
 
 ~~~csharp
-EntityParser<TEntity> WithItem<TItem>(IXmlParser<TItem> item, string node, string member);
+EntityParser<TEntity> WithItem<TItem>(IParser<XmlReader, TItem> item, string node, string member);
 ~~~
 
 ### 3. WithRepeat方法

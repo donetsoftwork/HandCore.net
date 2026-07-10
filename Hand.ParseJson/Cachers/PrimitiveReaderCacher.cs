@@ -12,12 +12,23 @@ namespace Hand.ParseJson.Cachers;
 public class PrimitiveReaderCacher(DefaultValueBuilder defaultValue)
     : CacheFactoryBase<Type>(new DictionaryCacher<Type>())
 {
+    #region 配置
     private readonly DefaultValueBuilder _defaultValue = defaultValue;
     /// <summary>
     /// 默认值提供者
     /// </summary>
     public DefaultValueBuilder DefaultValue
         => _defaultValue;
+    /// <summary>
+    /// 解析器
+    /// </summary>
+    private static readonly Parser _parser = new(default);
+    /// <summary>
+    /// 解析器
+    /// </summary>
+    public static Parser Parser
+        => _parser;
+    #endregion
 
     /// <inheritdoc />
     protected override TConverter CreateNew<TConverter>(in Type key)
@@ -79,77 +90,77 @@ public class PrimitiveReaderCacher(DefaultValueBuilder defaultValue)
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<byte> Greate(byte defaultValue)
-        => new(new ByteConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造sbyte读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<sbyte> Greate(sbyte defaultValue)
-        => new(new SByteConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造short读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<short> Greate(short defaultValue)
-        => new(new ShortConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造ushort读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<ushort> Greate(ushort defaultValue)
-        => new(new UShortConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造int读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<int> Greate(int defaultValue)
-        => new(new IntConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造uint读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<uint> Greate(uint defaultValue)
-        => new(new UIntConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造long读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<long> Greate(long defaultValue)
-        => new(new LongConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造ulong读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<ulong> Greate(ulong defaultValue)
-        => new(new ULongConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造float读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<float> Greate(float defaultValue)
-        => new(new FloatConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造double读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<double> Greate(double defaultValue)
-        => new(new DoubleConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造decimal读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<decimal> Greate(decimal defaultValue)
-        => new(new DecimalConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造char读取器
     /// </summary>
@@ -163,28 +174,28 @@ public class PrimitiveReaderCacher(DefaultValueBuilder defaultValue)
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<DateTime> Greate(DateTime defaultValue)
-        => new(new DateTimeConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造DateTimeOffset读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<DateTimeOffset> Greate(DateTimeOffset defaultValue)
-        => new(new DateTimeOffsetConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造TimeSpan读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<TimeSpan> Greate(TimeSpan defaultValue)
-        => new(new TimeSpanConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     /// <summary>
     /// 构造Guid读取器
     /// </summary>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     public static PrimitiveReader<Guid> Greate(Guid defaultValue)
-        => new(new GuidConverter(default, defaultValue), defaultValue);
+        => new(_parser, defaultValue);
     #endregion
     /// <summary>
     /// 检查转化器

@@ -8,15 +8,8 @@ namespace Hand.ParseXml.Nodes;
 public class ContentReader(string defaultValue)
     : ValueReader<string>(defaultValue)
 {
-    ///// <inheritdoc />
-    //public override string Get(XmlReader reader)
-    //{
-    //    if (reader.IsEmptyElement)
-    //        return _defaultValue;
-    //    return reader.ReadElementContentAsString();
-    //}
     /// <inheritdoc />
-    public override bool TryParser(XmlReader reader, out string result)
+    public override bool TryParse(XmlReader reader, out string result)
     {
         if (reader.IsEmptyElement)
         {

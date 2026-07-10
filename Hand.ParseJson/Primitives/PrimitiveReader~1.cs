@@ -1,30 +1,31 @@
-﻿using Hand.Maping;
+﻿using Hand.Convert;
 using Hand.ParseJson.Nodes;
-using System.Text.Json;
 
 namespace Hand.ParseJson.Primitives;
 
 /// <summary>
 /// 基础类型读取器
 /// </summary>
-/// <param name="converter"></param>
+/// <param name="parser"></param>
 /// <param name="defaultValue"></param>
-public class PrimitiveReader<TValue>(ISpanConverter<byte, TValue> converter, TValue defaultValue)
+public class PrimitiveReader<TValue>(ISpanParser<byte, TValue> parser, TValue defaultValue)
     : ValueReader<TValue>(defaultValue)
 {
     #region 配置
     /// <summary>
     /// ReadOnlySpan转化器
     /// </summary>
-    private readonly ISpanConverter<byte, TValue> _converter = converter;
+    private readonly ISpanParser<byte, TValue> _parser = parser;
     /// <summary>
     /// ReadOnlySpan转化器
     /// </summary>
-    public ISpanConverter<byte, TValue> Converter
-        => _converter;
+    public ISpanParser<byte, TValue> Converter
+        => _parser;
     #endregion
-
     /// <inheritdoc />
-    protected override TValue GetValue(ref Utf8JsonReader reader)
-        => _converter.Convert(GetOriginalValue(ref reader));
+    protected override bool TryParser(ReadOnlySpan<byte> bytes, out TValue result)
+        => _parser.TryParse(bytes, out result);
+    ///// <inheritdoc />
+    //protected override TValue GetValue(ref Utf8JsonReader reader)
+    //    => _converter.TryParse(GetOriginalValue(ref reader));
 }

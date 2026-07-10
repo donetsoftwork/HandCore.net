@@ -20,5 +20,5 @@ public class DefaultNameConverter : StringConverter<string>
     /// <summary>
     /// 单例
     /// </summary>
-    public static readonly IStringConverter<string> Instance = new DefaultNameConverter();
+    public static readonly DefaultNameConverter Instance = new();
 }

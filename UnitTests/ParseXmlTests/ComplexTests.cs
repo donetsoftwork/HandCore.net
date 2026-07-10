@@ -35,7 +35,7 @@ public class ComplexTests
             .WithItem(userParser, nameof(Complex.User))
             .WithItem(roleParser, nameof(Complex.Role))
             .First("root");
-        var result = complexParser.Get(text);
+        var result = complexParser.Parse(text);
         Assert.NotNull(result);
         var user = result.User;
         Assert.NotNull(user);

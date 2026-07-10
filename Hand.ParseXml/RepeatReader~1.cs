@@ -1,4 +1,5 @@
-﻿using Hand.ParseXml.Contracts;
+﻿using Hand.Convert;
+using Hand.ParseXml.Contracts;
 using Hand.ParseXml.Nodes;
 using Hand.Storage;
 using System.Xml;
@@ -12,13 +13,13 @@ namespace Hand.ParseXml;
 /// <param name="xml"></param>
 /// <param name="name"></param>
 /// <param name="item"></param>
-public class RepeatReader<TResult>(HandXml xml, string name, IXmlParser<TResult> item)
-     : WrapParser<TResult>(xml, item), IXmlParser<IEnumerable<TResult>>
+public class RepeatReader<TResult>(HandXml xml, string name, IParser<XmlReader, TResult> item)
+     : WrapParser<TResult>(xml, item), IParser<XmlReader, IEnumerable<TResult>>
     , IDataGet<XmlReader, IEnumerable<TResult>>, IDataGet<string, IEnumerable<TResult>>
 {
     #region 配置
     private readonly string _name = name;
-    private readonly IXmlParser<TResult> _item = item;
+    private readonly IParser<XmlReader, TResult> _item = item;
 
     /// <summary>
     /// 标签名
@@ -28,7 +29,7 @@ public class RepeatReader<TResult>(HandXml xml, string name, IXmlParser<TResult>
     /// <summary>
     /// 子元素解析器
     /// </summary>
-    public IXmlParser<TResult> Item
+    public IParser<XmlReader, TResult> Item
         => _item;
     #endregion
 
@@ -42,7 +43,7 @@ public class RepeatReader<TResult>(HandXml xml, string name, IXmlParser<TResult>
             {
                 case XmlNodeType.Element:
                     if (reader.Name == _name)
-                        if (_item.TryParser(reader, out var itemResult))
+                        if (_item.TryParse(reader, out var itemResult))
                             yield return itemResult;
                     break;
                 case XmlNodeType.EndElement:
@@ -64,9 +65,8 @@ public class RepeatReader<TResult>(HandXml xml, string name, IXmlParser<TResult>
         using var xmlReader = XmlReader.Create(stringReader);
         return [.. Get(xmlReader)];
     }
-
     /// <inheritdoc />
-    public bool TryParser(XmlReader reader, out IEnumerable<TResult> result)
+    public bool TryParse(XmlReader reader, out IEnumerable<TResult> result)
     {
         result = Get(reader);
         return true;

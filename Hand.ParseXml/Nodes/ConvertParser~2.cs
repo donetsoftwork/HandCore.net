@@ -1,5 +1,5 @@
-﻿using Hand.Maping;
-using Hand.ParseXml.Contracts;
+﻿using Hand.Convert;
+using Hand.Maping;
 using System.Xml;
 
 namespace Hand.ParseXml.Nodes;
@@ -13,9 +13,9 @@ namespace Hand.ParseXml.Nodes;
 /// <param name="original"></param>
 /// <param name="converter"></param>
 /// <param name="defaultValue"></param>
-public class ConvertParser<TSource, TDest>(HandXml xml, IXmlParser<TSource> original, IConverter<TSource, TDest> converter, TDest defaultValue)
+public class ConvertParser<TSource, TDest>(HandXml xml, IParser<XmlReader, TSource> original, IConverter<TSource, TDest> converter, TDest defaultValue)
     : WrapParser<TSource>(xml, original)
-    , IXmlParser<TDest>
+    , IParser<XmlReader, TDest>
 {
     #region 配置
     private readonly IConverter<TSource, TDest> _converter = converter;
@@ -23,9 +23,9 @@ public class ConvertParser<TSource, TDest>(HandXml xml, IXmlParser<TSource> orig
     #endregion
 
     /// <inheritdoc />
-    public bool TryParser(XmlReader reader, out TDest result)
+    public bool TryParse(XmlReader reader, out TDest result)
     {
-        if(_original.TryParser(reader, out var originalResult))
+        if(_original.TryParse(reader, out var originalResult))
         {
             result = _converter.Convert(originalResult);
             return true;

@@ -37,7 +37,7 @@ public class RssTests
             .WithItem("link", nameof(RssItem.Link))
             .Repeat("item")
             .Convert(static list => list.ToArray());
-        var items = itemParser.Get(xmlReader);
+        var items = itemParser.Parse(xmlReader);
         Assert.NotNull(items);
         Assert.Equal(10, items.Length);
     }

@@ -23,12 +23,12 @@ public class RepeatReaderTests
     	        <Name><![CDATA[<B>王二</B>]]></Name>
             </User>
             </Users>";
-        var elementReader = HandXml.Default.Entity<User>()
+        var repeatReader = HandXml.Default.Entity<User>()
             .WithItem<int>(nameof(User.Id))
             .WithItem(nameof(User.Name))
             .WithItem<int>(nameof(User.Age))
             .Repeat(nameof(User));
-        User[] result = elementReader.Get(text)
+        User[] result = repeatReader.Get(text)
             .ToArray();
         Assert.Equal(3, result.Length);
     }
@@ -50,9 +50,9 @@ public class RepeatReaderTests
     	<Name><![CDATA[<B>王二</B>]]></Name>
     </User>
     </Users>";
-        var elementReader = HandXml.Default.Content()
+        var repeatReader = HandXml.Default.Content()
             .Repeat(nameof(User.Name));
-        var result = elementReader.Get(text)
+        var result = repeatReader.Get(text)
             .ToArray();
         Assert.Equal(3, result.Length);
     }
@@ -77,9 +77,9 @@ public class RepeatReaderTests
     	<Age>9</Age>
     </User>
     </Users>";
-        var elementReader = HandXml.Default.First<int>(nameof(User.Id))
+        var repeatReader = HandXml.Default.First<int>(nameof(User.Id))
             .Repeat(nameof(User));
-        var result = elementReader.Get(text)
+        var result = repeatReader.Get(text)
             .ToArray();
         Assert.Equal(3, result.Length);
     }
@@ -100,14 +100,14 @@ public class RepeatReaderTests
     	<Age />
     </User>
     </Users>";
-        var elementReader = HandXml.Default.Entity<User>()
+        var repeatReader = HandXml.Default.Entity<User>()
             // 缺失属性填充默认值
             .WithAttribute<int>(nameof(User.Id))
             .WithItem(nameof(User.Name))
             // 缺失节点和空节点填充默认值
             .WithItem<int>(nameof(User.Age))
             .Repeat();
-        var result = elementReader.Get(text)
+        var result = repeatReader.Get(text)
             .ToArray();
         Assert.Equal(3, result.Length); ;
     }
@@ -126,9 +126,9 @@ public class RepeatReaderTests
     	<Name>王二</Name>
     </User>
     </Users>";
-        var elementReader = HandXml.Default.Attribute<int>(nameof(User.Id))
+        var repeatReader = HandXml.Default.Attribute<int>(nameof(User.Id))
             .Repeat(nameof(User));
-        var result = elementReader.Get(text)
+        var result = repeatReader.Get(text)
             .ToArray();
         Assert.Equal(3, result.Length);
     }

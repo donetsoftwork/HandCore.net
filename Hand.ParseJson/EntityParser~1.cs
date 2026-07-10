@@ -57,7 +57,7 @@ public class EntityParser<TEntity>(HandJson json, ICreator<IMemberBuilder<TEntit
         => _creator.Create();
 
     /// <inheritdoc />
-    protected override TEntity GetValue(ref Utf8JsonReader reader)
+    protected TEntity GetValue(ref Utf8JsonReader reader)
     {
         var builder = New();
         var currentDepth = reader.CurrentDepth;
@@ -91,6 +91,13 @@ public class EntityParser<TEntity>(HandJson json, ICreator<IMemberBuilder<TEntit
     {
         result = GetValue(ref reader);
         return true;
+    }
+    /// <inheritdoc />
+    protected override bool TryParser(ReadOnlySpan<byte> bytes, out TEntity result)
+    {
+        // 只实现基类,并不实际调用
+        result = _defaultValue;
+        return false;
     }
     /// <summary>
     /// 读取属性

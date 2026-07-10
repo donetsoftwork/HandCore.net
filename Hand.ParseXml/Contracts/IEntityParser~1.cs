@@ -1,4 +1,4 @@
-﻿using Hand.Storage;
+﻿using Hand.Convert;
 using System.Xml;
 
 namespace Hand.ParseXml.Contracts;
@@ -7,6 +7,6 @@ namespace Hand.ParseXml.Contracts;
 /// 实体解析器
 /// </summary>
 public interface IEntityParser<TEntity>
-    : IEntityParser, IXmlParser<TEntity>
+    : IEntityParser, IParser<XmlReader, TEntity>
 {
 }

@@ -1,4 +1,5 @@
-﻿using System.Buffers.Text;
+﻿using Hand.Convert;
+using System.Buffers.Text;
 
 namespace Hand.Utf8;
 
@@ -7,6 +8,22 @@ namespace Hand.Utf8;
 /// </summary>
 /// <param name="standardFormat"></param>
 public class Parser(char standardFormat)
+    : ISpanParser<byte, bool>
+    , ISpanParser<byte, byte>
+    , ISpanParser<byte, sbyte>
+    , ISpanParser<byte, short>
+    , ISpanParser<byte, ushort>
+    , ISpanParser<byte, int>
+    , ISpanParser<byte, uint>
+    , ISpanParser<byte, long>
+    , ISpanParser<byte, ulong>
+    , ISpanParser<byte, double>
+    , ISpanParser<byte, float>
+    , ISpanParser<byte, decimal>
+    , ISpanParser<byte, DateTime>
+    , ISpanParser<byte, DateTimeOffset>
+    , ISpanParser<byte, TimeSpan>
+    , ISpanParser<byte, Guid>
 {
     #region 配置
     /// <summary>
@@ -132,19 +149,19 @@ public class Parser(char standardFormat)
     public bool TryParse(ReadOnlySpan<byte> span, out DateTimeOffset result)
         => Utf8Parser.TryParse(span, out result, out var consumed, _standardFormat) && consumed == span.Length;
     /// <summary>
-    /// 尝试解析为 Guid 类型
-    /// </summary>
-    /// <param name="span"></param>
-    /// <param name="result"></param>
-    /// <returns></returns>
-    public bool TryParse(ReadOnlySpan<byte> span, out Guid result)
-        => Utf8Parser.TryParse(span, out result, out var consumed, _standardFormat) && consumed == span.Length;
-    /// <summary>
     /// 尝试解析为 TimeSpan 类型
     /// </summary>
     /// <param name="span"></param>
     /// <param name="result"></param>
     /// <returns></returns>
     public bool TryParse(ReadOnlySpan<byte> span, out TimeSpan result)
+        => Utf8Parser.TryParse(span, out result, out var consumed, _standardFormat) && consumed == span.Length;
+    /// <summary>
+    /// 尝试解析为 Guid 类型
+    /// </summary>
+    /// <param name="span"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public bool TryParse(ReadOnlySpan<byte> span, out Guid result)
         => Utf8Parser.TryParse(span, out result, out var consumed, _standardFormat) && consumed == span.Length;
 }

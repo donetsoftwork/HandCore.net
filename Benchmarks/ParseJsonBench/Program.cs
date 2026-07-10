@@ -19,6 +19,6 @@ var userList6 = userList.Custom();
 Console.ReadLine();
 
 #else
-//BenchmarkRunner.Run<UserSingleBench>();
-BenchmarkRunner.Run<UserListBench>();
+BenchmarkRunner.Run<UserSingleBench>();
+//BenchmarkRunner.Run<UserListBench>();
 #endif

@@ -8,9 +8,9 @@ public class JsonReaderTests
     [Fact]
     public void Text()
     {
-        string jsonContent = "{\"root\":{\"name\":\"111\", \"value\": 222, \"active\": true, \"description\": null }}";
-        //JsonSerializer.Deserialize<object>(jsonContent);
-        var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(jsonContent));
+        string json = "{\"root\":{\"name\":\"111\", \"value\": 222, \"active\": true, \"description\": null }}";
+        //JsonSerializer.Deserialize<object>(json);
+        var reader = new Utf8JsonReader(Encoding.UTF8.GetBytes(json));
         //Utf8Parser.TryParse(Encoding.UTF8.GetBytes("2023-01-01T00:00:00Z"), out DateTimeOffset dateTimeOffset, out int bytesConsumed);
         //Utf8Formatter.TryFormat(DateTimeOffset.Now, Encoding.UTF8.GetBytes(""), out int bytesWritten);
         while (reader.Read())
