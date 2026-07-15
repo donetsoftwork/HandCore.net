@@ -64,7 +64,8 @@ public class EntityParserTests
             .WithAttribute<int>(nameof(User.Id))
             .WithAttribute(nameof(User.Name))
             .WithAttribute<int>(nameof(User.Age))
-            .First("User");
+            .Element("User")
+            .First();
         User result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
@@ -83,7 +84,8 @@ public class EntityParserTests
         var userParser = HandXml.Default.Entity<User>(nameof(User.Name))
             .WithAttribute<int>(nameof(User.Id))
             .WithAttribute<int>(nameof(User.Age))
-            .First("User");
+            .Element("User")
+            .First();
         User result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
@@ -103,27 +105,7 @@ public class EntityParserTests
         var userParser = config.Entity<User>(config.Content().Member(nameof(User.Name)))
             .WithAttribute<int>(nameof(User.Id))
             .WithAttribute<int>(nameof(User.Age))
-            .First("User");
-        var result = userParser.Parse(text);
-        Assert.NotNull(result);
-        Assert.Equal(id, result.Id);
-        Assert.Equal(name, result.Name);
-        Assert.Equal(age, result.Age);
-    }
-    [Fact]
-    public void Custom()
-    {
-        var id = 123;
-        var name = "Jxj";
-        int age = 20;
-        var text = @$"<?xml version=""1.0"" encoding=""utf-8""?>
-            <User>
-	            <Id>{id}</Id>
-	            <Name>{name}</Name>
-	            <Age>{age}</Age>
-            </User>";
-
-        var userParser = new UserParser(HandXml.Default)
+            .Element("User")
             .First();
         var result = userParser.Parse(text);
         Assert.NotNull(result);

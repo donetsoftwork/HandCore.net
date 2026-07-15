@@ -11,12 +11,15 @@ public class ContentReader(string defaultValue)
     /// <inheritdoc />
     public override bool TryParse(XmlReader reader, out string result)
     {
-        if (reader.IsEmptyElement)
+        reader.MoveToContent();
+        if (reader.NodeType == XmlNodeType.Element && !reader.IsEmptyElement)
         {
-            result = _defaultValue;
-            return false;
+            //reader.CanResolveEntity =
+            result = reader.ReadElementContentAsString();
+            // result = reader.ReadContentAsString();
+            return true;
         }
-        result = reader.ReadElementContentAsString();
-        return true;
+        result = _defaultValue;
+        return false;
     }
 }

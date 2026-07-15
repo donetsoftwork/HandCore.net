@@ -3,10 +3,10 @@ using ParseXmlTests.Supports;
 
 namespace ParseXmlTests;
 
-public class RepeatReaderTests
+public class EachReaderTests
 {
     [Fact]
-    public void ListEntity()
+    public void EachEntity()
     {
         var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
             <Users>
@@ -23,68 +23,84 @@ public class RepeatReaderTests
     	        <Name><![CDATA[<B>王二</B>]]></Name>
             </User>
             </Users>";
-        var repeatReader = HandXml.Default.Entity<User>()
+        var eachParser = HandXml.Default.Entity<User>()
             .WithItem<int>(nameof(User.Id))
             .WithItem(nameof(User.Name))
             .WithItem<int>(nameof(User.Age))
-            .Repeat(nameof(User));
-        User[] result = repeatReader.Get(text)
+            .Element(nameof(User))
+            .Each();
+        User[] result = eachParser.Get(text)
             .ToArray();
         Assert.Equal(3, result.Length);
     }
     [Fact]
-    public void ListContent()
+    public void EachContent()
+    {
+        var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <Users>
+    <User>
+    	<Name>张三</Name>
+    </User>
+    <User>
+    	<Name>李四</Name>
+    </User>
+    <User>
+    	<Name><![CDATA[<B>王二</B>]]></Name>
+    </User>
+    </Users>";
+        var eachParser = HandXml.Default.Content()
+            .Element(nameof(User.Name))
+            .Each();
+        var result = eachParser.Get(text)
+            .ToArray();
+        Assert.Equal(3, result.Length);
+    }
+    [Fact]
+    public void EachElement()
     {
         var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <Users>
     <User>
     	<Id>1</Id>
-    	<Name>张三</Name>
     </User>
     <User>
     	<Id>2</Id>
-    	<Name>李四</Name>
     </User>
     <User>
     	<Id>3</Id>
-    	<Name><![CDATA[<B>王二</B>]]></Name>
     </User>
     </Users>";
-        var repeatReader = HandXml.Default.Content()
-            .Repeat(nameof(User.Name));
-        var result = repeatReader.Get(text)
+        var eachParser = HandXml.Default.Element<int>(nameof(User.Id))
+            .Each();
+        var result = eachParser.Get(text)
             .ToArray();
         Assert.Equal(3, result.Length);
     }
     [Fact]
-    public void ListFirst()
+    public void EachFirst()
     {
         var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <Users>
     <User>
     	<Id>1</Id>
-    	<Name>张三</Name>
-    	<Age>10</Age>
     </User>
     <User>
     	<Id>2</Id>
-    	<Name>李四</Name>
-    	<Age>11</Age>
     </User>
     <User>
     	<Id>3</Id>
-    	<Name><![CDATA[<B>王二</B>]]></Name>
-    	<Age>9</Age>
     </User>
     </Users>";
-        var repeatReader = HandXml.Default.First<int>(nameof(User.Id))
-            .Repeat(nameof(User));
-        var result = repeatReader.Get(text)
+        var eachParser = HandXml.Default.Element<int>(nameof(User.Id))
+            .First()
+            .Element("User")
+            .Each();
+        var result = eachParser.Get(text)
             .ToArray();
         Assert.Equal(3, result.Length);
     }
     [Fact]
-    public void ListWithAttribute()
+    public void EachWithAttribute()
     {
         var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <Users>
@@ -100,19 +116,20 @@ public class RepeatReaderTests
     	<Age />
     </User>
     </Users>";
-        var repeatReader = HandXml.Default.Entity<User>()
+        var eachParser = HandXml.Default.Entity<User>()
             // 缺失属性填充默认值
             .WithAttribute<int>(nameof(User.Id))
             .WithItem(nameof(User.Name))
             // 缺失节点和空节点填充默认值
             .WithItem<int>(nameof(User.Age))
-            .Repeat();
-        var result = repeatReader.Get(text)
+            .Element(nameof(User))
+            .Each();
+        var result = eachParser.Get(text)
             .ToArray();
         Assert.Equal(3, result.Length); ;
     }
     [Fact]
-    public void ListAttribute()
+    public void EachAttribute()
     {
         var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <Users>
@@ -126,10 +143,47 @@ public class RepeatReaderTests
     	<Name>王二</Name>
     </User>
     </Users>";
-        var repeatReader = HandXml.Default.Attribute<int>(nameof(User.Id))
-            .Repeat(nameof(User));
-        var result = repeatReader.Get(text)
+        var eachParser = HandXml.Default.Attribute<int>(nameof(User.Id))
+            .Element(nameof(User))
+            .Each();
+        var result = eachParser.Get(text)
             .ToArray();
+        Assert.Equal(3, result.Length);
+    }
+    [Fact]
+    public void EachName()
+    {
+        var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <User>
+    	<Id>1</Id>
+    	<Name>张三</Name>
+    	<Age>10</Age>
+    </User>";
+        var config = HandXml.Default;
+        var eachParser = config.Name()
+            .Each()
+            .MoveIn();
+        var result = eachParser.Parse(text)
+            .ToArray();
+        Assert.NotNull(result);
+        Assert.Equal(3, result.Length);
+    }
+    [Fact]
+    public void EachName2()
+    {
+        var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    <User>
+    	<Id>1</Id>
+    	<Name>张三</Name>
+    	<Age>10</Age>
+    </User>";
+        var config = HandXml.Default;
+        var eachParser = config.Name()
+            .Each()
+            .MoveTo("Id");
+        var result = eachParser.Parse(text)
+            .ToArray();
+        Assert.NotNull(result);
         Assert.Equal(3, result.Length);
     }
 }

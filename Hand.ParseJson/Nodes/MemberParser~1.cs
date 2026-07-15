@@ -32,7 +32,7 @@ public class MemberParser<TMember>(string name, IJsonParser<TMember> original)
     /// <inheritdoc />
     public void Save(IMemberStore entity, ref Utf8JsonReader reader)
     {
-        if (_original.TryParser(ref reader, out var value))
+        if (_original.TryParse(ref reader, out var value))
             entity.Save(_name, value);
     }
 }

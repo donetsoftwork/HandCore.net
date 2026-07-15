@@ -14,5 +14,5 @@ public interface IJsonParser<TResult>
     /// <param name="reader"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-    bool TryParser(ref Utf8JsonReader reader, out TResult result);
+    bool TryParse(ref Utf8JsonReader reader, out TResult result);
 }

@@ -15,8 +15,24 @@ public class ConvertTests
             <User Id=""{expected}"">{name}</User>";
 
         var idReader = HandXml.Default.Attribute<long>("Id")
-            .Convert(id => new UserId(id))
-            .First("User");
+            .First()
+            .Convert(id => new UserId(id));
+        UserId result = idReader.Parse(text);
+        Assert.Equal(expected, result.Original);
+    }
+    [Fact]
+    public void Convert0()
+    {
+        long expected = 123;
+        var name = "Jxj";
+        var text = @$"<?xml version=""1.0"" encoding=""utf-8""?>
+            <User Id=""{expected}"">{name}</User>";
+
+        var idReader = HandXml.Default.Attribute<long>("Id")
+            .First()
+            .Element("User")
+            .First()
+            .Convert(id => new UserId(id));
         UserId result = idReader.Parse(text);
         Assert.Equal(expected, result.Original);
     }

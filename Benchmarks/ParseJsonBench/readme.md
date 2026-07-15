@@ -10,15 +10,15 @@
 >* GetResult3是空构造函数简化的建造者模式,节省了一个对象构造,比GetResult2快一点
 >* Custom继承重写EntityParser,避免字典哈希,比GetResult3不少,比JsonSourceGeneration还快
 
-| Method      | Mean     | Error   | StdDev  | Median   | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
-|------------ |---------:|--------:|--------:|---------:|------:|--------:|-------:|----------:|------------:|
-| Deserialize | 131.6 ns | 1.84 ns | 2.12 ns | 131.5 ns |  1.00 |    0.02 | 0.0036 |      64 B |        1.00 |
-| Generated   | 122.8 ns | 0.51 ns | 0.59 ns | 122.8 ns |  0.93 |    0.02 | 0.0036 |      64 B |        1.00 |
-| GetResult   | 256.8 ns | 1.75 ns | 2.02 ns | 256.7 ns |  1.95 |    0.03 | 0.0402 |     696 B |       10.88 |
-| GetResult1  | 153.8 ns | 5.29 ns | 6.09 ns | 153.8 ns |  1.17 |    0.05 | 0.0110 |     192 B |        3.00 |
-| GetResult2  | 138.7 ns | 0.76 ns | 0.84 ns | 138.3 ns |  1.05 |    0.02 | 0.0110 |     192 B |        3.00 |
-| GetResult3  | 139.1 ns | 0.28 ns | 0.32 ns | 139.2 ns |  1.06 |    0.02 | 0.0106 |     184 B |        2.88 |
-| Custom      | 114.4 ns | 2.82 ns | 3.14 ns | 116.9 ns |  0.87 |    0.03 | 0.0106 |     184 B |        2.88 |
+| Method      | Mean     | Error   | StdDev  | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
+|------------ |---------:|--------:|--------:|------:|--------:|-------:|----------:|------------:|
+| Deserialize | 130.8 ns | 2.74 ns | 3.16 ns |  1.00 |    0.03 | 0.0036 |      64 B |        1.00 |
+| Generated   | 124.0 ns | 0.62 ns | 0.67 ns |  0.95 |    0.02 | 0.0036 |      64 B |        1.00 |
+| GetResult   | 261.3 ns | 1.34 ns | 1.55 ns |  2.00 |    0.05 | 0.0402 |     696 B |       10.88 |
+| GetResult1  | 150.6 ns | 0.32 ns | 0.35 ns |  1.15 |    0.03 | 0.0110 |     192 B |        3.00 |
+| GetResult2  | 150.5 ns | 1.61 ns | 1.85 ns |  1.15 |    0.03 | 0.0110 |     192 B |        3.00 |
+| GetResult3  | 144.0 ns | 0.28 ns | 0.33 ns |  1.10 |    0.03 | 0.0106 |     184 B |        2.88 |
+| Custom      | 114.9 ns | 0.49 ns | 0.56 ns |  0.88 |    0.02 | 0.0106 |     184 B |        2.88 |
 
 ## 2. UserListBench
 >* 解析对象列表

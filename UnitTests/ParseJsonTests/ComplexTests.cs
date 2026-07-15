@@ -18,15 +18,21 @@ public class ComplexTests
         var userParser = config.Entity<User>()
             .WithProperty<int>(nameof(User.Id))
             .WithProperty<string>(nameof(User.Name))
-            .WithProperty<bool>(nameof(User.State));
+            .WithProperty<bool>(nameof(User.State))
+            .Object()
+            .First();
         var roleParser = config.Entity<Role>()
             .WithProperty<int>(nameof(Role.Id))
-            .WithProperty<string>(nameof(Role.Name));
+            .WithProperty<string>(nameof(Role.Name))
+            .Object()
+            .First();
 
         var complexParser = config.Entity<Complex>()
             .WithProperty(userParser, nameof(Complex.User))
-            .WithProperty(roleParser, nameof(Complex.Role));
-        var result = complexParser.Parse(reader);
+            .WithProperty(roleParser, nameof(Complex.Role))
+            .Object()
+            .First();
+        var result = complexParser.Parse(ref reader);
         Assert.NotNull(result);
         var user = result.User;
         Assert.NotNull(user);

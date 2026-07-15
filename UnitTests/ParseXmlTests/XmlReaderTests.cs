@@ -9,13 +9,13 @@ public class XmlReaderTests
     {
         string xmlContent = "<root><child>Text</child><!-- This is a comment --><child><![CDATA[<B>CDATA</B>]]></child></root>";
         using var reader = XmlReader.Create(new StringReader(xmlContent));
-        string elementName = reader.Name;
+        string elementName = reader.LocalName;
         while (reader.Read())
         {
             switch (reader.NodeType)
             {
                 case XmlNodeType.Element:
-                    elementName = reader.Name;
+                    elementName = reader.LocalName;
                     break;
                 case XmlNodeType.Text:
                     var text = reader.Value;
@@ -30,7 +30,7 @@ public class XmlReaderTests
                     Console.WriteLine("Comment:" + comment);
                     break;
                 case XmlNodeType.EndElement:
-                    var name2 = reader.Name;
+                    var name2 = reader.LocalName;
                     break;
                 default:
                     break;

@@ -17,22 +17,21 @@ public class UserParser(HandXml xml)
     /// <inheritdoc />
     public override void ReadAttributes(IMemberStore entity, XmlReader reader) { }
     /// <inheritdoc />
-    public override void ReadItem(IMemberBuilder<User> entity, XmlReader reader, string name)
+    public override void ReadItem(IMemberBuilder<User> entity, XmlReader reader)
     {
         if (entity is UserBuilder2 builder)
-            ReadItem(builder.Original, reader, name);
+            ReadItem(builder.Original, reader);
         else
-            base.ReadItem(entity, reader, name);
+            base.ReadItem(entity, reader);
     }
     /// <summary>
     /// 使用自定义构造器
     /// </summary>
     /// <param name="entity"></param>
     /// <param name="reader"></param>
-    /// <param name="name"></param>
-    public void ReadItem(User entity, XmlReader reader, string name)
+    public void ReadItem(User entity, XmlReader reader)
     {        
-        switch (name)
+        switch (reader.LocalName)
         {
             case nameof(User.Id):
                 if (_id.TryParse(reader, out var idResult))

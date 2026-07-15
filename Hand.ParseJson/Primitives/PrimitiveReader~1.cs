@@ -15,7 +15,7 @@ public class PrimitiveReader<TValue>(ISpanParser<byte, TValue> parser, TValue de
     /// <summary>
     /// ReadOnlySpan转化器
     /// </summary>
-    private readonly ISpanParser<byte, TValue> _parser = parser;
+    protected readonly ISpanParser<byte, TValue> _parser = parser;
     /// <summary>
     /// ReadOnlySpan转化器
     /// </summary>
@@ -23,9 +23,6 @@ public class PrimitiveReader<TValue>(ISpanParser<byte, TValue> parser, TValue de
         => _parser;
     #endregion
     /// <inheritdoc />
-    protected override bool TryParser(ReadOnlySpan<byte> bytes, out TValue result)
+    protected override bool TryParse(ReadOnlySpan<byte> bytes, out TValue result)
         => _parser.TryParse(bytes, out result);
-    ///// <inheritdoc />
-    //protected override TValue GetValue(ref Utf8JsonReader reader)
-    //    => _converter.TryParse(GetOriginalValue(ref reader));
 }

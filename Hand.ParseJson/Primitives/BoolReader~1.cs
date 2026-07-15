@@ -39,25 +39,8 @@ public class BoolReader<TValue>(TValue trueValue, TValue falseValue, TValue defa
         => _parser;
     #endregion
 
-    ///// <inheritdoc />
-    //protected override TValue GetValue(ref Utf8JsonReader reader)
-    //    => reader.TokenType switch
-    //    {
-    //        JsonTokenType.True => _trueValue,
-    //        JsonTokenType.False => _falseValue,
-    //        JsonTokenType.Null => _defaultValue,
-    //        _ => GetDefaultValue(ref reader)
-    //    };
-
-    ///// <summary>
-    ///// 获取默认值
-    ///// </summary>
-    ///// <param name="reader"></param>
-    ///// <returns></returns>
-    //public virtual TValue GetDefaultValue(ref Utf8JsonReader reader)
-    //    => _parser.Convert(GetOriginalValue(ref reader)) ? _trueValue : _falseValue;
     /// <inheritdoc />
-    public override bool TryParser(ref Utf8JsonReader reader, out TValue result)
+    public override bool TryParse(ref Utf8JsonReader reader, out TValue result)
     {
         if (reader.Read())
         {
@@ -70,17 +53,21 @@ public class BoolReader<TValue>(TValue trueValue, TValue falseValue, TValue defa
                     result = _falseValue;
                     return true;
                 case JsonTokenType.Null:
+                case JsonTokenType.StartObject:
+                case JsonTokenType.StartArray:
+                case JsonTokenType.EndObject:
+                case JsonTokenType.EndArray:
                     result = _defaultValue;
                     return false;
             }
-            if (TryParser(GetOriginalValue(ref reader), out result))
+            if (TryParse(GetOriginalValue(ref reader), out result))
                 return true;
         }
         result = _defaultValue;
         return false;
     }
     /// <inheritdoc />
-    protected override bool TryParser(ReadOnlySpan<byte> bytes, out TValue result)
+    protected override bool TryParse(ReadOnlySpan<byte> bytes, out TValue result)
     {
         if(_parser.TryParse(bytes, out bool state))
         {

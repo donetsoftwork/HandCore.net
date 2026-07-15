@@ -14,16 +14,19 @@ public class RssTests
         var config = HandXml.Default;
         var imageParser = config.Entity<RssImage>()
             .WithItem("url", nameof(RssImage.Url))
-            .WithItem("name", nameof(RssImage.Name));
+            .WithItem("title", nameof(RssImage.Title));
         var itemParser = config.Entity<RssItem>()
             .WithItem("title", nameof(RssItem.Title))
             .WithItem("link", nameof(RssItem.Link))
-            .Repeat("item");
+            .Element("item")
+            .Each()
+            .ToArray();
         var rssParser = config.Entity<Rss>()
             .WithItem<string>("title", nameof(Rss.Title))
             .WithItem(imageParser, "image", nameof(Rss.Image))
-            .WithRepeat(itemParser, nameof(Rss.Items));
-        Rss rss = rssParser.Get(xmlReader);
+            .WithItem(itemParser, "item", nameof(Rss.Items))
+            .First();
+        Rss rss = rssParser.Parse(xmlReader);
         Assert.NotNull(rss);
     }
     [Fact]
@@ -35,7 +38,8 @@ public class RssTests
         var itemParser = config.Entity<RssItem>()
             .WithItem("title", nameof(RssItem.Title))
             .WithItem("link", nameof(RssItem.Link))
-            .Repeat("item")
+            .Element("item")
+            .Each()
             .Convert(static list => list.ToArray());
         var items = itemParser.Parse(xmlReader);
         Assert.NotNull(items);

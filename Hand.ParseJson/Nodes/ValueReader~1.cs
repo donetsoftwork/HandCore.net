@@ -30,23 +30,17 @@ public abstract class ValueReader<TValue>(TValue defaultValue)
     /// <returns></returns>
     protected ReadOnlySpan<byte> GetOriginalValue(ref Utf8JsonReader reader)
         => reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
-    ///// <summary>
-    ///// 获取值
-    ///// </summary>
-    ///// <param name="reader"></param>
-    ///// <returns></returns>
-    //protected abstract TValue GetValue(ref Utf8JsonReader reader);
     /// <summary>
     /// 解析
     /// </summary>
     /// <param name="bytes"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-    protected abstract bool TryParser(ReadOnlySpan<byte> bytes, out TValue result);
+    protected abstract bool TryParse(ReadOnlySpan<byte> bytes, out TValue result);
     /// <inheritdoc />
-    public virtual bool TryParser(ref Utf8JsonReader reader, out TValue result)
+    public virtual bool TryParse(ref Utf8JsonReader reader, out TValue result)
     {
-        if (reader.Read() && TryParser(GetOriginalValue(ref reader), out result))
+        if (reader.Read() && TryParse(GetOriginalValue(ref reader), out result))
             return true;
         result = _defaultValue;
         return false;

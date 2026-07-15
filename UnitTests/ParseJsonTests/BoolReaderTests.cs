@@ -12,7 +12,8 @@ public class BoolReaderTests
         string json = "{\"state\": true}";
 
         var config = HandJson.Default;
-        var stateReader = config.First("state", config.Bool());
+        var stateReader = HandJson.Default.Property("state", config.Bool())
+            .First();
         var result = stateReader.Parse(json);
         Assert.Equal(expected, result);
     }
@@ -23,7 +24,8 @@ public class BoolReaderTests
         string json = "{\"state\": \"true\"}";
 
         var config = HandJson.Default;
-        var stateReader = config.First("state", config.Bool());
+        var stateReader = config.Property("state", config.Bool())
+            .First();
         var result = stateReader.Parse(json);
         Assert.Equal(expected, result);
     }
@@ -34,7 +36,8 @@ public class BoolReaderTests
         string json = "{\"state\": true}";
 
         var config = HandJson.Default;
-        var stateReader = config.First("state", config.Value<bool>());
+        var stateReader = config.Property("state", config.Value<bool>())
+            .First();
         var result = stateReader.Parse(json);
         Assert.Equal(expected, result);
     }
@@ -45,7 +48,7 @@ public class BoolReaderTests
         string json = "{\"state\": \"true\"}";
 
         var config = HandJson.Default;
-        var stateReader = config.First("state", config.Value<bool>());
+        var stateReader = config.First<bool>("state");
         var result = stateReader.Parse(json);
         Assert.Equal(expected, result);
     }
@@ -56,7 +59,8 @@ public class BoolReaderTests
         string json = "{\"state\": true}";
 
         var config = HandJson.Default;
-        var stateReader = config.First("state", new BoolReader<string>("赢", "输", "平"));
+        var stateReader = config.Property("state", new BoolReader<string>("赢", "输", "平"))
+            .First();
         var result = stateReader.Parse(json);
         Assert.Equal(expected, result);
     }
@@ -67,7 +71,8 @@ public class BoolReaderTests
         string json = "{\"state\": true}";
 
         var config = HandJson.Default;
-        var stateReader = config.First("state", new BoolReader<int>(3, 0, 1));
+        var stateReader = config.Property("state", new BoolReader<int>(3, 0, 1))
+            .First();
         var result = stateReader.Parse(json);
         Assert.Equal(expected, result);
     }
@@ -78,7 +83,8 @@ public class BoolReaderTests
         string json = "{\"state\": null}";
 
         var config = HandJson.Default;
-        var stateReader = config.First("state", new BoolReader<int>(3, 0, 1));
+        var stateReader = config.Property("state", new BoolReader<int>(3, 0, 1))
+            .First();
         var result = stateReader.Parse(json);
         Assert.Equal(expected, result);
     }
@@ -89,7 +95,8 @@ public class BoolReaderTests
         string json = "{}";
 
         var config = HandJson.Default;
-        var stateReader = config.First("state", new BoolReader<int>(3, 0, 1));
+        var stateReader = config.Property("state", new BoolReader<int>(3, 0, 1))
+            .First();
         var result = stateReader.Parse(json);
         Assert.Equal(expected, result);
     }

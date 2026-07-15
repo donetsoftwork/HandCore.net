@@ -9,8 +9,6 @@ namespace ParseXmlBench;
 public class UserSingleBench
 {
     private static readonly XmlSerializer _serializer = new(typeof(User));
-    //private static readonly IMemberBuilderProvider _builderProvider = MemberBuilderProvider.Instance/*.UseCreator(new UserCreater())*/;
-    //private static readonly HandXml _xmlConfig = new(_builderProvider, DefaultValueBuilder.Instance);
 
     private static readonly EntityParser<User> _parser = HandXml.Default.Entity<User>()
         .WithItem<int>(nameof(User.Id))

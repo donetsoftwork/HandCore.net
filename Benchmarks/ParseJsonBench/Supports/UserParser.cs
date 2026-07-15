@@ -25,15 +25,15 @@ public class UserParser(HandJson json)
         switch (name)
         {
             case nameof(User.Id):
-                if (_id.TryParser(ref reader, out var idResult))
+                if (_id.TryParse(ref reader, out var idResult))
                     entity.Id = idResult;
                 break;
             case nameof(User.Name):
-                if (_name.TryParser(ref reader, out var nameResult))
+                if (_name.TryParse(ref reader, out var nameResult))
                     entity.Name = nameResult;
                 break;
             case nameof(User.Age):
-                if (_age.TryParser(ref reader, out var ageResult))
+                if (_age.TryParse(ref reader, out var ageResult))
                     entity.Age = ageResult;
                 break;
         }

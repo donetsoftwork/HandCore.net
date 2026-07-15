@@ -11,20 +11,8 @@ namespace Hand.ParseJson.Primitives;
 public class StringReader(string defaultValue)
     : ValueReader<string>(defaultValue)
 {
-    ///// <inheritdoc />
-    //protected override string GetValue(ref Utf8JsonReader reader)
-    //{
-    //    return reader.TokenType switch
-    //    {
-    //        JsonTokenType.String => reader.GetString() ?? _defaultValue,
-    //        JsonTokenType.True => "true",
-    //        JsonTokenType.False => "false",
-    //        JsonTokenType.Null => _defaultValue,
-    //        _ => base.GetValue(ref reader)
-    //    };
-    //}
     /// <inheritdoc />
-    public override bool TryParser(ref Utf8JsonReader reader, out string result)
+    public override bool TryParse(ref Utf8JsonReader reader, out string result)
     {
         if (reader.Read())
         {
@@ -46,6 +34,10 @@ public class StringReader(string defaultValue)
                     result = "false";
                     return true;
                 case JsonTokenType.Null:
+                case JsonTokenType.StartObject:
+                case JsonTokenType.StartArray:
+                case JsonTokenType.EndObject:
+                case JsonTokenType.EndArray:
                     result = _defaultValue;
                     return false;
                 default:
@@ -57,7 +49,7 @@ public class StringReader(string defaultValue)
         return false;
     }
     /// <inheritdoc />
-    protected override bool TryParser(ReadOnlySpan<byte> bytes, out string result)
+    protected override bool TryParse(ReadOnlySpan<byte> bytes, out string result)
     {
         result = StringConverter.GetString(bytes); 
         return true;

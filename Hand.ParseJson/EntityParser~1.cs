@@ -20,7 +20,7 @@ public class EntityParser<TEntity>(HandJson json, ICreator<IMemberBuilder<TEntit
     /// </summary>
     /// <param name="json"></param>
     public EntityParser(HandJson json)
-        : this(json, json.BuilderProvider.Get<TEntity>()!, json.DefaultValue.Get<TEntity>())
+        : this(json, json.Builders.Get<TEntity>()!, json.DefaultValues.Get<TEntity>())
     {
     }
 
@@ -74,12 +74,7 @@ public class EntityParser<TEntity>(HandJson json, ICreator<IMemberBuilder<TEntit
                     if (reader.CurrentDepth <= currentDepth)
                         goto Build;
                     break;
-                //case JsonTokenType.None:
-                //    break;
                 default:
-                    //// 检查是否到达结束节点
-                    //if (reader.CurrentDepth <= currentDepth)
-                    //    goto Build;
                     break;
             }
         } while (reader.Read());
@@ -87,13 +82,13 @@ public class EntityParser<TEntity>(HandJson json, ICreator<IMemberBuilder<TEntit
         return builder.Build();
     }
     /// <inheritdoc />
-    public override bool TryParser(ref Utf8JsonReader reader, out TEntity result)
+    public override bool TryParse(ref Utf8JsonReader reader, out TEntity result)
     {
         result = GetValue(ref reader);
         return true;
     }
     /// <inheritdoc />
-    protected override bool TryParser(ReadOnlySpan<byte> bytes, out TEntity result)
+    protected override bool TryParse(ReadOnlySpan<byte> bytes, out TEntity result)
     {
         // 只实现基类,并不实际调用
         result = _defaultValue;

@@ -1,8 +1,10 @@
-﻿using Hand.Convert;
+﻿using Hand.Configuration;
+using Hand.Convert;
 using Hand.Creational;
 using Hand.Maping;
 using Hand.ParseXml.Cachers;
 using Hand.ParseXml.Contracts;
+using Hand.ParseXml.Move;
 using Hand.ParseXml.Nodes;
 using System.Xml;
 
@@ -71,6 +73,21 @@ public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaul
     /// <returns></returns>
     public IParser<XmlReader, TAttribute> Attribute<TAttribute>(string attributeName)
         => Primitive<TAttribute>(new AttributeReader(attributeName, _defaultValues.Get<string>()));
+    /// <summary>
+    /// 属性读取器
+    /// </summary>
+    /// <param name="attributeIndex"></param>
+    /// <returns></returns>
+    public IndexAttributeReader Attribute(int attributeIndex)
+        => new(attributeIndex, _defaultValues.Get<string>());
+    /// <summary>
+    /// 属性读取器
+    /// </summary>
+    /// <typeparam name="TAttribute"></typeparam>
+    /// <param name="attributeIndex"></param>
+    /// <returns></returns>
+    public IParser<XmlReader, TAttribute> Attribute<TAttribute>(int attributeIndex)
+        => Primitive<TAttribute>(new IndexAttributeReader(attributeIndex, _defaultValues.Get<string>()));
     #endregion
     #region Content
     /// <summary>
@@ -86,6 +103,21 @@ public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaul
     /// <returns></returns>
     public IParser<XmlReader, TContent> Content<TContent>()
         => Primitive<TContent>(new ContentReader(_defaultValues.Get<string>()));
+    #endregion
+    #region Name
+    /// <summary>
+    /// 属性名读取
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <returns></returns>
+    public IParser<XmlReader, TValue> Name<TValue>()
+        => Primitive<TValue>(new ElementNameParser(_defaultValues.Get<string>()));
+    /// <summary>
+    /// 属性名读取
+    /// </summary>
+    /// <returns></returns>
+    public ElementNameParser Name()
+        => new(_defaultValues.Get<string>());
     #endregion
     #region Entity
     /// <summary>
@@ -145,16 +177,58 @@ public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaul
     public EntityParser<TEntity> Entity<TEntity>(string contentName)
         => new(this, _builders.Get<TEntity>() ?? throw new NotSupportedException("请先配置构造器或传入构造器"), Content().Member(contentName));
     #endregion
-    #region Single
+    #region Element
     /// <summary>
-    /// 获取单个节点
+    /// 获取节点
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="elementName"></param>
+    /// <param name="parser"></param>
+    /// <returns></returns>
+    public ElementParser<TResult> Element<TResult>(string elementName, IParser<XmlReader, TResult> parser)
+        => new(elementName, parser, _defaultValues.Get<TResult>());
+    /// <summary>
+    /// 获取节点
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="parser"></param>
+    /// <returns></returns>
+    public ElementParser<TResult> Element<TResult>(IParser<XmlReader, TResult> parser)
+        => new(typeof(TResult).Name, parser, _defaultValues.Get<TResult>());
+    /// <summary>
+    /// 获取节点
+    /// </summary>
+    /// <param name="element"></param>
+    /// <returns></returns>
+    public ElementParser<string> Element(string element)
+        => new(element, Content(), _defaultValues.Get<string>());
+    /// <summary>
+    /// 获取节点
     /// </summary>
     /// <typeparam name="TResult"></typeparam>
     /// <param name="element"></param>
+    /// <returns></returns>
+    public ElementParser<TResult> Element<TResult>(string element)
+        => new(element, Content<TResult>(), _defaultValues.Get<TResult>());
+    #endregion
+    /// <summary>
+    /// 移入子节点
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
     /// <param name="parser"></param>
     /// <returns></returns>
-    public FirstReader<TResult> First<TResult>(string element, IParser<XmlReader, TResult> parser)
-        => new(element, parser, _defaultValues.Get<TResult>());
+    public MoveInParser<TResult> MoveIn<TResult>(IParser<XmlReader, TResult> parser)
+        => new(parser, _defaultValues.Get<TResult>());
+    /// <summary>
+    /// 移到子节点
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="name"></param>
+    /// <param name="parser"></param>
+    /// <returns></returns>
+    public MoveToParser<TResult> MoveTo<TResult>(string name, IParser<XmlReader, TResult> parser)
+        => new(name, parser, _defaultValues.Get<TResult>());
+    #region First
     /// <summary>
     /// 获取单个节点
     /// </summary>
@@ -162,22 +236,32 @@ public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaul
     /// <param name="parser"></param>
     /// <returns></returns>
     public FirstReader<TResult> First<TResult>(IParser<XmlReader, TResult> parser)
-        => new(typeof(TResult).Name, parser, _defaultValues.Get<TResult>());
-    /// <summary>
-    /// 获取单个节点
-    /// </summary>
-    /// <param name="element"></param>
-    /// <returns></returns>
-    public FirstReader<string> First(string element)
-        => new(element, Content(), _defaultValues.Get<string>());
+    {
+        if (parser is IDefault<TResult> @default)
+            return new(parser, @default.DefaultValue);
+        return new(parser, _defaultValues.Get<TResult>());
+    }
     /// <summary>
     /// 获取单个节点
     /// </summary>
     /// <typeparam name="TResult"></typeparam>
-    /// <param name="element"></param>
+    /// <param name="property"></param>
     /// <returns></returns>
-    public FirstReader<TResult> First<TResult>(string element)
-        => new(element, Content<TResult>(), _defaultValues.Get<TResult>());
+    public FirstReader<TResult> First<TResult>(string property)
+    {
+        var @default = _defaultValues.Get<TResult>();
+        return new(new ElementParser<TResult>(property, Content<TResult>(), @default), @default);
+    }
+    /// <summary>
+    /// 获取单个节点
+    /// </summary>
+    /// <param name="property"></param>
+    /// <returns></returns>
+    public FirstReader<string> First(string property)
+    {
+        var @default = _defaultValues.Get<string>();
+        return new(new ElementParser<string>(property, new ContentReader(@default), @default), @default);
+    }
     #endregion
     #region Convert
     /// <summary>

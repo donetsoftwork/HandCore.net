@@ -59,4 +59,19 @@ public class JsonReaderTests
             }
         }
     }
+    [Fact]
+    public void Deserialize()
+    {
+        string json = "{\"id\":111, \"value\": 3.5, \"active\": true}";
+        if (JsonSerializer.Deserialize<object>(json) is not JsonElement element)
+        {
+            Assert.Fail();
+            return;
+        }            
+        //foreach (var item in element.EnumerateObject())
+        //{
+        //    var name = item.Name;
+        //    var value = item.Value;
+        //}
+    }
 }

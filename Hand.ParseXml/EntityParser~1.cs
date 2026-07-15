@@ -102,7 +102,7 @@ public class EntityParser<TEntity>(HandXml xml, ICreator<IMemberBuilder<TEntity>
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        ReadItem(builder, reader, reader.Name);
+                        ReadItem(builder, reader);
                         break;
                     case XmlNodeType.EndElement:
                         // 检查是否到达结束节点
@@ -133,11 +133,10 @@ public class EntityParser<TEntity>(HandXml xml, ICreator<IMemberBuilder<TEntity>
     /// </summary>
     /// <param name="entity"></param>
     /// <param name="reader"></param>
-    /// <param name="name"></param>
     /// <returns></returns>
-    public virtual void ReadItem(IMemberBuilder<TEntity> entity, XmlReader reader, string name)
+    public virtual void ReadItem(IMemberBuilder<TEntity> entity, XmlReader reader)
     {
-        if (_items.TryGetValue(name, out var child))
+        if (_items.TryGetValue(reader.LocalName, out var child))
             child.Save(entity, reader);
     }
     /// <summary>
@@ -246,65 +245,65 @@ public class EntityParser<TEntity>(HandXml xml, ICreator<IMemberBuilder<TEntity>
     public EntityParser<TEntity> WithItem<TItem>(IParser<XmlReader, TItem> item, string name)
         => WithItem(item, name, name);
     #endregion
-    #region WithRepeat
-    /// <summary>
-    /// 添加重复节点解析器
-    /// </summary>
-    /// <typeparam name="TItem"></typeparam>
-    /// <typeparam name="TRepeat"></typeparam>
-    /// <param name="repeat"></param>
-    /// <param name="converter"></param>
-    /// <param name="member"></param>
-    /// <returns></returns>
-    public EntityParser<TEntity> WithRepeat<TItem, TRepeat>(RepeatReader<TItem> repeat, IConverter<IEnumerable<TItem>, TRepeat> converter, string member)
-        => WithItem(repeat.Convert(converter), repeat.Name, member);
-    /// <summary>
-    /// 添加重复节点解析器
-    /// </summary>
-    /// <typeparam name="TItem"></typeparam>
-    /// <typeparam name="TRepeat"></typeparam>
-    /// <param name="repeat"></param>
-    /// <param name="converter"></param>
-    /// <returns></returns>
-    public EntityParser<TEntity> WithRepeat<TItem, TRepeat>(RepeatReader<TItem> repeat, IConverter<IEnumerable<TItem>, TRepeat> converter)
-        => WithItem(repeat.Convert(converter), repeat.Name, repeat.Name);
-    /// <summary>
-    /// 添加重复节点解析器
-    /// </summary>
-    /// <typeparam name="TItem"></typeparam>
-    /// <typeparam name="TRepeat"></typeparam>
-    /// <param name="repeat"></param>
-    /// <param name="convert"></param>
-    /// <param name="member"></param>
-    /// <returns></returns>
-    public EntityParser<TEntity> WithRepeat<TItem, TRepeat>(RepeatReader<TItem> repeat, Converter<IEnumerable<TItem>, TRepeat> convert, string member)
-        => WithItem(repeat.Convert(convert), repeat.Name, member);
-    /// <summary>
-    /// 添加重复节点解析器
-    /// </summary>
-    /// <typeparam name="TItem"></typeparam>
-    /// <typeparam name="TRepeat"></typeparam>
-    /// <param name="repeat"></param>
-    /// <param name="convert"></param>
-    /// <returns></returns>
-    public EntityParser<TEntity> WithRepeat<TItem, TRepeat>(RepeatReader<TItem> repeat, Converter<IEnumerable<TItem>, TRepeat> convert)
-        => WithItem(repeat.Convert(convert), repeat.Name, repeat.Name);
-    /// <summary>
-    /// 添加重复节点解析器
-    /// </summary>
-    /// <typeparam name="TItem"></typeparam>
-    /// <param name="repeat"></param>
-    /// <param name="member"></param>
-    /// <returns></returns>
-    public EntityParser<TEntity> WithRepeat<TItem>(RepeatReader<TItem> repeat, string member)
-        => WithItem(repeat.ToArray(), repeat.Name, member);
-    /// <summary>
-    /// 添加重复节点解析器
-    /// </summary>
-    /// <typeparam name="TItem"></typeparam>
-    /// <param name="repeat"></param>
-    /// <returns></returns>
-    public EntityParser<TEntity> WithRepeat<TItem>(RepeatReader<TItem> repeat)
-        => WithItem(repeat.ToArray(), repeat.Name, repeat.Name);
-    #endregion
+    //#region WithEach
+    ///// <summary>
+    ///// 添加重复节点解析器
+    ///// </summary>
+    ///// <typeparam name="TItem"></typeparam>
+    ///// <typeparam name="TEach"></typeparam>
+    ///// <param name="repeat"></param>
+    ///// <param name="converter"></param>
+    ///// <param name="member"></param>
+    ///// <returns></returns>
+    //public EntityParser<TEntity> WithEach<TItem, TEach>(EachReader<TItem> repeat, IConverter<IEnumerable<TItem>, TEach> converter, string member)
+    //    => WithItem(repeat.Convert(converter), repeat.Name, member);
+    ///// <summary>
+    ///// 添加重复节点解析器
+    ///// </summary>
+    ///// <typeparam name="TItem"></typeparam>
+    ///// <typeparam name="TEach"></typeparam>
+    ///// <param name="repeat"></param>
+    ///// <param name="converter"></param>
+    ///// <returns></returns>
+    //public EntityParser<TEntity> WithEach<TItem, TEach>(EachReader<TItem> repeat, IConverter<IEnumerable<TItem>, TEach> converter)
+    //    => WithItem(repeat.Convert(converter), repeat.Name, repeat.Name);
+    ///// <summary>
+    ///// 添加重复节点解析器
+    ///// </summary>
+    ///// <typeparam name="TItem"></typeparam>
+    ///// <typeparam name="TEach"></typeparam>
+    ///// <param name="repeat"></param>
+    ///// <param name="convert"></param>
+    ///// <param name="member"></param>
+    ///// <returns></returns>
+    //public EntityParser<TEntity> WithEach<TItem, TEach>(EachReader<TItem> repeat, Converter<IEnumerable<TItem>, TEach> convert, string member)
+    //    => WithItem(repeat.Convert(convert), repeat.Name, member);
+    ///// <summary>
+    ///// 添加重复节点解析器
+    ///// </summary>
+    ///// <typeparam name="TItem"></typeparam>
+    ///// <typeparam name="TEach"></typeparam>
+    ///// <param name="repeat"></param>
+    ///// <param name="convert"></param>
+    ///// <returns></returns>
+    //public EntityParser<TEntity> WithEach<TItem, TEach>(EachReader<TItem> repeat, Converter<IEnumerable<TItem>, TEach> convert)
+    //    => WithItem(repeat.Convert(convert), repeat.Name, repeat.Name);
+    ///// <summary>
+    ///// 添加重复节点解析器
+    ///// </summary>
+    ///// <typeparam name="TItem"></typeparam>
+    ///// <param name="repeat"></param>
+    ///// <param name="member"></param>
+    ///// <returns></returns>
+    //public EntityParser<TEntity> WithEach<TItem>(EachReader<TItem> repeat, string member)
+    //    => WithItem(repeat.ToArray(), repeat.Name, member);
+    ///// <summary>
+    ///// 添加重复节点解析器
+    ///// </summary>
+    ///// <typeparam name="TItem"></typeparam>
+    ///// <param name="repeat"></param>
+    ///// <returns></returns>
+    //public EntityParser<TEntity> WithEach<TItem>(EachReader<TItem> repeat)
+    //    => WithItem(repeat.ToArray(), repeat.Name, repeat.Name);
+    //#endregion
 }

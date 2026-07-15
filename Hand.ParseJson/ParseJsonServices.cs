@@ -45,7 +45,7 @@ public static class ParseJsonServices
     /// <param name="json"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-    public static bool TryParser<TResult>(this IJsonParser<TResult> parser, string json, out TResult result)
+    public static bool TryParse<TResult>(this IJsonParser<TResult> parser, string json, out TResult result)
     {
         byte[]? tempArray = null;
         var count = json.Length;
@@ -75,7 +75,7 @@ public static class ParseJsonServices
 #endif
 
             var reader = new Utf8JsonReader(utf8.Slice(0, actualByteCount));
-            return parser.TryParser(ref reader, out result);
+            return parser.TryParse(ref reader, out result);
         }
         finally
         {
@@ -95,7 +95,7 @@ public static class ParseJsonServices
     /// <returns></returns>
     public static TResult Parse<TResult>(this IJsonParser<TResult> parser, string json)
     {
-        _ = TryParser(parser, json, out var result);
+        _ = TryParse(parser, json, out var result);
         return result;
     }
     /// <summary>
@@ -105,9 +105,9 @@ public static class ParseJsonServices
     /// <param name="parser"></param>
     /// <param name="reader"></param>
     /// <returns></returns>
-    public static TResult Parse<TResult>(this IJsonParser<TResult> parser, Utf8JsonReader reader)
+    public static TResult Parse<TResult>(this IJsonParser<TResult> parser, ref Utf8JsonReader reader)
     {
-        _ = parser.TryParser(ref reader, out var result);
+        _ = parser.TryParse(ref reader, out var result);
         return result;
     }
     #region First
@@ -115,17 +115,10 @@ public static class ParseJsonServices
     /// 第一个节点读取
     /// </summary>
     /// <typeparam name="TResult"></typeparam>
-    /// <param name="element"></param>
     /// <param name="original"></param>
     /// <returns></returns>
-    public static FirstReader<TResult> First<TResult>(this IJsonParser<TResult> original, string element)
-    {
-        if (original is IDefault<TResult> @default)
-            return new FirstReader<TResult>(element, original, @default.DefaultValue);
-        if (original is IEntityParser entity)
-            return entity.Json.First(element, original);
-        return HandJson.Default.First(element, original);
-    }
+    public static FirstReader<TResult> First<TResult>(this IEntityParser<TResult> original)
+        => new(original, original.Json.DefaultValues.Get<TResult>());
     /// <summary>
     /// 第一个节点读取
     /// </summary>
@@ -133,29 +126,80 @@ public static class ParseJsonServices
     /// <param name="original"></param>
     /// <returns></returns>
     public static FirstReader<TResult> First<TResult>(this IJsonParser<TResult> original)
-        => First(original, typeof(TResult).Name);
-    #endregion
-    #region Repeat
-    /// <summary>
-    /// 重复节点读取
-    /// </summary>
-    /// <typeparam name="TResult"></typeparam>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public static RepeatReader<TResult> Repeat<TResult>(this IEntityParser<TResult> item)
-        => new(item.Json, item);
-    /// <summary>
-    /// 重复节点读取
-    /// </summary>
-    /// <typeparam name="TResult"></typeparam>
-    /// <param name="item"></param>
-    /// <returns></returns>
-    public static RepeatReader<TResult> Repeat<TResult>(this IJsonParser<TResult> item)
     {
-        if (item is IEntityParser entity)
-            return new RepeatReader<TResult>(entity.Json, item);
-        return new RepeatReader<TResult>(HandJson.Default, item);
+        if (original is IDefault<TResult> @default)
+            return new FirstReader<TResult>(original, @default.DefaultValue);
+        if (original is IEntityParser entity)
+            return entity.Json.First(original);
+        return HandJson.Default.First(original);
     }
+    #endregion
+    /// <summary>
+    /// Object开始
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="original"></param>
+    /// <returns></returns>
+    public static ObjectParser<TResult> Object<TResult>(this IJsonParser<TResult> original)
+    {
+        if (original is IDefault<TResult> @default)
+            return new ObjectParser<TResult>(original, @default.DefaultValue);
+        if (original is IEntityParser entity)
+            return entity.Json.Object(original);
+        return HandJson.Default.Object(original);
+    }
+    /// <summary>
+    /// Array开始
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="original"></param>
+    /// <returns></returns>
+    public static ArrayParser<TResult> Array<TResult>(this IJsonParser<TResult> original)
+    {
+        if (original is IDefault<TResult> @default)
+            return new ArrayParser<TResult>(original, @default.DefaultValue);
+        if (original is IEntityParser entity)
+            return entity.Json.Array(original);
+        return HandJson.Default.Array(original);
+    }
+    #region Each
+    /// <summary>
+    /// 重复节点读取
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    public static EachReader<TResult> Each<TResult>(this IJsonParser<TResult> item)
+        => new(item);
+    #endregion
+    #region Dictionary
+    /// <summary>
+    /// 字典读取
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <param name="acceptDefault"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DictionaryParser<TKey, TValue> Dictionary<TKey, TValue>(this IJsonParser<TKey> key, IJsonParser<TValue> value, IEqualityComparer<TKey> comparer, bool acceptDefault = false)
+        where TKey : notnull
+        => new(key, value, comparer, acceptDefault);
+    /// <summary>
+    /// 字典读取
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <param name="acceptDefault"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static DictionaryParser<TKey, TValue> Dictionary<TKey, TValue>(this IJsonParser<TKey> key, IJsonParser<TValue> value, bool acceptDefault = false)
+        where TKey : notnull
+        => new(key, value, EqualityComparer<TKey>.Default, acceptDefault);
     #endregion
     #region Convert
     /// <summary>
@@ -168,7 +212,7 @@ public static class ParseJsonServices
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ConvertParser<TSource, TDest> Convert<TSource, TDest>(this IEntityParser<TSource> entity, Converter<TSource, TDest> convert)
-        => new(entity.Json, entity, new DelegateConverter<TSource, TDest>(convert));
+        => new(entity, new DelegateConverter<TSource, TDest>(convert), entity.Json.DefaultValues.Get<TDest>());
     /// <summary>
     /// 转换为其他类型解析器
     /// </summary>
@@ -179,7 +223,7 @@ public static class ParseJsonServices
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ConvertParser<TSource, TDest> Convert<TSource, TDest>(this IEntityParser<TSource> entity, IConverter<TSource, TDest> converter)
-        => new(entity.Json, entity, converter);
+        => new(entity, converter, entity.Json.DefaultValues.Get<TDest>());
     /// <summary>
     /// 转换为其他类型解析器
     /// </summary>
@@ -191,8 +235,8 @@ public static class ParseJsonServices
     public static ConvertParser<TSource, TDest> Convert<TSource, TDest>(this IJsonParser<TSource> node, IConverter<TSource, TDest> converter)
     {
         if (node is IEntityParser entity)
-            return new ConvertParser<TSource, TDest>(entity.Json, node, converter);
-        return new ConvertParser<TSource, TDest>(HandJson.Default, node, converter);
+            return new ConvertParser<TSource, TDest>(node, converter, entity.Json.DefaultValues.Get<TDest>());
+        return new ConvertParser<TSource, TDest>(node, converter, HandJson.Default.DefaultValues.Get<TDest>());
     }
     /// <summary>
     /// 转换为其他类型解析器
@@ -212,7 +256,7 @@ public static class ParseJsonServices
     /// <param name="repeat"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static ConvertParser<List<TItem>, TItem[]> ToArray<TItem>(this RepeatReader<TItem> repeat)
+    public static ConvertParser<List<TItem>, TItem[]> ToArray<TItem>(this EachReader<TItem> repeat)
         => Convert(repeat, new DelegateConverter<List<TItem>, TItem[]>(static items => [.. items]));
     #endregion
 }

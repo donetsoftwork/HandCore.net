@@ -34,8 +34,6 @@ public class UserBuilder2
                 if (value is int ageValue)
                     _original.Age = ageValue;
                 break;
-            default:
-                break;
         }
     }
     /// <summary>

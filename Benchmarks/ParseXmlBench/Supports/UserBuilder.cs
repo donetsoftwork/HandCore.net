@@ -54,8 +54,6 @@ public class UserBuilder(int id, string name, int age)
                 if (value is int ageValue)
                     _age = ageValue;
                 break;
-            default:
-                break;
         }
     }
     /// <summary>

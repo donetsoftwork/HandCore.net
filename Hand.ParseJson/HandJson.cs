@@ -1,10 +1,10 @@
 ﻿using Hand.Configuration;
+using Hand.Convert;
 using Hand.Creational;
 using Hand.ParseJson.Cachers;
 using Hand.ParseJson.Contracts;
 using Hand.ParseJson.Nodes;
-using Hand.Storage;
-using System.Xml;
+using Hand.Utf8;
 
 namespace Hand.ParseJson;
 
@@ -21,93 +21,98 @@ public class HandJson(IMemberBuilderProvider builderProvider, DefaultValueBuilde
     {
     }
     #region 配置
-    private readonly IMemberBuilderProvider _builderProvider = builderProvider;
-    private readonly DefaultValueBuilder _defaultValue = defaultValue;
-    private readonly PrimitiveReaderCacher _primitiveCacher = new(defaultValue);
+    private readonly IMemberBuilderProvider _builders = builderProvider;
+    private readonly DefaultValueBuilder _defaultValues = defaultValue;
+    private readonly PrimitiveReaderCacher _primitives = new(defaultValue);
 
     /// <summary>
     /// 构造器提供者
     /// </summary>
-    public IMemberBuilderProvider BuilderProvider
-        => _builderProvider;
-    /// <summary>
-    /// 默认值提供者
-    /// </summary>
-    public DefaultValueBuilder DefaultValue
-        => _defaultValue;
+    public IMemberBuilderProvider Builders
+        => _builders;
     /// <summary>
     /// 基础类型缓存
     /// </summary>
-    internal PrimitiveReaderCacher PrimitiveCacher
-        => _primitiveCacher;
+    internal PrimitiveReaderCacher Primitives
+        => _primitives;
+    /// <summary>
+    /// 默认值提供者
+    /// </summary>
+    public DefaultValueBuilder DefaultValues
+        => _defaultValues;
     #endregion
     /// <summary>
     /// 文本读取器
     /// </summary>
     /// <returns></returns>
     public Primitives.StringReader String()
-        => new(_defaultValue.Get<string>());
+        => new(_defaultValues.Get<string>());
+    #region Bool
     /// <summary>
     /// 文本读取器
     /// </summary>
     /// <returns></returns>
     public Primitives.BoolReader Bool()
-        => new(_defaultValue.Get<bool>());
+        => new(_defaultValues.Get<bool>());
     /// <summary>
     /// 文本读取器
     /// </summary>
     /// <returns></returns>
     public static Primitives.BoolReader<TValue> Bool<TValue>(TValue trueValue, TValue falseValue, TValue defaultValue)
         => new(trueValue, falseValue, defaultValue);
+    #endregion
     /// <summary>
     /// 值读取器
     /// </summary>
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
     public IJsonParser<TValue> Value<TValue>()
-        => _primitiveCacher.Get<TValue>() ?? throw new ArgumentException($"不支持类型{typeof(TValue).FullName}");
-    //#region WithProperty
-    ///// <summary>
-    ///// 添加节点
-    ///// </summary>
-    ///// <typeparam name="TEntityParser"></typeparam>
-    ///// <typeparam name="TProperty"></typeparam>
-    ///// <param name="entity"></param>
-    ///// <param name="parser"></param>
-    ///// <param name="property"></param>
-    ///// <param name="member"></param>
-    ///// <returns></returns>
-    //public static TEntityParser WithProperty<TEntityParser, TProperty>(TEntityParser entity, IJsonParser<TProperty> parser, string property, string member)
-    //    where TEntityParser : IEntityParser
-    //{
-    //    entity.AddProperty(property, new MemberParser<TProperty>(member, parser));
-    //    return entity;
-    //}
-    ///// <summary>
-    ///// 添加节点
-    ///// </summary>
-    ///// <typeparam name="TEntityParser"></typeparam>
-    ///// <typeparam name="TProperty"></typeparam>
-    ///// <param name="entity"></param>
-    ///// <param name="property"></param>
-    ///// <param name="member"></param>
-    ///// <returns></returns>
-    //public TEntityParser WithProperty<TEntityParser, TProperty>(TEntityParser entity, string property, string member)
-    //    where TEntityParser : IEntityParser
-    //    => WithProperty(entity, Value<TProperty>(), property, member);
-    /////// <summary>
-    /////// 添加节点
-    /////// </summary>
-    /////// <typeparam name="TEntityParser"></typeparam>
-    /////// <typeparam name="TProperty"></typeparam>
-    /////// <param name="entity"></param>
-    /////// <param name="name"></param>
-    /////// <returns></returns>
-    ////public TEntityParser WithProperty<TEntityParser, TProperty>(TEntityParser entity, string name)
-    ////    where TEntityParser : IEntityParser
-    ////    => WithProperty(entity, Value<TProperty>(), name, name);
-    //#endregion
-
+        => _primitives.Get<TValue>() ?? throw new ArgumentException($"不支持类型{typeof(TValue).FullName}");
+    #region Property
+    /// <summary>
+    /// 属性读取
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="name"></param>
+    /// <param name="original"></param>
+    /// <returns></returns>
+    public PropertyParser<TValue> Property<TValue>(string name, IJsonParser<TValue> original)
+    {
+        if(original is IDefault<TValue> @default)
+            return new(name, original, @default.DefaultValue);
+        return new(name, original, _defaultValues.Get<TValue>());
+    }
+    /// <summary>
+    /// 属性读取
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public PropertyParser<TValue> Property<TValue>(string name)
+        => new(name, Value<TValue>(), _defaultValues.Get<TValue>());
+    /// <summary>
+    /// 属性读取
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public PropertyParser<string> Property(string name)
+        => new(name, String(), _defaultValues.Get<string>());
+    #endregion
+    #region PropertyName
+    /// <summary>
+    /// 属性名读取
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <returns></returns>
+    public PropertyNameParser<TValue> PropertyName<TValue>()
+        => new(PrimitiveReaderCacher.Parser as ISpanParser<byte, TValue> ?? throw new NotSupportedException($"不支持类型{typeof(TValue).FullName}"), _defaultValues.Get<TValue>());
+    /// <summary>
+    /// 属性名读取
+    /// </summary>
+    /// <returns></returns>
+    public PropertyNameParser<string> PropertyName()
+        => new(StringConverter.Instance, _defaultValues.Get<string>());
+    #endregion
     #region Entity
     /// <summary>
     /// 实体解析器
@@ -115,7 +120,7 @@ public class HandJson(IMemberBuilderProvider builderProvider, DefaultValueBuilde
     /// <typeparam name="TEntity"></typeparam>
     /// <returns></returns>
     public EntityParser<TEntity> Entity<TEntity>(ICreator<IMemberBuilder<TEntity>> creator)
-        => new(this, creator, _defaultValue.Get<TEntity>());
+        => new(this, creator, _defaultValues.Get<TEntity>());
     /// <summary>
     /// 实体解析器
     /// </summary>
@@ -124,29 +129,87 @@ public class HandJson(IMemberBuilderProvider builderProvider, DefaultValueBuilde
     /// <returns></returns>
     public EntityParser<TEntity> Entity<TEntity, TBuilder>()
         where TBuilder : IMemberBuilder<TEntity>, new()
-        => new(this, new DelegateCreator<IMemberBuilder<TEntity>>(() => new TBuilder()), _defaultValue.Get<TEntity>());
+        => new(this, new DelegateCreator<IMemberBuilder<TEntity>>(() => new TBuilder()), _defaultValues.Get<TEntity>());
     /// <summary>
     /// 实体解析器
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
     /// <returns></returns>
     public EntityParser<TEntity> Entity<TEntity>()
-        => new(this, _builderProvider.Get<TEntity>() ?? throw new NotSupportedException("请先配置构造器或传入构造器"), _defaultValue.Get<TEntity>());
+        => new(this, _builders.Get<TEntity>() ?? throw new NotSupportedException("请先配置构造器或传入构造器"), _defaultValues.Get<TEntity>());
     #endregion
-    #region First
+    #region Dictionary
     /// <summary>
-    /// 获取单个节点
+    /// 字典解析器
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="value"></param>
+    /// <param name="acceptDefault"></param>
+    /// <returns></returns>
+    public DictionaryParser<TKey, TValue> Dictionary<TKey, TValue>(IJsonParser<TValue> value, bool acceptDefault = false)
+        where TKey : notnull
+        => new(PropertyName<TKey>(), value, EqualityComparer<TKey>.Default, acceptDefault);
+    /// <summary>
+    /// 字典解析器
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="acceptDefault"></param>
+    /// <returns></returns>
+    public DictionaryParser<TKey, TValue> Dictionary<TKey, TValue>(bool acceptDefault = false)
+        where TKey : notnull
+        => new(PropertyName<TKey>(), Value<TValue>(), EqualityComparer<TKey>.Default, acceptDefault);
+    /// <summary>
+    /// 字典解析器
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="value"></param>
+    /// <param name="acceptDefault"></param>
+    /// <returns></returns>
+    public DictionaryParser<string, TValue> Dictionary<TValue>(IJsonParser<TValue> value, bool acceptDefault = false)
+        => new(PropertyName(), value, StringComparer.Ordinal, acceptDefault);
+    /// <summary>
+    /// 字典解析器
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="acceptDefault"></param>
+    /// <returns></returns>
+    public DictionaryParser<string, TValue> Dictionary<TValue>(bool acceptDefault = false)
+        => new(PropertyName(), Value<TValue>(), StringComparer.Ordinal, acceptDefault);
+    /// <summary>
+    /// 字典解析器
+    /// </summary>
+    /// <returns></returns>
+    /// <param name="acceptDefault"></param>
+    public DictionaryParser<string, object> Dictionary(bool acceptDefault = false)
+        => new(PropertyName(), Value<object>(), StringComparer.Ordinal, acceptDefault);
+    #endregion
+    /// <summary>
+    /// Object开始
     /// </summary>
     /// <typeparam name="TResult"></typeparam>
-    /// <param name="property"></param>
     /// <param name="parser"></param>
     /// <returns></returns>
-    public FirstReader<TResult> First<TResult>(string property, IJsonParser<TResult> parser)
+    public ObjectParser<TResult> Object<TResult>(IJsonParser<TResult> parser)
     {
         if (parser is IDefault<TResult> @default)
-            return new(property, parser, @default.DefaultValue);
-        return new(property, parser, _defaultValue.Get<TResult>());
+            return new(parser, @default.DefaultValue);
+        return new(parser, _defaultValues.Get<TResult>());
     }
+    /// <summary>
+    /// Array开始
+    /// </summary>
+    /// <typeparam name="TResult"></typeparam>
+    /// <param name="parser"></param>
+    /// <returns></returns>
+    public ArrayParser<TResult> Array<TResult>(IJsonParser<TResult> parser)
+    {
+        if (parser is IDefault<TResult> @default)
+            return new(parser, @default.DefaultValue);
+        return new(parser, _defaultValues.Get<TResult>());
+    }
+    #region First
     /// <summary>
     /// 获取单个节点
     /// </summary>
@@ -154,7 +217,11 @@ public class HandJson(IMemberBuilderProvider builderProvider, DefaultValueBuilde
     /// <param name="parser"></param>
     /// <returns></returns>
     public FirstReader<TResult> First<TResult>(IJsonParser<TResult> parser)
-        => First(typeof(TResult).Name, parser);
+    {
+        if (parser is IDefault<TResult> @default)
+            return new(parser, @default.DefaultValue);
+        return new(parser, _defaultValues.Get<TResult>());
+    }
     /// <summary>
     /// 获取单个节点
     /// </summary>
@@ -162,7 +229,10 @@ public class HandJson(IMemberBuilderProvider builderProvider, DefaultValueBuilde
     /// <param name="property"></param>
     /// <returns></returns>
     public FirstReader<TResult> First<TResult>(string property)
-        => First(property, Value<TResult>());
+    {
+        var @default = _defaultValues.Get<TResult>();
+        return new(new PropertyParser<TResult>(property, Value<TResult>(), @default), @default);
+    }
     /// <summary>
     /// 获取单个节点
     /// </summary>
@@ -170,8 +240,8 @@ public class HandJson(IMemberBuilderProvider builderProvider, DefaultValueBuilde
     /// <returns></returns>
     public FirstReader<string> First(string property)
     {
-        var @default = _defaultValue.Get<string>();
-        return new(property, new Primitives.StringReader(@default), @default);
+        var @default = _defaultValues.Get<string>();
+        return new(new PropertyParser<string>(property, new Primitives.StringReader(@default), @default), @default);
     }
     #endregion
 

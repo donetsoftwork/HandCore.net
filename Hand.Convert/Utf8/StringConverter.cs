@@ -1,4 +1,5 @@
-﻿using Hand.Maping;
+﻿using Hand.Convert;
+using Hand.Maping;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -9,6 +10,7 @@ namespace Hand.Utf8;
 /// </summary>
 public class StringConverter
     : ISpanConverter<byte, string>
+    , ISpanParser<byte, string>
 {
     private StringConverter() { }
     #region 配置
@@ -23,6 +25,13 @@ public class StringConverter
     /// <inheritdoc />
     public string Convert(ReadOnlySpan<byte> source)
         => GetString(source);
+    /// <inheritdoc />
+    public bool TryParse(ReadOnlySpan<byte> resource, out string result)
+    {
+        result = GetString(resource);
+        return true;
+    }
+
     /// <summary>
     /// 单例
     /// </summary>

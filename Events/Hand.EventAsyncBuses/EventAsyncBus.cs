@@ -26,6 +26,7 @@ public class EventAsyncBus(
     /// <typeparam name="TEvent"></typeparam>
     /// <param name="event"></param>
     /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async Task PublishAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
         => await _dispatcher.DispatchAsync(@event, cancellationToken);
 }

@@ -53,7 +53,7 @@ var result = userParser.Parse(json);
 ~~~
 
 ## 三、解析集合
->* 通过Repeat方法定义集合解析
+>* 通过Each方法定义集合解析
 
 ~~~csharp
 string json = "[{ \"Id\": 1, \"Name\": \"张三\",  \"State\": true}, { \"Id\": 2, \"Name\": \"李四\",  \"State\": false}]";
@@ -61,11 +61,37 @@ var repeatReader = HandJson.Default.Entity<User>()
     .WithProperty<int>(nameof(User.Id))
     .WithProperty<string>(nameof(User.Name))
     .WithProperty<bool>(nameof(User.State))
-    .Repeat();
+    .Each();
 var result = repeatReader.Parse(json);
 ~~~
 
-## 四、包装类型转化
+## 四、解析字典
+### 1. 把列表解析为字典
+>* 先定义键的解析规则
+>* 使用Dictionary扩展方法解析字典,acceptDefault可选参数配置是否包含默认值
+
+~~~csharp
+string json = "[{ \"Id\": 1, \"Name\": \"张三\"}, { \"Id\": 2, \"Name\": \"李四\"}]";
+
+var config = HandJson.Default;
+var dictionaryReader = config.Property<int>(nameof(User.Id))            
+    .Dictionary(config.Property("Name").First());
+IDictionary<int, string> result = dictionaryReader.Parse(json);
+~~~
+
+### 2.默认字典
+>* 使用Dictionary方法解析字典,acceptDefault可选参数配置是否包含默认值
+>* 支持一个值类型参数的重载
+>* 支持键类型和值类型参数的重载
+
+~~~csharp
+        string json = "{ \"Id\": 1, \"Name\": \"张三\",  \"State\": true}";
+
+        var dictionaryReader = HandJson.Default.Dictionary();
+        IDictionary<string, object> result = dictionaryReader.Parse(json);
+~~~
+
+## 五、包装类型转化
 >* Convert方法转入一个转化器可以变成另一个类型的解析器
 
 ~~~csharp
@@ -76,7 +102,7 @@ var idReader = config.First<int>("id")
 UserId result = idReader.Parse(json);
 ~~~
 
-## 五、复杂类型
+## 六、复杂类型
 >* 通过WithProperty可以一个解析器绑定到主解析器的成员上
 
 ~~~csharp

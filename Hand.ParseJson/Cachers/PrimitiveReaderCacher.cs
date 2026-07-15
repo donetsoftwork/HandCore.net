@@ -50,6 +50,7 @@ public class PrimitiveReaderCacher(DefaultValueBuilder defaultValue)
             TypeCode.DateTime => CheckReader<DateTime, TConverter>(Greate(_defaultValue.Get<DateTime>())),
             TypeCode.Char => CheckReader<char, TConverter>(Greate(_defaultValue.Get<char>())),
             TypeCode.String => CheckReader<string, TConverter>(new Primitives.StringReader(_defaultValue.Get<string>())),
+            TypeCode.Object => CheckReader<object, TConverter>(new PrimitiveParser(_defaultValue.Get<object>())),
             _ => CreateOthers<TConverter>(key),
         };
     }

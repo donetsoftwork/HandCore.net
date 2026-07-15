@@ -1,6 +1,5 @@
 ﻿using Hand.ParseXml;
 using ParseXmlTests.Supports;
-using System.Xml;
 
 namespace ParseXmlTests;
 
@@ -46,7 +45,8 @@ public class CustomerTests
             .WithItem<int>("Id", nameof(Customer.CustomerId))
             .WithItem("Name", nameof(Customer.CustomerName))
             .WithItem<int>("Age", nameof(Customer.CustomerAge))
-            .First("User");
+            .Element("User")
+            .First();
         var result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.CustomerId);
@@ -66,7 +66,8 @@ public class CustomerTests
             .WithAttribute<int>("Id", nameof(Customer.CustomerId))
             .WithAttribute("Name", nameof(Customer.CustomerName))
             .WithAttribute<int>("Age", nameof(Customer.CustomerAge))
-            .First("User");
+            .Element("User")
+            .First();
         var result = userParser.Parse(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.CustomerId);
@@ -99,7 +100,8 @@ public class CustomerTests
             .WithItem<int>("Id", nameof(Customer.CustomerId))
             .WithItem("Name", nameof(Customer.CustomerName))
             .WithItem<int>("Age", nameof(Customer.CustomerAge))
-            .Repeat("User");
+            .Element("User")
+            .Each();
         var result = elementReader.Get(text)
             .ToArray();
         Assert.Equal(3, result.Length);
@@ -128,7 +130,8 @@ public class CustomerTests
             .WithItem("Name", nameof(Customer.CustomerName))
             // 缺失节点和空节点填充默认值
             .WithItem<int>("Age", nameof(Customer.CustomerAge))
-            .Repeat("User");
+            .Element("User")
+            .Each();
         var result = elementReader.Get(text)
             .ToArray();
         Assert.Equal(3, result.Length); ;

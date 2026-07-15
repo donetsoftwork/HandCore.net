@@ -34,7 +34,8 @@ public class ComplexTests
         var complexParser = config.Entity<Complex>()
             .WithItem(userParser, nameof(Complex.User))
             .WithItem(roleParser, nameof(Complex.Role))
-            .First("root");
+            .Element("root")
+            .First();
         var result = complexParser.Parse(text);
         Assert.NotNull(result);
         var user = result.User;
