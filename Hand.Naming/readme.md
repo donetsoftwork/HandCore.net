@@ -23,7 +23,7 @@ class PascalWordRule : IWordRule
     /// <summary>
     /// 首字母大写
     /// </summary>
-    public static string FistToUpper(string original, int startIndex = 0);
+    public static string FistToUpper(ReadOnlySpan<char> original);
 }
 ```
 
@@ -36,7 +36,7 @@ class CamelWordRule : IWordRule
     /// <summary>
     /// 首字母小写
     /// </summary>
-    public static string FistToLower(string original, int startIndex = 0);
+    public static string FistToLower(ReadOnlySpan<char> original);
 }
 ```
 
@@ -54,40 +54,36 @@ class UnderWordRule : IWordRule;
 class UnderWordRule : IWordRule
 {
     /// <summary>
-    /// 下划线开头
-    /// </summary>
-    public static string Under(string original, int startIndex = 0);
-        /// <summary>
     /// 下换线次字母小写
     /// </summary>
-    public static string UnderLower(string original, int startIndex = 0);
+    public static string UnderLower(ReadOnlySpan<char> original);
 }
 ```
 
 ## 二、 命名转化规则
-### 1. IPathRule接口
->* 路径拆分规则
+### 1. IStringSpliter接口
+>* 字符拆分规则
 
 ```csharp	
-interface IPathRule
+interface IStringSpliter
 {
     /// <summary>
     /// 拆分
     /// </summary>
-    IEnumerable<string> Split‌(string fullPath, int startIndex = 0);
+    IEnumerable<string> Split(ReadOnlySpan<char> str);
 }
 ```
 
-### 2. INameConverter接口
->* 命名转化接口
+### 2. ISpanConverter<char, string>接口
+>* 字符转化接口
 
 ```csharp	
-interface INameConverter
+interface ISpanConverter<char, string>
 {
     /// <summary>
     /// 转化
     /// </summary>
-    string Convert(string name, int startIndex = 0);
+    string Convert(ReadOnlySpan<char> source);
 }
 ```
 
@@ -101,7 +97,7 @@ interface INameConverter
 /// 默认路径转化
 /// </summary>
 class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRule)
-    : INameConverter, IPathRule;
+    : StringConverter<string>, IStringSpliter;
 ```
 
 ### 4. PascalPathConverter类
@@ -114,5 +110,5 @@ class DefaultPathConverter(IEnumerable<char> separators, IWordRule destRule)
 /// 帕斯卡路径转化
 /// </summary>
 class PascalPathConverter(IWordRule destRule)
-    : INameConverter, IPathRule;
+    : StringConverter<string>, IStringSpliter;
 ```

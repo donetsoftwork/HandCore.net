@@ -2,6 +2,9 @@
 using ParseXmlBench;
 
 #if DEBUG
+ElementContentBench content = new();
+var content1 = content.First();
+var content2 = content.MoveTo();
 UserSingleBench userSingle = new();
 var userSingle1 = userSingle.Deserialize();
 var userSingle2 = userSingle.GetResult();
@@ -19,6 +22,7 @@ var userList6 = userList.Custom();
 Console.ReadLine();
 
 #else
+BenchmarkRunner.Run<ElementContentBench>();
 //BenchmarkRunner.Run<UserSingleBench>();
-BenchmarkRunner.Run<UserListBench>();
+//BenchmarkRunner.Run<UserListBench>();
 #endif

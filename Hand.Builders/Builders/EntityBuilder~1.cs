@@ -1,6 +1,4 @@
-﻿using Hand.Collections;
-using Hand.Creational;
-using Hand.Members;
+﻿using Hand.Creational;
 using System.Reflection;
 
 namespace Hand.Builders;
@@ -36,17 +34,6 @@ public class EntityBuilder<TEntity>(ConstructorInfo constructor, IDictionary<str
         }
         return (TEntity)instance;
     }
-    ///// <inheritdoc />
-    //public virtual ISlotStore<TMember>? GetSlot<TMember>(string memberName)
-    //{
-    //    if (_parameterNames.TryGetValue(memberName, out var index))
-    //        return new IndexStore<TMember>(index, _parameters);
-    //    if(_properties.TryGetValue(memberName, out var property))
-    //        return new PropertyStore<TMember>(property, _initializers);
-    //    if (_fields.TryGetValue(memberName, out var field))
-    //        return new FieldStore<TMember>(field, _initializers);
-    //    return null;
-    //}
     /// <inheritdoc />
     public void Save<TMember>(string name, TMember value)
     {

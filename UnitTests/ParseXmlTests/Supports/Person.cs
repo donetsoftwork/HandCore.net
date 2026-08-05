@@ -8,6 +8,8 @@ public class Person
 {
     [XmlAttribute("PersonId")]
     public int Id { get; set; }
-    [XmlElement("PersonName")]
+    //[XmlElement("PersonAge")]
+    //public int Age { get; set; }
+    [XmlText]
     public string Name { get; set; }
 }

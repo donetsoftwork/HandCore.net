@@ -27,7 +27,7 @@ public class UserSingleBench
         .WithItem(nameof(User.Name))
         .WithItem<int>(nameof(User.Age));
     private static readonly UserParser _customParser = new(HandXml.Default);
-    private static readonly string text = @"<?xml version=""1.0"" encoding=""utf-8""?>
+    private static readonly string _text = @"<?xml version=""1.0"" encoding=""utf-8""?>
     <User>
     	<Id>1</Id>
     	<Name>张三</Name>
@@ -37,32 +37,32 @@ public class UserSingleBench
     [Benchmark(Baseline = true)]
     public User? Deserialize()
     {
-        using var stringReader = new StringReader(text);
+        using var stringReader = new StringReader(_text);
         return (User?)_serializer.Deserialize(stringReader);
     }
     [Benchmark]
     public User GetResult()
     {
-        return _parser.Get(text);
+        return _parser.Get(_text);
     }
     [Benchmark]
     public User GetResult1()
     {
-        return _parser1.Get(text);
+        return _parser1.Get(_text);
     }
     [Benchmark]
     public User GetResult2()
     {
-        return _parser2.Get(text);
+        return _parser2.Get(_text);
     }
     [Benchmark]
     public User GetResult3()
     {
-        return _parser3.Get(text);
+        return _parser3.Get(_text);
     }
     [Benchmark]
     public User Custom()
     {
-        return _customParser.Get(text);
+        return _customParser.Get(_text);
     }
 }

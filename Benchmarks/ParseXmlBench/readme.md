@@ -1,6 +1,14 @@
 ﻿# xml解析性能测试
 
-## 1. UserSingleBench
+## 1. ElementContentBench
+>* 解析单个节点MoveTo要比First快一点
+
+| Method | Mean     | Error   | StdDev  | Ratio | Gen0   | Gen1   | Allocated | Alloc Ratio |
+|------- |---------:|--------:|--------:|------:|-------:|-------:|----------:|------------:|
+| First  | 604.1 ns | 2.65 ns | 3.06 ns |  1.00 | 0.6215 | 0.0239 |  10.46 KB |        1.00 |
+| MoveTo | 597.0 ns | 1.02 ns | 1.13 ns |  0.99 | 0.6188 | 0.0237 |  10.42 KB |        1.00 |
+
+## 2. UserSingleBench
 >* 解析单个对象
 >* Deserialize是反序列化方法
 >* GetResult是普通的xml解析方法，普通的xml解析比反序列化快32%
@@ -18,7 +26,7 @@
 | GetResult3  |   799.5 ns | 6.24 ns |  6.68 ns |   799.4 ns |  0.59 | 0.6500 |      - |  10.95 KB |        0.90 |
 | Custom      |   765.9 ns | 1.41 ns |  1.57 ns |   766.2 ns |  0.57 | 0.6500 |      - |  10.95 KB |        0.90 |
 
-## 2. UserListBench
+## 3. UserListBench
 >* 解析对象列表
 >* Deserialize是反序列化方法
 >* GetResult是普通的xml解析方法，普通的xml解析比反序列化快29%

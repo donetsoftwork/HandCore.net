@@ -1,7 +1,7 @@
 ﻿using Hand.Comparers;
 using Hand.Rule.Logics;
 using System;
-#if !NET7_0
+#if NET8_0_OR_GREATER
 using System.Collections.Frozen;
 #endif
 using System.Collections.Generic;
@@ -248,10 +248,12 @@ public static class Logic
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IValidation<TMember> Included<TMember>(IEqualityComparer<TMember> comparer, params IEnumerable<TMember> members)
-#if NET7_0
+#if NET8_0_OR_GREATER
+        => new IncludedRule<TMember>(members.ToFrozenSet(comparer));
+#elif NET7_0
         => new IncludedRule<TMember>(members.ToHashSet(comparer));
 #else
-        => new IncludedRule<TMember>(members.ToFrozenSet(comparer));
+        => new IncludedRule<TMember>(new HashSet<TMember>(members, comparer));
 #endif
     /// <summary>
     /// 被包含验证规则(成员之一)

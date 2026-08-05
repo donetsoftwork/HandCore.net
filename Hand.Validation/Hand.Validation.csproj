@@ -5,7 +5,7 @@
 		<TargetFrameworks>net4.6.2;net4.7;net4.8;net7.0;net8.0;net9.0;net10.0;netstandard2.0;netstandard2.1</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<RootNamespace>Hand.Rule</RootNamespace>
-		<Version>$(VersionBase).2-alpha</Version>
+		<Version>$(VersionBase).4-alpha</Version>
 		<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
@@ -13,12 +13,9 @@
 		<Content Include="readme.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="$(OutputPath)\netstandard2.0\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-	</ItemGroup>
-	<ItemGroup  Condition="'$(TargetFramework)'!='net7.0'">
-		<PackageReference Include="System.Collections.Immutable" Version="10.0.5" />
+		<ProjectReference Include="..\Hand.Core\Hand.Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Hand.Core\Hand.Core.csproj" />
+		<None Include="$(OutputPath)\netstandard2.0\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 	</ItemGroup>
 </Project>

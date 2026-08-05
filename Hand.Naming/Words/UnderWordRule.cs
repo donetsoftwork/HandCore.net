@@ -23,83 +23,45 @@ public class UnderWordRule : IWordRule
         else
             builder.Append(char.ToUpperInvariant(first));
     }
-    /// <summary>
-    /// 下换线
-    /// </summary>
-    /// <param name="original"></param>
-    /// <param name="startIndex"></param>
-    /// <returns></returns>
-    public static string Under(string original, int startIndex = 0)
-    {
-        if (string.IsNullOrEmpty(original))
-            return "_";
-        var first = original[startIndex];
-        if (first == Prefix)
-            return original.Substring(startIndex);
-        var count = original.Length;
-        var builder = new StringBuilder(count + 1 - startIndex);
-        builder.Append(Prefix);
-        for (var i = startIndex; i < count; i++)
-            builder.Append(original[i]);
-        return builder.ToString();
-    }
-    /// <summary>
-    /// 下换线
-    /// </summary>
-    /// <param name="original"></param>
-    /// <returns></returns>
-    public static string Under(ReadOnlySpan<char> original)
-    {
-        var count = original.Length;
-        if (count == 0)
-            return "_";
-        var first = original[0];
-        if (first == Prefix)
-            return original.ToString();
-        var builder = new StringBuilder(count + 1);
-        builder.Append(Prefix);
-        for (var i = 0; i < count; i++)
-            builder.Append(original[i]);
-        return builder.ToString();
-    }
-    /// <summary>
-    /// 下换线次字母小写
-    /// </summary>
-    /// <param name="original"></param>
-    /// <param name="startIndex"></param>
-    /// <returns></returns>
-    public static string UnderLower(string original, int startIndex = 0)
-    {
-        if (string.IsNullOrEmpty(original))
-            return "_";
-        var count0 = original.Length;
-        var count = count0 + 1 - startIndex;
-        var builder = new StringBuilder(count)
-            .Append(Prefix);
-        var first = original[startIndex];
-        if (first == Prefix)
-        {
-            if (count == 1)
-            {
-                return "_";
-            }
-            else
-            {
-                first = original[++startIndex];
-            }
-        }
-        if (char.IsUpper(first))
-        {
-            builder.Append(char.ToLowerInvariant(first));
-        }
-        else
-        {
-            builder.Append(first);
-        }
-        for (var i = startIndex + 1; i < count0; i++)
-            builder.Append(original[i]);
-        return builder.ToString();
-    }
+    ///// <summary>
+    ///// 下换线
+    ///// </summary>
+    ///// <param name="original"></param>
+    ///// <param name="startIndex"></param>
+    ///// <returns></returns>
+    //public static string Under(string original, int startIndex = 0)
+    //{
+    //    if (string.IsNullOrEmpty(original))
+    //        return "_";
+    //    var first = original[startIndex];
+    //    if (first == Prefix)
+    //        return original.Substring(startIndex);
+    //    var count = original.Length;
+    //    var builder = new StringBuilder(count + 1 - startIndex);
+    //    builder.Append(Prefix);
+    //    for (var i = startIndex; i < count; i++)
+    //        builder.Append(original[i]);
+    //    return builder.ToString();
+    //}
+    ///// <summary>
+    ///// 下换线
+    ///// </summary>
+    ///// <param name="original"></param>
+    ///// <returns></returns>
+    //public static string Under(ReadOnlySpan<char> original)
+    //{
+    //    var count = original.Length;
+    //    if (count == 0)
+    //        return "_";
+    //    var first = original[0];
+    //    if (first == Prefix)
+    //        return original.ToString();
+    //    var builder = new StringBuilder(count + 1);
+    //    builder.Append(Prefix);
+    //    for (var i = 0; i < count; i++)
+    //        builder.Append(original[i]);
+    //    return builder.ToString();
+    //}
     /// <summary>
     /// 下换线次字母小写
     /// </summary>
@@ -107,37 +69,32 @@ public class UnderWordRule : IWordRule
     /// <returns></returns>
     public static string UnderLower(ReadOnlySpan<char> original)
     {
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        if (original is [var first, .. var others])
+        {
+#else
         var count = original.Length;
         if (count == 0)
-            return "_";
+            return string.Empty;
 
-        var builder = new StringBuilder(count + 1)
-            .Append(Prefix);
         var first = original[0];
-        var start = 1;
-        if (first == Prefix)
-        {
-            if (count == 1)
+        var others = original.Slice(1);
+#endif
+            if (char.IsUpper(first))
             {
-                return "_";
+                ReadOnlySpan<char> list = [Prefix, char.ToLowerInvariant(first), .. others];
+                return list.ToString();
             }
-            else
+            else if (char.IsLower(first))
             {
-                first = original[1];
-                start = 2;
+                ReadOnlySpan<char> list = [Prefix, first, .. others];
+                return list.ToString();
             }
+            return UnderLower(others);
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         }
-        if (char.IsUpper(first))
-        {
-            builder.Append(char.ToLowerInvariant(first));
-        }
-        else
-        {
-            builder.Append(first);
-        }
-        for (var i = start; i < count; i++)
-            builder.Append(original[i]);
-        return builder.ToString();
+        return string.Empty;
+#endif
     }
     /// <summary>
     /// 单例

@@ -70,10 +70,6 @@ public static class EnumerationService
     public static T Match<T, K>(this IEnumerable<T> list, K key, string description, Func<T, bool> predicate)
         where T : EnumerationBase
     {
-        var item = list.FirstOrDefault(predicate);
-        if (item is null)
-            throw new Exception($"'{key}' is not a valid {description} in {typeof(T)}");
-
-        return item;
+        return list.FirstOrDefault(predicate) ?? throw new Exception($"'{key}' is not a valid {description} in {typeof(T)}");
     }
 }

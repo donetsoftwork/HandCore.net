@@ -11,9 +11,7 @@ public class XmlSerializerTests
     public void Deserialize()
     {
         var text = @"<?xml version=""1.0"" encoding=""utf-8""?>
-            <Root PersonId=""1"">
-    	        <PersonName>张三</PersonName>
-            </Root>";
+            <Root PersonId=""1"">张三</Root>";
         using var stringReader = new StringReader(text);
         Person? person = _serializer.Deserialize(stringReader) as Person;
         Assert.NotNull(person);

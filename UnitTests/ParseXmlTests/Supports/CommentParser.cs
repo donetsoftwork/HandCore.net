@@ -14,7 +14,7 @@ public class CommentParser(HandXml xml)
 {
     #region 配置
     private readonly ContentReader _content = xml.Content();
-    private readonly AttributeReader _name = xml.Attribute("name");
+    private readonly IndexAttributeReader _name = xml.Attribute(0);
     #endregion
     /// <inheritdoc />
     public override void ReadAttributes(IMemberStore entity, XmlReader reader) { }
@@ -59,10 +59,8 @@ public class CommentParser(HandXml xml)
     /// <param name="dic"></param>
     public void ReadDictionary(XmlReader reader, Dictionary<string, string> dic)
     {
-        if(_name.TryParse(reader, out var name))
-        {
-            var value = _content.Parse(reader);
+        if(_name.TryParse(reader, out var name)
+            && _content.TryParse(reader, out var value))
             dic[name] = value;
-        }
     }
 }

@@ -152,7 +152,7 @@ public class UserParser(HandXml xml)
 
 ### 2. 通用性对比
 #### 2.1 XmlSerializer通过Attribute标记映射
->* 通过XmlRoot、XmlAttribute和XmlElement来映射属性
+>* 通过XmlRoot、XmlAttribute、XmlElement和XmlText等来映射属性
 >* 一个类只能支持一种格式的xml文件
 
 ~~~csharp
@@ -261,12 +261,12 @@ public record User(int Id, string Name);
 
 ### 2.3 通用性分析
 
-| 特性        | XmlSerializer     | ParseXml                       |
-|------------ |:----------------- |:------------------------------ |
-| 同类Xml格式 | 只支持一种格式    | 支持多种                       |
-| 映射对象    | 只映射属性        | 映射属性、字段和构造函数参数   |
-| 映射Xml结构 | 支持属性和子节点  | 支持属性、子节点和当前节点     |
-| 结果类型    | object需要转化    | 当前类型,直接使用              |
+| 特性        | XmlSerializer               | ParseXml                       |
+|------------ |:--------------------------- |:------------------------------ |
+| 同类Xml格式 | 只支持一种格式              | 支持多种                       |
+| 映射对象    | 只映射属性                  | 映射属性、字段和构造函数参数   |
+| 映射Xml结构 | 支持属性、子节点和当前节点  | 支持属性、子节点和当前节点     |
+| 结果类型    | object需要转化              | 当前类型,直接使用              |
 
 ## 二、ParseXml主要功能
 ### 1. 读取单个节点
@@ -302,7 +302,7 @@ var nameReader = HandXml.Default.Attribute("name")
 string name = nameReader.Parse(text);
 ~~~
 
-### 2. 读取强类型值
+#### 2.2 读取强类型值
 >* 使用Attribute泛型方法读取属性强类型值
 >* 支持使用属性名或属性索引
 
@@ -634,21 +634,23 @@ interface IXmlParser<TResult>
 >* 其他类都是通过组装IXmlParser实例来实现
 >* 通过完美的组件化可以模拟和解析复杂的Xml文件
 
-| 类                              | 作用                                                                       |
-|-------------------------------- | :------------------------------------------------------------------------- |
-| AttributeReader                 | 读取属性的原始文本                                                         |
-| ContentReader                   | 读取节点的原始文本                                                         |
-| PrimitiveReader                 | 调用AttributeReader或ContentReader,使用Converters把文本转化为需要的类型    |
-| ConvertParser\<TSource, TDest\> | 把一种类型的解析器封装为另一种类型的解析器                                 |
-| FirstReader\<TResult\>          | 解析碰到的第一个该节点                                                     |
-| RepeatReader\<TResult\>         | 解析连续重复的该节点                                                       | 
-| EntityParser<TEntity\>          | 解析包含多个属性或子节点为实体类型的成员                                   | 
+| 类                               | 作用                                                                       |
+|--------------------------------- | :------------------------------------------------------------------------- |
+| AttributeReader                  | 读取属性的原始文本                                                         |
+| ContentReader                    | 读取节点的原始文本                                                         |
+| PrimitiveReader                  | 调用AttributeReader或ContentReader,使用Converters把文本转化为需要的类型    |
+| ConvertParser\<TSource, TDest\>  | 把一种类型的解析器封装为另一种类型的解析器                                 |
+| FirstReader\<TResult\>           | 解析碰到的第一个该节点                                                     |
+| EachReader\<TResult\>            | 解析连续重复的该节点                                                       | 
+| DictionaryParser\<TKey, TValue\> | 解析为字典                                                                 |
+| EntityParser<TEntity\>           | 解析包含多个属性或子节点为实体类型的成员                                   | 
 
 ~~~csharp
 class PrimitiveReader<TPrimitive>(IXmlParser<string> original, IConverter<string, TPrimitive> converter, TPrimitive defaultValue);
 class ConvertParser<TSource, TDest>(HandXml xml, IXmlParser<TSource> original, IConverter<TSource, TDest> converter, TDest defaultValue);
 class FirstReader<TResult>(string element, IXmlParser<TResult> original, TResult defaultValue);
 class RepeatReader<TResult>(HandXml xml, string name, IXmlParser<TResult> item);
+class DictionaryParser<TKey, TValue>(IParser<XmlReader, TKey> key, IParser<XmlReader, TValue> value, IEqualityComparer<TKey> comparer, bool acceptDefault);
 class EntityParser<TEntity>(HandXml xml, ICreator<IMemberBuilder<TEntity>> creator, IMemberParser? content, bool hasItem = false);
 ~~~
 

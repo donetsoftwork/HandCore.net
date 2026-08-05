@@ -1,5 +1,4 @@
 ﻿using Hand.ParseXml;
-using System.Xml;
 
 namespace ParseXmlTests;
 
@@ -33,6 +32,22 @@ public class FirstReaderTests
         var config = HandXml.Default;
         var summaryReader = config.Element("summary", config.Content())
             .First();
+        var result = summaryReader.Parse(text);
+        Assert.Equal(expected, result.Trim());
+    }
+    [Fact]
+    public void Summary2()
+    {
+        var expected = "自增列";
+        var text = @$"<member name = ""F:GenerateConvertTests.Supports.ColumnType.Identity"">
+            <summary>
+            {expected}
+            </summary>
+        </member>";
+
+        var config = HandXml.Default;
+        var summaryReader = config.Content()
+            .MoveTo("summary");
         var result = summaryReader.Parse(text);
         Assert.Equal(expected, result.Trim());
     }
@@ -75,7 +90,7 @@ public class FirstReaderTests
         var text = @$"<?xml version=""1.0"" encoding=""utf-8""?>
     <User Id=""{expected}"">{name}</User>";
 
-        var idReader = HandXml.Default.Attribute<int>("name")
+        var idReader = HandXml.Default.Attribute<int>("Id")
             .First();
         int result = idReader.Parse(text);
         Assert.Equal(expected, result);

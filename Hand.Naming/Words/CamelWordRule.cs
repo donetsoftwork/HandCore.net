@@ -21,44 +21,35 @@ public class CamelWordRule : IWordRule
     /// 首字母小写
     /// </summary>
     /// <param name="original"></param>
-    /// <param name="startIndex"></param>
-    /// <returns></returns>
-    public static string FistToLower(string original, int startIndex = 0)
-    {
-        if (string.IsNullOrEmpty(original))
-            return string.Empty;
-        var count = original.Length;
-        var first = original[startIndex];
-        if (char.IsUpper(first))
-        {
-            var builder = new StringBuilder(count - startIndex);
-            builder.Append(char.ToLowerInvariant(first));
-            for (var i = startIndex + 1; i < count; i++)
-                builder.Append(original[i]);
-            return builder.ToString();
-        }
-        return original;
-    }
-    /// <summary>
-    /// 首字母小写
-    /// </summary>
-    /// <param name="original"></param>
     /// <returns></returns>
     public static string FistToLower(ReadOnlySpan<char> original)
     {
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+        if (original is [var first, .. var others])
+        {
+#else
         var count = original.Length;
         if (count == 0)
             return string.Empty;
+
         var first = original[0];
-        if (char.IsUpper(first))
-        {
-            var builder = new StringBuilder(count);
-            builder.Append(char.ToLowerInvariant(first));
-            for (var i = 1; i < count; i++)
-                builder.Append(original[i]);
-            return builder.ToString();
+        var others = original.Slice(1);
+#endif
+            if (char.IsUpper(first))
+            {
+                ReadOnlySpan<char> list = [char.ToLowerInvariant(first), .. others];
+                return list.ToString();
+            }
+            else if (char.IsLower(first))
+            {
+                ReadOnlySpan<char> list = [first, .. others];
+                return list.ToString();
+            }
+            return FistToLower(others);
+#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
         }
-        return original.ToString();
+        return string.Empty;
+#endif
     }
     /// <summary>
     /// 单例

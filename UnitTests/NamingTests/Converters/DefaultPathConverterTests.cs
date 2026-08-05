@@ -20,9 +20,8 @@ public class DefaultPathConverterTests
     [InlineData("abcDef", "AbcDef")]
     [InlineData("abc", "Abc")]
     [InlineData("_id", "Id")]
-    [InlineData(null, "")]
     [InlineData("", "")]
-    public void ConvertToPascal(string? fullPath, string? expected)
+    public void ConvertToPascal(string fullPath, string? expected)
     {
         var actual = _toPascal.Convert(fullPath);
         Assert.Equal(expected, actual);
@@ -36,9 +35,8 @@ public class DefaultPathConverterTests
     [InlineData("abcDef", new string[] {"AbcDef" })]
     [InlineData("abc", new string[] { "Abc" })]
     [InlineData("_id", new string[] { "Id" })]
-    [InlineData(null, new string[0])]
     [InlineData("", new string[0])]
-    public void SplitToPascal(string? fullPath, IEnumerable<string> expected)
+    public void SplitToPascal(string fullPath, IEnumerable<string> expected)
     {
         var actual = _toPascal.Split(fullPath);
         Assert.Equal(expected, actual);
@@ -52,9 +50,8 @@ public class DefaultPathConverterTests
     [InlineData("abcDef", "abcDef")]
     [InlineData("abc", "abc")]
     [InlineData("_id", "id")]
-    [InlineData(null, "")]
     [InlineData("", "")]
-    public void ConvertToCamel(string? fullPath, string? expected)
+    public void ConvertToCamel(string fullPath, string? expected)
     {
         var actual = _toCamel.Convert(fullPath);
         Assert.Equal(expected, actual);
@@ -68,9 +65,8 @@ public class DefaultPathConverterTests
     [InlineData("abcDef", new string[] { "abcDef" })]
     [InlineData("abc", new string[] { "abc" })]
     [InlineData("_id", new string[] { "id" })]
-    [InlineData(null, new string[0])]
     [InlineData("", new string[0])]
-    public void SplitToCamel(string? fullPath, IEnumerable<string> expected)
+    public void SplitToCamel(string fullPath, IEnumerable<string> expected)
     {
         var actual = _toCamel.Split(fullPath);
         Assert.Equal(expected, actual);
@@ -84,9 +80,8 @@ public class DefaultPathConverterTests
     [InlineData("abcDef", "abcDef")]
     [InlineData("abc", "abc")]
     [InlineData("_id", "id")]
-    [InlineData(null, "")]
     [InlineData("", "")]
-    public void ConvertToLower(string? fullPath, string? expected)
+    public void ConvertToLower(string fullPath, string? expected)
     {
         var actual = _toLower.Convert(fullPath);
         Assert.Equal(expected, actual);
@@ -100,9 +95,8 @@ public class DefaultPathConverterTests
     [InlineData("abcDef", new string[] { "abcDef" })]
     [InlineData("abc", new string[] { "abc" })]
     [InlineData("_id", new string[] { "id" })]
-    [InlineData(null, new string[0])]
     [InlineData("", new string[0])]
-    public void SplitToLower(string? fullPath, IEnumerable<string> expected)
+    public void SplitToLower(string fullPath, IEnumerable<string> expected)
     {
         var actual = _toLower.Split(fullPath);
         Assert.Equal(expected, actual);
@@ -116,9 +110,8 @@ public class DefaultPathConverterTests
     [InlineData("abcDef", "_abcDef")]
     [InlineData("abc", "_abc")]
     [InlineData("_id", "_id")]
-    [InlineData(null, "")]
     [InlineData("", "")]
-    public void ConvertToUnder(string? fullPath, string? expected)
+    public void ConvertToUnder(string fullPath, string? expected)
     {
         var actual = _toUnder.Convert(fullPath);
         Assert.Equal(expected, actual);
@@ -132,9 +125,8 @@ public class DefaultPathConverterTests
     [InlineData("abcDef", new string[] { "_abcDef" })]
     [InlineData("abc", new string[] { "_abc" })]
     [InlineData("_id", new string[] { "_id" })]
-    [InlineData(null, new string[0])]
     [InlineData("", new string[0])]
-    public void SplitToUnder(string? fullPath, IEnumerable<string> expected)
+    public void SplitToUnder(string fullPath, IEnumerable<string> expected)
     {
         var actual = _toUnder.Split(fullPath);
         Assert.Equal(expected, actual);
