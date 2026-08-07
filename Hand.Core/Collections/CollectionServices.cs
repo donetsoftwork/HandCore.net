@@ -38,7 +38,7 @@ public static partial class HandCoreCollectionServices
     /// <param name="group"></param>
     /// <param name="key"></param>
     /// <param name="value"></param>
-    public static void Add<TKey, TValue>(this IDictionary<TKey, List<TValue>> group, TKey key, TValue value)
+    public static void Add<TKey, TValue>(this IDictionary<TKey, ICollection<TValue>> group, TKey key, TValue value)
     {
         if (group.TryGetValue(key, out var list))
         {
@@ -58,7 +58,7 @@ public static partial class HandCoreCollectionServices
     /// <param name="key"></param>
     /// <param name="value"></param>
     /// <param name="valueComparer"></param>
-    public static void Add<TKey, TValue>(this IDictionary<TKey, HashSet<TValue>> group, TKey key, TValue value, IEqualityComparer<TValue> valueComparer)
+    public static void Add<TKey, TValue>(this IDictionary<TKey, ISet<TValue>> group, TKey key, TValue value, IEqualityComparer<TValue> valueComparer)
     {
         if (group.TryGetValue(key, out var set))
         {
@@ -78,7 +78,7 @@ public static partial class HandCoreCollectionServices
     /// <param name="key"></param>
     /// <param name="value"></param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Add<TKey, TValue>(this IDictionary<TKey, HashSet<TValue>> group, TKey key, TValue value)
+    public static void Add<TKey, TValue>(this IDictionary<TKey, ISet<TValue>> group, TKey key, TValue value)
         => Add(group, key, value, EqualityComparer<TValue>.Default);
 
 //    public static ISet<TValue> ToSet<TValue>(this IEnumerable<TValue> values, IEqualityComparer<TValue> comparer)

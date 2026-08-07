@@ -5,9 +5,9 @@
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
-/// <param name="group"></param>
+/// <param name="original"></param>
 /// <param name="valueComparer"></param>
-public class GroupSet<TKey, TValue>(IDictionary<TKey, HashSet<TValue>> group, IEqualityComparer<TValue> valueComparer)
+public class GroupSet<TKey, TValue>(IDictionary<TKey, ISet<TValue>> original, IEqualityComparer<TValue> valueComparer)
     : IGroupCollection<TKey, TValue>
     where TKey : notnull
 {
@@ -17,35 +17,35 @@ public class GroupSet<TKey, TValue>(IDictionary<TKey, HashSet<TValue>> group, IE
     /// <param name="keyComparer"></param>
     /// <param name="valueComparer"></param>
     public GroupSet(IEqualityComparer<TKey> keyComparer, IEqualityComparer<TValue> valueComparer)
-        : this(new Dictionary<TKey, HashSet<TValue>>(keyComparer), valueComparer)
+        : this(new Dictionary<TKey, ISet<TValue>>(keyComparer), valueComparer)
     {
     }
     /// <summary>
     /// 分组排重
     /// </summary>
     public GroupSet()
-        : this(new Dictionary<TKey, HashSet<TValue>>(), EqualityComparer<TValue>.Default)
+        : this(new Dictionary<TKey, ISet<TValue>>(), EqualityComparer<TValue>.Default)
     {
     }
     #region 配置
-    private readonly IDictionary<TKey, HashSet<TValue>> _group = group;
+    private readonly IDictionary<TKey, ISet<TValue>> _original = original;
     private readonly IEqualityComparer<TValue> _valueComparer = valueComparer;
 
     /// <inheritdoc />
     public IEnumerable<TKey> Keys
-        => _group.Keys;
+        => _original.Keys;
     #endregion
     /// <inheritdoc />
     public bool ContainsKey(TKey key)
-        => _group.ContainsKey(key);
+        => _original.ContainsKey(key);
     /// <inheritdoc />
     public IEnumerable<TValue> GetValues(TKey key)
     {
-        if (_group.TryGetValue(key, out var values))
+        if (_original.TryGetValue(key, out var values))
             return values;
         return [];
     }
     /// <inheritdoc />
-    public void Add(TKey key, TValue value)
-        => _group.Add(key, value, _valueComparer);
+    public virtual void Add(TKey key, TValue value)
+        => _original.Add(key, value, _valueComparer);
 }
