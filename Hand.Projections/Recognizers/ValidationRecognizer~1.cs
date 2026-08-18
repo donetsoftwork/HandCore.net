@@ -4,16 +4,19 @@ using System.Collections.Generic;
 namespace Hand.Maping.Recognizers;
 
 /// <summary>
-/// 验证识别器
+/// 验证成员识别器
 /// </summary>
-/// <param name="validation">投影规则</param>
+/// <param name="keys">投影规则</param>
+/// <param name="exclude"></param>
 /// <param name="comparer"></param>
-public sealed class ValidationRecognizer<TKey>(IValidation<TKey> validation, IEqualityComparer<TKey> comparer)
+public sealed class ValidationRecognizer<TKey>(IEnumerable<TKey> keys, bool exclude, IEqualityComparer<TKey> comparer)
     : IRecognizer<TKey>
     where TKey : notnull
 {
     #region 配置
-    private readonly IValidation<TKey> _validation = validation;
+    //private readonly IEnumerable<TKey> _keys = keys;
+    //private readonly bool _exclude = exclude;
+    private readonly IValidation<TKey> _validation = exclude ? Logic.Included(comparer, keys).Not() : Logic.Included(comparer, keys);
     private readonly IEqualityComparer<TKey> _comparer = comparer;
     /// <summary>
     /// 验证规则
@@ -29,4 +32,7 @@ public sealed class ValidationRecognizer<TKey>(IValidation<TKey> validation, IEq
     /// <inheritdoc />
     IDictionary<TKey, TValue> IRecognizer<TKey>.Recognize<TValue>(IDictionary<TKey, TValue> source)
         => _validation.Filter(source, _comparer);
+    /// <inheritdoc />
+    IRecognizer<TKey> IRecognizer<TKey>.Reverse()
+        => this;
 }

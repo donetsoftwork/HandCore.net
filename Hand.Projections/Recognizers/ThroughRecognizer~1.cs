@@ -28,4 +28,7 @@ public sealed class ThroughRecognizer<TKey>(IProjection<TKey> projection, IEqual
     /// <inheritdoc />
     IDictionary<TKey, TValue> IRecognizer<TKey>.Recognize<TValue>(IDictionary<TKey, TValue> source)
         => _projection.Through(source, _comparer);
+    /// <inheritdoc />
+    IRecognizer<TKey> IRecognizer<TKey>.Reverse()
+        => new ThroughRecognizer<TKey>(_projection.Reverse(), _comparer);
 }

@@ -13,4 +13,9 @@ public interface IRecognizer<TKey>
     /// <param name="members"></param>
     /// <returns></returns>
     IDictionary<TKey, TMember> Recognize<TMember>(IDictionary<TKey, TMember> members);
+    /// <summary>
+    /// 反转
+    /// </summary>
+    /// <returns></returns>
+    IRecognizer<TKey> Reverse();
 }

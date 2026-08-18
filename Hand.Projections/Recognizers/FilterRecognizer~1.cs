@@ -28,4 +28,7 @@ public sealed class FilterRecognizer<TKey>(IProjection<TKey> projection, IEquali
     /// <inheritdoc />
     IDictionary<TKey, TValue> IRecognizer<TKey>.Recognize<TValue>(IDictionary<TKey, TValue> source)
         => _projection.Filter(source, _comparer);
+    /// <inheritdoc />
+    IRecognizer<TKey> IRecognizer<TKey>.Reverse()
+        => new FilterRecognizer<TKey>(_projection.Reverse(), _comparer);
 }

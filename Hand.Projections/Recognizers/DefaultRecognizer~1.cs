@@ -13,4 +13,7 @@ public sealed class DefaultRecognizer<TKey>
     /// <inheritdoc />
     IDictionary<TKey, TValue> IRecognizer<TKey>.Recognize<TValue>(IDictionary<TKey, TValue> source)
         => source;
+    /// <inheritdoc />
+    IRecognizer<TKey> IRecognizer<TKey>.Reverse()
+        => this;
 }

@@ -80,7 +80,7 @@ public class MemberRuleParser(string include, string exclude, char[] separators,
     /// <param name="comparer"></param>
     /// <param name="skip"></param>
     /// <returns></returns>
-    public static IValidation<string> ToIncluded(string text, char[] separators, IEqualityComparer<string> comparer, int skip = 0)
+    public static IValidation<string> ToIncluded(string text, char[] separators, IEqualityComparer<string> comparer, int skip)
         => ToIncluded(text.Split(separators, StringSplitOptions.RemoveEmptyEntries), comparer, skip);
     /// <summary>
     /// 转化为被包含验证规则
@@ -89,11 +89,16 @@ public class MemberRuleParser(string include, string exclude, char[] separators,
     /// <param name="comparer"></param>
     /// <param name="skip"></param>
     /// <returns></returns>
-    public static IValidation<string> ToIncluded(string[] parts, IEqualityComparer<string> comparer, int skip = 0)
-    {
-        var items = skip > 0 ? parts.Skip(skip).Distinct() : parts.Distinct();
-        return Logic.Included(comparer, items);
-    }
+    public static IValidation<string> ToIncluded(string[] parts, IEqualityComparer<string> comparer, int skip)
+        => Logic.Included(comparer, Skip(parts, skip));
+    /// <summary>
+    /// 跳过
+    /// </summary>
+    /// <param name="parts"></param>
+    /// <param name="skip"></param>
+    /// <returns></returns>
+    public static IEnumerable<string> Skip(string[] parts, int skip)
+        => skip > 0 ? parts.Skip(skip).Distinct() : parts.Distinct();
     /// <summary>
     /// 默认实例
     /// </summary>

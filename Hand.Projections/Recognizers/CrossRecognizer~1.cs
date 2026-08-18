@@ -29,4 +29,7 @@ public sealed class CrossRecognizer<TKey>(IProjection<TKey> projection, IEqualit
     /// <inheritdoc />
     IDictionary<TKey, TValue> IRecognizer<TKey>.Recognize<TValue>(IDictionary<TKey, TValue> source)
         => _projection.Cross(source, _comparer);
+    /// <inheritdoc />
+    IRecognizer<TKey> IRecognizer<TKey>.Reverse()
+        => new CrossRecognizer<TKey>(_projection.Reverse(), _comparer);
 }

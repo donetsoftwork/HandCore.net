@@ -55,8 +55,8 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
         {
             if (TryParseProjection(parts, 1, out var projection))
                 return new FilterRecognizer<string>(projection!, _memberComparer);
-            if(TryParseFilter(parts, 1, out var filter))
-                return new ValidationRecognizer<string>(filter!, _memberComparer);
+            if (TryParseFilter(parts, 1, out var filter))
+                return filter!;
         }
         else if (TryParseProjection(parts, 0, out var projection))
         {
@@ -64,8 +64,8 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
         }
         else if (TryParseFilter(parts, 0, out var filter))
         {
-            return new ValidationRecognizer<string>(filter!, _memberComparer);
-        }            
+            return filter!;
+        }
         return RecognizerInner.Default;
     }
     /// <summary>
@@ -75,7 +75,7 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
     /// <param name="start"></param>
     /// <param name="filter"></param>
     /// <returns></returns>
-    public bool TryParseFilter(string[] parts, int start, out IValidation<string>? filter)
+    public bool TryParseFilter(string[] parts, int start, out ValidationRecognizer<string>? filter)
     {
         if (start >= parts.Length)
         {
@@ -84,13 +84,13 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
         }
         var name = parts[start];
         if (name.Equals(_includePrefix, StringComparison.OrdinalIgnoreCase))
-            filter = ToIncluded(parts, _memberComparer, start + 1);
+            filter = new ValidationRecognizer<string>(Skip(parts, start + 1), false, _memberComparer);
         // 逐个排除
         else if (name.Equals(_excludePrefix, StringComparison.OrdinalIgnoreCase))
-            filter = ToIncluded(parts, _memberComparer, start + 1).Not();
+            filter = new ValidationRecognizer<string>(Skip(parts, start + 1), true, _memberComparer);
         else
             // 逐个解析
-            filter = ToIncluded(parts, _memberComparer, start);
+            filter = new ValidationRecognizer<string>(Skip(parts, start), false, _memberComparer);
         return true;
     }
     /// <summary>
