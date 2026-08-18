@@ -27,7 +27,7 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
     private readonly string _throughPrefix = through;
     private readonly string _filterPrefix = filter;
     private readonly StringComparison _comparison = comparison;
-    private readonly Dictionary<string, Func<IEnumerable<string>, IProjection<string>?>> _factorys = factory;
+    private readonly Dictionary<string, Func<IEnumerable<string>, IProjection<string>?>> _factory = factory;
     #endregion
     /// <summary>
     /// 解析
@@ -109,7 +109,7 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
             return false;
         }
         var name = parts[start];
-        if (_factorys.TryGetValue(name, out var factory))
+        if (_factory.TryGetValue(name, out var factory))
         {
             projection = factory(parts.Skip(skip));
             return projection is not null;
@@ -126,9 +126,15 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
     /// <param name="factory"></param>
     public MemberRecognizeParser UseProjection(string name, Func<IEnumerable<string>, IProjection<string>?> factory)
     {
-        _factorys[name] = factory;
+        _factory[name] = factory;
         return this;
     }
+    /// <summary>
+    /// 添加字典映射投影
+    /// </summary>
+    /// <returns></returns>
+    public MemberRecognizeParser UseMap()
+         => UseProjection(nameof(Map), arguments => Map([.. arguments], CompareConverter.ToComparer(_comparison)));
     /// <summary>
     /// 添加前缀投影
     /// </summary>
@@ -155,6 +161,30 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
         => UseProjection(nameof(RemoveSuffix), arguments => RemoveSuffix(arguments, _comparison));
     #endregion
     #region Projection
+    /// <summary>
+    /// 映射
+    /// </summary>
+    /// <param name="arguments"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static IProjection<string>? Map(string[] arguments, StringComparer comparer)
+    {
+        var count = arguments.Length / 2;
+        if (count == 0)
+            return null;
+        var map = new Dictionary<string, string>(count, comparer);
+        for (var i = 0; i < count; i++)
+        {
+            var key = arguments[i * 2];
+            var value = arguments[i * 2 + 1];
+            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
+                continue;
+            map[key] = value;
+        }
+        if (map.Count == 0)
+            return null;
+        return new DictionaryProjection<string>(map);
+    }
     /// <summary>
     /// 解析前缀投影
     /// </summary>
@@ -217,6 +247,8 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
             return new ReplaceSuffixProjection(suffix, enumerator.Current, comparison);
         return new RemoveSuffixProjection(suffix, comparison);
     }
+    #endregion
+    #region Create
     /// <summary>
     /// 构造默认实例
     /// </summary>
@@ -230,12 +262,14 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
     /// <returns></returns>
     public static MemberRecognizeParser CreateDefault(string cross, string through, string filter, string include, string exclude, char[] separators, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
     {
-        var factory = new Dictionary<string, Func<IEnumerable<string>, IProjection<string>?>>(CompareConverter.ToComparer(comparison))
+        var comparer = CompareConverter.ToComparer(comparison);
+        var factory = new Dictionary<string, Func<IEnumerable<string>, IProjection<string>?>>(comparer)
         {
             [nameof(Prefix)] = arguments => Prefix(arguments, comparison),
             [nameof(Suffix)] = arguments => Suffix(arguments, comparison),
             [nameof(RemovePrefix)] = arguments => RemovePrefix(arguments, comparison),
-            [nameof(RemoveSuffix)] = arguments => RemoveSuffix(arguments, comparison)
+            [nameof(RemoveSuffix)] = arguments => RemoveSuffix(arguments, comparison),
+            [nameof(Map)] = arguments => Map([.. arguments], comparer)
         };
         return new MemberRecognizeParser(cross, through, filter, include, exclude, separators, factory, comparison);
     }
@@ -245,13 +279,14 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
     /// <param name="comparison"></param>
     /// <returns></returns>
     public static MemberRecognizeParser CreateDefault(StringComparison comparison = StringComparison.OrdinalIgnoreCase)
-        => CreateDefault("Cross:", "Through:", "Filter:", "Include:", "Exclude:", [' '], comparison);
+        => CreateDefault("Cross:", "Through:", "Filter:", "Include:", "Exclude:", [' ', ','], comparison);
+    #endregion
+    #region Default
     /// <summary>
     /// 默认实例
     /// </summary>
     public new static MemberRecognizeParser Default
         => DefaultInner.Instance;
-    #endregion
     class RecognizerInner
     {
         /// <summary>
@@ -266,4 +301,5 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
         /// </summary>
         internal static readonly MemberRecognizeParser Instance = CreateDefault();
     }
+    #endregion
 }

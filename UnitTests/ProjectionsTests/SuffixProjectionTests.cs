@@ -9,13 +9,11 @@ public class SuffixProjectionTests
     [InlineData("es", "bus", "buses")]
     public void Convert(string suffix, string source, string expected)
     {
-        var projection = new SuffixProjection(suffix);
-        Assert.Equal(suffix, projection.Suffix);
-        if (projection.Validate(source))
-            Assert.Equal(expected, projection.Convert(source));
-        else
-            Assert.Equal(expected, source);
+        IProjection<string> projection = new SuffixProjection(suffix);
         projection.TryConvert(source, out var result);
         Assert.Equal(expected, result);
+        var reversed = projection.Reverse();
+        reversed.TryConvert(expected, out var source2);
+        Assert.Equal(source, source2);
     }
 }

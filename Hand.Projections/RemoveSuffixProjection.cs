@@ -21,6 +21,10 @@ public class RemoveSuffixProjection(string suffix, StringComparison comparison =
     /// </summary>
     protected readonly int _suffixLength = suffix.Length;
     /// <summary>
+    /// 比较器
+    /// </summary>
+    protected readonly StringComparison _comparison = comparison;
+    /// <summary>
     /// 验证规则
     /// </summary>
     protected readonly IValidation<string> _validation = Logic.Suffix(suffix, comparison);
@@ -75,4 +79,7 @@ public class RemoveSuffixProjection(string suffix, StringComparison comparison =
             return Convert(source);
         return source;
     }
+    /// <inheritdoc />
+    IProjection<string> IProjection<string>.Reverse()
+        => new PrefixProjection(_suffix, _comparison);
 }

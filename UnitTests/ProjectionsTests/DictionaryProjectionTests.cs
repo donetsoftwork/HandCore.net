@@ -4,7 +4,7 @@ namespace ProjectionsTests;
 
 public class DictionaryProjectionTests
 {
-    private readonly DictionaryProjection<string> _projection = new(new Dictionary<string, string>
+    private readonly IProjection<string>  _projection = new DictionaryProjection<string>(new Dictionary<string, string>
     {
         { "feet", "foot" },
         { "mice", "mouse" }
@@ -17,5 +17,8 @@ public class DictionaryProjectionTests
     {
         _projection.TryConvert(source, out var result);
         Assert.Equal(expected, result);
+        var reversed = _projection.Reverse();
+        reversed.TryConvert(expected, out var source2);
+        Assert.Equal(source, source2);
     }
 }

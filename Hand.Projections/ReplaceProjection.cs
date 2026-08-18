@@ -16,6 +16,8 @@ public class ReplaceProjection(string target, string replacement, int start = 0,
     #region 配置
     private readonly string _target = target;
     private readonly string _replacement = replacement;
+    private int _start = start;
+    private readonly StringComparison _comparison = comparison;
     /// <summary>
     /// 验证规则
     /// </summary>
@@ -48,4 +50,7 @@ public class ReplaceProjection(string target, string replacement, int start = 0,
         return source;
     }
     #endregion
+    /// <inheritdoc />
+    IProjection<string> IProjection<string>.Reverse()
+        => new ReplaceProjection(_replacement, _target, _start, _comparison);
 }

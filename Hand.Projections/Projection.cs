@@ -53,32 +53,32 @@ public static class Projection
     public static IProjection<string> RemoveSuffix(string suffix, StringComparison comparison = StringComparison.Ordinal)
         => new RemoveSuffixProjection(suffix, comparison);
     #endregion
-    #region Trim
-    /// <summary>
-    /// 字符去除投影
-    /// </summary>
-    /// <param name="trimChars"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IProjection<string> Trim(params char[] trimChars)
-        => new TrimProjection(trimChars);
-    /// <summary>
-    /// 前导字符去除投影
-    /// </summary>
-    /// <param name="starts"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IProjection<string> TrimStart(params char[] starts)
-        => new TrimStartProjection(starts);
-    /// <summary>
-    /// 结尾字符去除投影
-    /// </summary>
-    /// <param name="ends"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IProjection<string> TrimEnd(params char[] ends)
-        => new TrimEndProjection(ends);
-    #endregion
+    //#region Trim
+    ///// <summary>
+    ///// 字符去除投影
+    ///// </summary>
+    ///// <param name="trimChars"></param>
+    ///// <returns></returns>
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public static IProjection<string> Trim(params char[] trimChars)
+    //    => new TrimProjection(trimChars);
+    ///// <summary>
+    ///// 前导字符去除投影
+    ///// </summary>
+    ///// <param name="starts"></param>
+    ///// <returns></returns>
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public static IProjection<string> TrimStart(params char[] starts)
+    //    => new TrimStartProjection(starts);
+    ///// <summary>
+    ///// 结尾字符去除投影
+    ///// </summary>
+    ///// <param name="ends"></param>
+    ///// <returns></returns>
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public static IProjection<string> TrimEnd(params char[] ends)
+    //    => new TrimEndProjection(ends);
+    //#endregion
     #region Replace
     /// <summary>
     /// 替换投影
@@ -112,46 +112,46 @@ public static class Projection
     public static IProjection<string> ReplaceSuffix(string suffix, string replacement, StringComparison comparison = StringComparison.Ordinal)
         => new ReplaceSuffixProjection(suffix, replacement, comparison);
     #endregion
-    #region Verify
-    /// <summary>
-    /// 校验投影
-    /// </summary>
-    /// <typeparam name="TArgument"></typeparam>
-    /// <param name="validation"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IProjection<TArgument> Verify<TArgument>(IValidation<TArgument> validation)
-        => new VerifyProjection<TArgument>(validation);
-    /// <summary>
-    /// 校验投影
-    /// </summary>
-    /// <typeparam name="TArgument"></typeparam>
-    /// <param name="validation"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IProjection<TArgument> ToProjection<TArgument>(this IValidation<TArgument> validation)
-        => new VerifyProjection<TArgument>(validation);
-    #endregion
-    #region Naming
-    /// <summary>
-    /// 命名规则投影
-    /// </summary>
-    /// <param name="validation"></param>
-    /// <param name="converter"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IProjection<string> Naming(IValidation<string> validation, IConverter<string, string> converter)
-        => new NamingProjection(validation, converter);
-    /// <summary>
-    /// 命名规则投影
-    /// </summary>
-    /// <param name="converter"></param>
-    /// <param name="validation"></param>
-    /// <returns></returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IProjection<string> ToProjection(this IConverter<string, string> converter, IValidation<string> validation)
-        => new NamingProjection(validation, converter);
-    #endregion
+    //#region Verify
+    ///// <summary>
+    ///// 校验投影
+    ///// </summary>
+    ///// <typeparam name="TArgument"></typeparam>
+    ///// <param name="validation"></param>
+    ///// <returns></returns>
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public static IProjection<TArgument> Verify<TArgument>(IValidation<TArgument> validation)
+    //    => new VerifyProjection<TArgument>(validation);
+    ///// <summary>
+    ///// 校验投影
+    ///// </summary>
+    ///// <typeparam name="TArgument"></typeparam>
+    ///// <param name="validation"></param>
+    ///// <returns></returns>
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public static IProjection<TArgument> ToProjection<TArgument>(this IValidation<TArgument> validation)
+    //    => new VerifyProjection<TArgument>(validation);
+    //#endregion
+    //#region Naming
+    ///// <summary>
+    ///// 命名规则投影
+    ///// </summary>
+    ///// <param name="validation"></param>
+    ///// <param name="converter"></param>
+    ///// <returns></returns>
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public static IProjection<string> Naming(IValidation<string> validation, IConverter<string, string> converter)
+    //    => new NamingProjection(validation, converter);
+    ///// <summary>
+    ///// 命名规则投影
+    ///// </summary>
+    ///// <param name="converter"></param>
+    ///// <param name="validation"></param>
+    ///// <returns></returns>
+    //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+    //public static IProjection<string> ToProjection(this IConverter<string, string> converter, IValidation<string> validation)
+    //    => new NamingProjection(validation, converter);
+    //#endregion
     #region EachIn
     /// <summary>
     /// 逐个投影

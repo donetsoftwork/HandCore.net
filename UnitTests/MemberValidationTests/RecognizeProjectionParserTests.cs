@@ -13,6 +13,7 @@ public class RecognizeProjectionParserTests
     [InlineData("RemoveSuffix s", typeof(RemoveSuffixProjection))]
     [InlineData("RemovePrefix User Customer", typeof(ReplacePrefixProjection))]
     [InlineData("RemoveSuffix y ies", typeof(ReplaceSuffixProjection))]
+    [InlineData("Map a,b c,d", typeof(DictionaryProjection<string>))]
     public void ParseProjection(string? text, Type expected)
     {
         if (MemberRecognizeParser.Default.Parse(text) is not ThroughRecognizer<string> recognizer)
@@ -31,6 +32,7 @@ public class RecognizeProjectionParserTests
     [InlineData("Through: RemoveSuffix s", typeof(RemoveSuffixProjection))]
     [InlineData("Through: RemovePrefix User Customer", typeof(ReplacePrefixProjection))]
     [InlineData("Through: RemoveSuffix y ies", typeof(ReplaceSuffixProjection))]
+    [InlineData("Through: Map a,b c,d", typeof(DictionaryProjection<string>))]
     public void ParseThrough(string? text, Type expected)
     {
         if (MemberRecognizeParser.Default.Parse(text) is not ThroughRecognizer<string> recognizer)
@@ -49,6 +51,7 @@ public class RecognizeProjectionParserTests
     [InlineData("Cross: RemoveSuffix s", typeof(RemoveSuffixProjection))]
     [InlineData("Cross: RemovePrefix User Customer", typeof(ReplacePrefixProjection))]
     [InlineData("Cross: RemoveSuffix y ies", typeof(ReplaceSuffixProjection))]
+    [InlineData("Cross: Map a,b c,d", typeof(DictionaryProjection<string>))]
     public void ParseCross(string? text, Type expected)
     {
         if (MemberRecognizeParser.Default.Parse(text) is not CrossRecognizer<string> recognizer)
@@ -67,6 +70,7 @@ public class RecognizeProjectionParserTests
     [InlineData("Filter: RemoveSuffix s", typeof(RemoveSuffixProjection))]
     [InlineData("Filter: RemovePrefix User Customer", typeof(ReplacePrefixProjection))]
     [InlineData("Filter: RemoveSuffix y ies", typeof(ReplaceSuffixProjection))]
+    [InlineData("Filter: Map a,b c,d", typeof(DictionaryProjection<string>))]
     public void ParseFilter(string? text, Type expected)
     {
         if (MemberRecognizeParser.Default.Parse(text) is not FilterRecognizer<string> recognizer)

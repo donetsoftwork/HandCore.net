@@ -21,6 +21,10 @@ public class RemovePrefixProjection(string prefix, StringComparison comparison =
     /// </summary>
     protected readonly int _prefixLength = prefix.Length;
     /// <summary>
+    /// 比较器
+    /// </summary>
+    protected readonly StringComparison _comparison = comparison;
+    /// <summary>
     /// 验证规则
     /// </summary>
     protected readonly IValidation<string> _validation = Logic.Prefix(prefix, comparison);
@@ -77,4 +81,7 @@ public class RemovePrefixProjection(string prefix, StringComparison comparison =
         return source;
     }
     #endregion
+    /// <inheritdoc />
+    IProjection<string> IProjection<string>.Reverse()
+        => new PrefixProjection(_prefix, _comparison);
 }

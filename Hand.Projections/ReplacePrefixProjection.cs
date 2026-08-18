@@ -9,7 +9,7 @@ namespace Hand.Maping;
 /// <param name="replacement"></param>
 /// <param name="comparison"></param>
 public class ReplacePrefixProjection(string prefix, string replacement, StringComparison comparison = StringComparison.Ordinal)
-    : RemovePrefixProjection(prefix, comparison)
+    : RemovePrefixProjection(prefix, comparison), IProjection<string>
 {
     #region 配置
     private readonly string _replacement = replacement;
@@ -52,4 +52,7 @@ public class ReplacePrefixProjection(string prefix, string replacement, StringCo
 #endif
         return source;
     }
+    /// <inheritdoc />
+    IProjection<string> IProjection<string>.Reverse()
+        => new ReplacePrefixProjection(_replacement, _prefix, _comparison);
 }

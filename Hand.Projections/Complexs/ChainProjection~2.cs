@@ -59,4 +59,12 @@ public class ChainProjection<T>(LinkedList<IProjection<T>> chain)
             return result;
         return source;
     }
+    /// <inheritdoc />
+    IProjection<T> IProjection<T>.Reverse()
+    {
+        LinkedList<IProjection<T>> chain = [];
+        foreach (var item in _chain)
+            chain.AddLast(item);
+        return new ChainProjection<T>(chain);
+    }
 }

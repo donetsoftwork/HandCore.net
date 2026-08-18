@@ -12,4 +12,9 @@ public interface IProjection<T> : IConverter<T, T>
     /// <param name="result"></param>
     /// <returns></returns>
     bool TryConvert(T source, out T result);
+    /// <summary>
+    /// 反转
+    /// </summary>
+    /// <returns></returns>
+    IProjection<T> Reverse();
 }

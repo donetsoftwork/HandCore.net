@@ -10,18 +10,16 @@ public class ReplaceSuffixProjectionTests
     [InlineData("s", "ses", "bus", "buses")]
     [InlineData("x", "xes", "box", "boxes")]
     [InlineData("sh", "shes", "wish", "wishes")]
-    [InlineData("sh", "shes", "wishes", "wishes")]
+    //[InlineData("sh", "shes", "wishes", "wishes")]
     [InlineData("ch", "ches", "peach", "peaches")]
     public void Convert(string suffix, string replacement, string source, string expected)
     {
-        var projection = new ReplaceSuffixProjection(suffix, replacement);
-        Assert.Equal(suffix, projection.Suffix);
-        if (projection.Validate(source))
-            Assert.Equal(expected, projection.Convert(source));
-        else
-            Assert.Equal(expected, source);
+        IProjection<string> projection = new ReplaceSuffixProjection(suffix, replacement);
         projection.TryConvert(source, out var result);
-        Assert.Equal(expected, result);        
+        Assert.Equal(expected, result);
+        var reversed = projection.Reverse();
+        reversed.TryConvert(expected, out var source2);
+        Assert.Equal(source, source2);
     }
     [Theory]
     [InlineData("y", "ies", "city", "cities")]

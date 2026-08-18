@@ -9,7 +9,7 @@ namespace Hand.Maping.Complexs;
 /// <param name="chain"></param>
 /// <param name="failContinue"></param>
 public sealed class EachInProjection<T>(LinkedList<IProjection<T>> chain, bool failContinue = true)
-    : ChainProjection<T>(chain)
+    : ChainProjection<T>(chain), IProjection<T>
 {
     /// <summary>
     /// 逐个投影
@@ -55,4 +55,12 @@ public sealed class EachInProjection<T>(LinkedList<IProjection<T>> chain, bool f
         return state;
     }
     #endregion
+    /// <inheritdoc />
+    IProjection<T> IProjection<T>.Reverse()
+    {
+        LinkedList<IProjection<T>> chain = [];
+        foreach (var item in _chain)
+            chain.AddLast(item);
+        return new FirstReturnProjection<T>(chain);
+    }
 }

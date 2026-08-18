@@ -13,6 +13,7 @@ public class SuffixProjection(string suffix, StringComparison comparison = Strin
 {
     #region 配置
     private readonly string _suffix = suffix;
+    private readonly StringComparison _comparison = comparison;
     /// <summary>
     /// 验证规则
     /// </summary>
@@ -51,4 +52,7 @@ public class SuffixProjection(string suffix, StringComparison comparison = Strin
         return source;
     }
     #endregion
+    /// <inheritdoc />
+    IProjection<string> IProjection<string>.Reverse()
+        => new RemoveSuffixProjection(_suffix, _comparison);
 }

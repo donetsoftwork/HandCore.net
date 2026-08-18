@@ -8,7 +8,7 @@ namespace Hand.Maping.Complexs;
 /// <typeparam name="T"></typeparam>
 /// <param name="chain"></param>
 public sealed class FirstReturnProjection<T>(LinkedList<IProjection<T>> chain)
-    : ChainProjection<T>(chain)
+    : ChainProjection<T>(chain), IProjection<T>
 {
     /// <summary>
     /// 快速结束投影
@@ -36,4 +36,12 @@ public sealed class FirstReturnProjection<T>(LinkedList<IProjection<T>> chain)
         return state;
     }
     #endregion
+    /// <inheritdoc />
+    IProjection<T> IProjection<T>.Reverse()
+    {
+        LinkedList<IProjection<T>> chain = [];
+        foreach (var item in _chain)
+            chain.AddLast(item);
+        return new FirstReturnProjection<T>(chain);
+    }
 }

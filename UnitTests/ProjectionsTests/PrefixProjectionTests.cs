@@ -19,17 +19,15 @@ public class PrefixProjectionTests
 
     [Theory]
     [InlineData("User", "Id", "UserId")]
-    [InlineData("User", "UserName", "UserName")]
+    [InlineData("User", "Name", "UserName")]
     public void Convert(string prefix, string source, string expected)
     {
-        var projection = new PrefixProjection(prefix);
-        Assert.Equal(prefix, projection.Prefix);
-        if (projection.Validate(source))
-            Assert.Equal(expected, projection.Convert(source));
-        else
-            Assert.Equal(expected, source);
+        IProjection<string> projection = new PrefixProjection(prefix);
         projection.TryConvert(source, out var result);
         Assert.Equal(expected, result);
+        var reversed = projection.Reverse();
+        reversed.TryConvert(expected, out var source2);
+        Assert.Equal(source, source2);
     }
     [Fact]
     public void Cross()

@@ -87,8 +87,8 @@ public class MemberRuleParserTests
     [Fact]
     public void Separators()
     {
-        var parser = new MemberRuleParser("I:", "E:", [',', ' '], StringComparer.Ordinal);
-        var rule = parser.Parse("I: Id, Name");
+        var parser = new MemberRuleParser("I:", "E:", [' ', '/'], StringComparer.Ordinal);
+        var rule = parser.Parse("I: Id/Name");
         Assert.NotNull(rule);
         Assert.True(rule.Validate("Id"));
         Assert.True(rule.Validate("Name"));

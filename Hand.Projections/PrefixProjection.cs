@@ -13,6 +13,8 @@ public class PrefixProjection(string prefix, StringComparison comparison = Strin
 {
     #region 配置
     private readonly string _prefix = prefix;
+    private readonly StringComparison _comparison = comparison;
+
     /// <summary>
     /// 前缀
     /// </summary>
@@ -54,4 +56,7 @@ public class PrefixProjection(string prefix, StringComparison comparison = Strin
         return source;
     }
     #endregion
+    /// <inheritdoc />
+    IProjection<string> IProjection<string>.Reverse()
+        => new RemovePrefixProjection(_prefix, _comparison);
 }
