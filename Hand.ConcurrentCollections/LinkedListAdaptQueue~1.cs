@@ -1,4 +1,5 @@
 using Hand.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Hand.ConcurrentCollections;
 
@@ -9,6 +10,7 @@ namespace Hand.ConcurrentCollections;
 /// <param name="target"></param>
 public class LinkedListAdaptQueue<TItem>(LinkedList<TItem> target)
     : IQueue<TItem>
+    where TItem : notnull
 {
     /// <summary>
     /// LinkedList适配器队列
@@ -67,7 +69,7 @@ public class LinkedListAdaptQueue<TItem>(LinkedList<TItem> target)
         }
     }
     /// <inheritdoc />
-    public bool TryDequeue(out TItem? item)
+    public bool TryDequeue([NotNullWhen(true)] out TItem? item)
     {
         if (_target.Count > 0)
         {

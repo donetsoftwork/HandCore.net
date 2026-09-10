@@ -1,4 +1,6 @@
-﻿namespace Hand.Convert;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Hand.Convert;
 
 /// <summary>
 /// 解析器
@@ -13,5 +15,5 @@ public interface IParser<TResource, TResult>
     /// <param name="resource"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-    bool TryParse(TResource resource, out TResult result);
+    bool TryParse(TResource resource, [NotNullWhen(true)] out TResult result);
 }

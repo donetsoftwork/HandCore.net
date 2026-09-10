@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Hand.Collections;
 
 /// <summary>
@@ -20,5 +22,5 @@ public interface IQueue<TItem>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool TryDequeue(out TItem? item);
+    bool TryDequeue([NotNullWhen(true)] out TItem? item);
 }

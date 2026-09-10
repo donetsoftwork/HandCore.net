@@ -33,6 +33,7 @@ public class ReduceOptions
     /// <param name="processor"></param>
     /// <returns></returns>
     public static ReduceJobService<TItem> CreateJob<TItem>(ReduceOptions options, IQueue<TItem> queue, IQueueProcessor<TItem> processor)
+        where TItem : notnull
         => new(queue, processor, options);
     /// <summary>
     /// 构造作业服务
@@ -42,6 +43,7 @@ public class ReduceOptions
     /// <param name="processor"></param>
     /// <returns></returns>
     public ReduceJobService<TItem> CreateJob<TItem>(IQueue<TItem> queue, IQueueProcessor<TItem> processor)
+        where TItem : notnull
         => CreateJob(this, queue, processor);
     /// <summary>
     /// 构造作业服务
@@ -50,6 +52,7 @@ public class ReduceOptions
     /// <param name="processor"></param>
     /// <returns></returns>
     public ReduceJobService<TItem> CreateJob<TItem>(IQueueProcessor<TItem> processor)
+        where TItem : notnull
         => CreateJob(this, new ConcurrentQueueAdapter<TItem>(), processor);
     /// <summary>
     /// 构造作业服务

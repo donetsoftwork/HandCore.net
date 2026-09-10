@@ -50,7 +50,7 @@ public class ConcurrentQueueTests(ITestOutputHelper output)
             var sw = Stopwatch.StartNew();
             queue.TryDequeue(out var first);
             sw.Stop();
-            _output.WriteLine(first.ToString() + " Span :" + sw.Elapsed.TotalMilliseconds);
+            _output.WriteLine(first?.ToString() + " Span :" + sw.Elapsed.TotalMilliseconds);
         }
     }
     [Fact]
@@ -72,7 +72,7 @@ public class ConcurrentQueueTests(ITestOutputHelper output)
             var sw = Stopwatch.StartNew();
             queue.TryDequeue(out var first);
             sw.Stop();
-            _output.WriteLine(first.ToString() + " Span :" + sw.Elapsed.TotalMilliseconds);
+            _output.WriteLine(first?.ToString() + " Span :" + sw.Elapsed.TotalMilliseconds);
         }
     }
 

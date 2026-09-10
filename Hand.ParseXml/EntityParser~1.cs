@@ -3,6 +3,7 @@ using Hand.Creational;
 using Hand.Maping;
 using Hand.ParseXml.Contracts;
 using Hand.Storage;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace Hand.ParseXml;
@@ -123,9 +124,9 @@ public class EntityParser<TEntity>(HandXml xml, ICreator<IMemberBuilder<TEntity>
         return builder.Build();
     }
     /// <inheritdoc />
-    public bool TryParse(XmlReader reader, out TEntity result)
+    public bool TryParse(XmlReader reader, [NotNullWhen(true)] out TEntity result)
     {
-        result = Get(reader);
+        result = Get(reader)!;
         return true;
     }
     /// <summary>

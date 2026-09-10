@@ -1,5 +1,6 @@
 using Hand.Collections;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Hand.ConcurrentCollections;
 
@@ -10,6 +11,7 @@ namespace Hand.ConcurrentCollections;
 /// <param name="target"></param>
 public class ConcurrentQueueAdapter<TItem>(ConcurrentQueue<TItem> target)
     : IQueue<TItem>
+    where TItem : notnull
 {
     /// <summary>
     /// ConcurrentQueue适配器
@@ -41,7 +43,7 @@ public class ConcurrentQueueAdapter<TItem>(ConcurrentQueue<TItem> target)
     public void Enqueue(TItem item)
         => _target.Enqueue(item);
     /// <inheritdoc />
-    public bool TryDequeue(out TItem? item)
+    public bool TryDequeue([NotNullWhen(true)] out TItem? item)
         => _target.TryDequeue(out item);
     #endregion
     /// <summary>
@@ -49,6 +51,6 @@ public class ConcurrentQueueAdapter<TItem>(ConcurrentQueue<TItem> target)
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public bool TryPeek(out TItem? item)
+    public bool TryPeek([NotNullWhen(true)] out TItem? item)
         => _target.TryPeek(out item);
 }

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Hand.Collections;
 
 /// <summary>
@@ -20,5 +22,5 @@ public interface IStack<TItem>
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    bool TryPop(out TItem? item);
+    bool TryPop([NotNullWhen(true)] out TItem? item);
 }

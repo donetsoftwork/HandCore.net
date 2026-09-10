@@ -1,5 +1,6 @@
 ﻿using Hand.Convert;
 using Hand.Maping;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace Hand.ParseXml.Nodes;
@@ -31,11 +32,11 @@ public class PrimitiveReader<TPrimitive>(IParser<XmlReader, string> original, IC
     #endregion
 
     /// <inheritdoc />
-    public override bool TryParse(XmlReader reader, out TPrimitive result)
+    public override bool TryParse(XmlReader reader, [NotNullWhen(true)] out TPrimitive result)
     {
         if (_original.TryParse(reader, out var originalResult))
         {
-            result = _converter.Convert(originalResult);
+            result = _converter.Convert(originalResult)!;
             return true;
         }
         result = _defaultValue;

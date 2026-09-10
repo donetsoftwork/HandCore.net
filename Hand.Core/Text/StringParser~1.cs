@@ -1,4 +1,5 @@
 ﻿using Hand.Convert;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Hand.Text;
 
@@ -12,10 +13,10 @@ public abstract class StringParser<TResult>
     , ISpanParser<char, TResult>
 {
     /// <inheritdoc />
-    public virtual bool TryParse(string resource, out TResult result)
+    public virtual bool TryParse(string resource, [NotNullWhen(true)] out TResult result)
         => TryParse(resource.AsSpan(), out result);
     /// <inheritdoc />
-    public virtual bool TryParse(char[] resource, out TResult result)
+    public virtual bool TryParse(char[] resource, [NotNullWhen(true)] out TResult result)
         => TryParse(resource.AsSpan(), out result);
     /// <inheritdoc />
     public abstract bool TryParse(ReadOnlySpan<char> resource, out TResult result);

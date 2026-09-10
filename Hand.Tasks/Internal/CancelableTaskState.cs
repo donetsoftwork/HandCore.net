@@ -1,5 +1,5 @@
 using Hand.Job;
-using Hand.Models;
+using Hand.Primitives;
 using Hand.Structural;
 
 namespace Hand.Tasks.Internal;
@@ -16,7 +16,7 @@ internal class CancelableTaskState(Func<CancellationToken, Task> original, Cance
     private readonly Func<CancellationToken, Task> _original = original;
     private readonly CancellationToken _token = token;
     /// <inheritdoc />
-    public Func<CancellationToken, Task> Original 
+    public Func<CancellationToken, Task> Original
         => _original;
     /// <summary>
     /// 取消令牌

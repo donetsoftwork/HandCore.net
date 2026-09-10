@@ -1,5 +1,6 @@
 using Hand.Collections;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Hand.ConcurrentCollections;
 
@@ -10,6 +11,7 @@ namespace Hand.ConcurrentCollections;
 /// <param name="target"></param>
 public class ConcurrentStackAdapter<TItem>(ConcurrentStack<TItem> target)
     : IStack<TItem>
+    where TItem : notnull
 {
     #region 配置
     private readonly ConcurrentStack<TItem> _target = target;
@@ -34,14 +36,14 @@ public class ConcurrentStackAdapter<TItem>(ConcurrentStack<TItem> target)
     public void Push(TItem item)
         => _target.Push(item);
     /// <inheritdoc />
-    public bool TryPop(out TItem? item)
-        => TryPop(out item);
+    public bool TryPop([NotNullWhen(true)] out TItem? item)
+        => _target.TryPop(out item);
     #endregion
     /// <summary>
     /// 尝试获取
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    public bool TryPeek(out TItem? item)
+    public bool TryPeek([NotNullWhen(true)] out TItem? item)
         => _target.TryPeek(out item);
 }

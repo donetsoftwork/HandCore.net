@@ -18,6 +18,10 @@
       <Build Solution="Release|Any CPU" Project="false" />
     </Project>
   </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/enumeration.md" />
+    <File Path="docs/projection.md" />
+  </Folder>
   <Folder Name="/Events/">
     <File Path="Events/readme.md" />
     <Project Path="Events/Hand.EventAsyncBuses/Hand.EventAsyncBuses.csproj" />
@@ -30,6 +34,7 @@
     <Project Path="UnitTests/ConcurrentCollectionTests/ConcurrentCollectionTests.csproj" />
     <Project Path="UnitTests/EventBusTests/EventBusTests.csproj" />
     <Project Path="UnitTests/Hand.EnumerationTests/Hand.EnumerationTests.csproj" />
+    <Project Path="UnitTests/Hand.ReflectionEnumerationTests/Hand.ReflectionEnumerationTests.csproj" Id="5a60105d-72ff-43d2-80da-a86e30a86dac" />
     <Project Path="UnitTests/Hand.ValidationTests/Hand.ValidationTests.csproj" />
     <Project Path="UnitTests/JobTests/JobTests.csproj" />
     <Project Path="UnitTests/MemberValidationTests/MemberValidationTests.csproj" />
@@ -67,6 +72,7 @@
   </Project>
   <Project Path="Hand.Projections/Hand.Projections.csproj" />
   <Project Path="Hand.Reflection/Hand.Reflection.csproj" />
+  <Project Path="Hand.ReflectionEnumeration/Hand.ReflectionEnumeration.csproj" Id="8b1cd280-a69e-4193-9727-bdf377501248" />
   <Project Path="Hand.Services/Hand.Services.csproj" />
   <Project Path="Hand.Tasks/Hand.Tasks.csproj" />
   <Project Path="Hand.Validation/Hand.Validation.csproj" />

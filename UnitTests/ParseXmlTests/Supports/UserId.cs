@@ -1,4 +1,4 @@
-﻿using Hand.Models;
+﻿using Hand.Primitives;
 
 namespace ParseXmlTests.Supports;
 

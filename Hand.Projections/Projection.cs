@@ -1,9 +1,5 @@
 ﻿using Hand.Comparers;
 using Hand.Maping.Complexs;
-using Hand.Rule;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Hand.Maping;

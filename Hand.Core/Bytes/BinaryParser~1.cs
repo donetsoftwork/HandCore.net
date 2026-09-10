@@ -1,4 +1,5 @@
 ﻿using Hand.Convert;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Hand.Bytes;
 
@@ -11,8 +12,8 @@ public abstract class BinaryParser<TResult>
     , ISpanParser<byte, TResult>
 {
     /// <inheritdoc />
-    public virtual bool TryParse(byte[] resource, out TResult result)
+    public virtual bool TryParse(byte[] resource, [NotNullWhen(true)] out TResult result)
         => TryParse(resource.AsSpan(), out result);
     /// <inheritdoc />
-    public abstract bool TryParse(ReadOnlySpan<byte> resource, out TResult result);
+    public abstract bool TryParse(ReadOnlySpan<byte> resource, [NotNullWhen(true)] out TResult result);
 }

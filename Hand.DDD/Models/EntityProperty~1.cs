@@ -1,3 +1,5 @@
+using Hand.Primitives;
+
 namespace Hand.Models;
 
 /// <summary>
@@ -51,7 +53,7 @@ public abstract class EntityProperty<TProperty>(TProperty original)
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        if(_original is null)
+        if (_original is null)
             return 0;
         return _original.GetHashCode();
     }

@@ -1,4 +1,4 @@
-namespace Hand.Models;
+namespace Hand.Primitives;
 
 /// <summary>
 /// 实体标识

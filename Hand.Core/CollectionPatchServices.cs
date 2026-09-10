@@ -1,11 +1,13 @@
-﻿namespace Hand.Collections;
+﻿#if NETSTANDARD2_0 || NETFRAMEWORK
+using System.Runtime.CompilerServices;
+namespace Hand;
 
 /// <summary>
 /// 集合补丁扩展方法
 /// </summary>
-public static partial class HandCoreCollectionServices
+public static partial class HandCoreServices
 {
-#if NETSTANDARD2_0 || NETFRAMEWORK
+
     /// <summary>
     /// 获取值或默认值
     /// </summary>
@@ -14,7 +16,8 @@ public static partial class HandCoreCollectionServices
     /// <param name="dictionary"></param>
     /// <param name="key"></param>
     /// <returns></returns>
-    public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key)
         where TKey : notnull
         => dictionary.GetValueOrDefault(key, default!);
     /// <summary>
@@ -26,7 +29,8 @@ public static partial class HandCoreCollectionServices
     /// <param name="key"></param>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
-    public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static TValue GetValueOrDefault<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue)
         => dictionary.TryGetValue(key, out var value) ? value : defaultValue;
     /// <summary>
     /// 尝试添加
@@ -44,5 +48,5 @@ public static partial class HandCoreCollectionServices
         dictionary.Add(key, value);
         return true;
     }
-#endif
 }
+#endif

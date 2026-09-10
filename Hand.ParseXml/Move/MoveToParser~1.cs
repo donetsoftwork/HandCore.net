@@ -1,5 +1,6 @@
 ﻿using Hand.Convert;
 using Hand.ParseXml.Nodes;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace Hand.ParseXml.Move;
@@ -32,7 +33,7 @@ public class MoveToParser<TResult>(string name, IParser<XmlReader, TResult> orig
     #endregion
 
     /// <inheritdoc />
-    public virtual bool TryParse(XmlReader reader, out TResult result)
+    public virtual bool TryParse(XmlReader reader, [NotNullWhen(true)] out TResult result)
     {
         if (reader.ReadToDescendant(_name) && _original.TryParse(reader, out result))
             return true;

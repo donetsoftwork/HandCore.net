@@ -68,6 +68,24 @@ public static class CompareConverter
         return EqualityComparer<TKey>.Default;
     }
     /// <summary>
+    /// 获取字典比较器
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="owner"></param>
+    /// <returns></returns>
+    public static IEqualityComparer<TKey> GetComparer<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> owner)
+        where TKey : notnull
+    {
+        if (owner is Dictionary<TKey, TValue> dictionary)
+            return dictionary.Comparer;
+#if NET7_0_OR_GREATER
+        if (owner is ConcurrentDictionary<TKey, TValue> concurrentDictionary)
+            return concurrentDictionary.Comparer;
+#endif
+        return EqualityComparer<TKey>.Default;
+    }
+    /// <summary>
     /// 获取集合比较器
     /// </summary>
     /// <typeparam name="T"></typeparam>

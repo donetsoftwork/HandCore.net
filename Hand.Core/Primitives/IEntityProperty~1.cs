@@ -1,6 +1,6 @@
 using Hand.Structural;
 
-namespace Hand.Models;
+namespace Hand.Primitives;
 
 /// <summary>
 /// 实体属性

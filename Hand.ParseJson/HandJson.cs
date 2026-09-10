@@ -105,7 +105,7 @@ public class HandJson(IMemberBuilderProvider builderProvider, DefaultValueBuilde
     /// <typeparam name="TValue"></typeparam>
     /// <returns></returns>
     public PropertyNameParser<TValue> PropertyName<TValue>()
-        => new(PrimitiveReaderCacher.Parser as ISpanParser<byte, TValue> ?? throw new NotSupportedException($"不支持类型{typeof(TValue).FullName}"), _defaultValues.Get<TValue>());
+        => new(PrimitiveReaderCacher.Parser as ISpanParser<byte, TValue> ?? StringConverter.Instance as ISpanParser<byte, TValue> ?? throw new NotSupportedException($"不支持类型{typeof(TValue).FullName}"), _defaultValues.Get<TValue>());
     /// <summary>
     /// 属性名读取
     /// </summary>

@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Hand.Reflection;
 
@@ -7,69 +8,92 @@ namespace Hand.Reflection;
 /// </summary>
 public static class ReflectionMember
 {
-    #region GetPropery
+    #region GetProperties
+    /// <summary>
+    /// 筛选属性
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="binding"></param>
+    /// <returns></returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<PropertyInfo> GetProperties<T>(Func<PropertyInfo, bool> filter, BindingFlags binding = BindingFlags.Instance | BindingFlags.Public)
+        => typeof(T).GetProperties(binding).Where(filter);
     /// <summary>
     /// 筛选属性
     /// </summary>
     /// <param name="declareType"></param>
     /// <param name="filter"></param>
+    /// <param name="binding"></param>
     /// <returns></returns>
-    public static PropertyInfo? GetPropery(Type declareType, Func<PropertyInfo, bool> filter)
-    {
-        var properties = declareType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-        foreach (var propery in properties)
-        {
-            if (filter(propery))
-                return propery;
-        }
-        return null;
-    }
-    #endregion
-    #region Properties
-    /// <summary>
-    /// 获取所有属性
-    /// </summary>
-    /// <typeparam name="TStructuralType"></typeparam>
-    /// <returns></returns>
-    public static PropertyInfo[] GetProperties<TStructuralType>()
-        => GetProperties(typeof(TStructuralType));
-    /// <summary>
-    /// 获取所有属性
-    /// </summary>
-    /// <returns></returns>
-    public static PropertyInfo[] GetProperties(Type declareType)
-        => declareType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<PropertyInfo> GetProperties(Type declareType, Func<PropertyInfo, bool> filter, BindingFlags binding = BindingFlags.Instance | BindingFlags.Public)
+        => declareType.GetProperties(binding).Where(filter);
     #endregion
     #region GetFields
     /// <summary>
-    /// 获取所有实例字段
+    /// 筛选字段
     /// </summary>
-    /// <typeparam name="TStructuralType"></typeparam>
+    /// <param name="filter"></param>
+    /// <param name="binding"></param>
     /// <returns></returns>
-    public static FieldInfo[] GetFields<TStructuralType>()
-        => GetFields(typeof(TStructuralType));
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<FieldInfo> GetFields<T>(Func<FieldInfo, bool> filter, BindingFlags binding = BindingFlags.Static | BindingFlags.Public)
+        => typeof(T).GetFields(binding).Where(filter);
     /// <summary>
-    /// 获取所有实例字段
+    /// 筛选字段
     /// </summary>
+    /// <param name="declareType"></param>
+    /// <param name="filter"></param>
+    /// <param name="binding"></param>
     /// <returns></returns>
-    public static FieldInfo[] GetFields(Type declareType)
-        => declareType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+    public static IEnumerable<FieldInfo> GetFields(Type declareType, Func<FieldInfo, bool> filter, BindingFlags binding = BindingFlags.Static | BindingFlags.Public)
+        => declareType.GetFields(binding).Where(filter);
     #endregion
-    #region GetStaticFields
-    /// <summary>
-    /// 获取所有静态字段
-    /// </summary>
-    /// <typeparam name="TStructuralType"></typeparam>
-    /// <returns></returns>
-    public static FieldInfo[] GetStaticFields<TStructuralType>()
-        => GetStaticFields(typeof(TStructuralType));
-    /// <summary>
-    /// 获取所有静态字段
-    /// </summary>
-    /// <returns></returns>
-    public static FieldInfo[] GetStaticFields(Type declareType)
-        => declareType.GetFields(BindingFlags.Static | BindingFlags.Public);
-    #endregion
+    //#region Properties
+    ///// <summary>
+    ///// 获取所有属性
+    ///// </summary>
+    ///// <typeparam name="TStructuralType"></typeparam>
+    ///// <returns></returns>
+    //public static PropertyInfo[] GetProperties<TStructuralType>()
+    //    => GetProperties(typeof(TStructuralType));
+    ///// <summary>
+    ///// 获取所有属性
+    ///// </summary>
+    ///// <returns></returns>
+    //public static PropertyInfo[] GetProperties(Type declareType)
+    //    => declareType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+    //#endregion
+    //#region GetFields
+    ///// <summary>
+    ///// 获取所有实例字段
+    ///// </summary>
+    ///// <typeparam name="TStructuralType"></typeparam>
+    ///// <returns></returns>
+    //public static FieldInfo[] GetFields<TStructuralType>()
+    //    => GetFields(typeof(TStructuralType));
+    ///// <summary>
+    ///// 获取所有实例字段
+    ///// </summary>
+    ///// <returns></returns>
+    //public static FieldInfo[] GetFields(Type declareType)
+    //    => declareType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+    //#endregion
+    //#region GetStaticFields
+    ///// <summary>
+    ///// 获取所有静态字段
+    ///// </summary>
+    ///// <typeparam name="TStructuralType"></typeparam>
+    ///// <returns></returns>
+    //public static FieldInfo[] GetStaticFields<TStructuralType>()
+    //    => GetStaticFields(typeof(TStructuralType));
+    ///// <summary>
+    ///// 获取所有静态字段
+    ///// </summary>
+    ///// <returns></returns>
+    //public static FieldInfo[] GetStaticFields(Type declareType)
+    //    => declareType.GetFields(BindingFlags.Static | BindingFlags.Public);
+    //#endregion
     #region ConstructorInfo
     /// <summary>
     /// 获取构造函数

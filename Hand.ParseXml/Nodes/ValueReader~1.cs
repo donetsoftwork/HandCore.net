@@ -1,5 +1,6 @@
 ﻿using Hand.Configuration;
 using Hand.Convert;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace Hand.ParseXml.Nodes;
@@ -24,5 +25,5 @@ public abstract class ValueReader<TValue>(TValue defaultValue)
     #endregion
 
     /// <inheritdoc />
-    public abstract bool TryParse(XmlReader reader, out TValue result);
+    public abstract bool TryParse(XmlReader reader, [NotNullWhen(true)] out TValue result);
 }

@@ -1,4 +1,5 @@
 ﻿using Hand.Convert;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace Hand.ParseXml.Nodes;
@@ -30,7 +31,7 @@ public class ElementParser<TResult>(string name, IParser<XmlReader, TResult> ori
     #endregion
 
     /// <inheritdoc />
-    public bool TryParse(XmlReader reader, out TResult result)
+    public bool TryParse(XmlReader reader, [NotNullWhen(true)] out TResult result)
     {
         if (reader.NodeType == XmlNodeType.Element
             && reader.LocalName == _name

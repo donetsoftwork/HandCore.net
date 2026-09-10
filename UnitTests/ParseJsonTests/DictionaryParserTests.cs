@@ -11,7 +11,7 @@ public class DictionaryParserTests
         string json = "[{ \"Id\": 1, \"Name\": \"张三\"}, { \"Id\": 2, \"Name\": \"李四\"}]";
 
         var config = HandJson.Default;
-        var dictionaryReader = config.Property<int>(nameof(User.Id))            
+        var dictionaryReader = config.Property<int>(nameof(User.Id))
             .Dictionary(config.Property("Name").First());
         IDictionary<int, string> result = dictionaryReader.Parse(json);
         Assert.Equal(2, result.Count);

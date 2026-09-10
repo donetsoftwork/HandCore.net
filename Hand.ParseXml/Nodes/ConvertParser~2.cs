@@ -1,6 +1,7 @@
 ﻿using Hand.Configuration;
 using Hand.Convert;
 using Hand.Maping;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace Hand.ParseXml.Nodes;
@@ -34,11 +35,11 @@ public class ConvertParser<TSource, TDest>(IParser<XmlReader, TSource> original,
     #endregion
 
     /// <inheritdoc />
-    public bool TryParse(XmlReader reader, out TDest result)
+    public bool TryParse(XmlReader reader, [NotNullWhen(true)] out TDest result)
     {
         if(_original.TryParse(reader, out var originalResult))
         {
-            result = _converter.Convert(originalResult);
+            result = _converter.Convert(originalResult)!;
             return true;
         }
         result = _defaultValue;

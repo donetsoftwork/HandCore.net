@@ -1,5 +1,6 @@
 ﻿using Hand.Convert;
 using Hand.ParseXml.Nodes;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace Hand.ParseXml;
@@ -23,7 +24,7 @@ public class FirstReader<TResult>(IParser<XmlReader, TResult> original, TResult 
     #endregion
 
     /// <inheritdoc />
-    public override bool TryParse(XmlReader reader, out TResult result)
+    public override bool TryParse(XmlReader reader, [NotNullWhen(true)] out TResult result)
     {
         var depth = reader.Depth;
         do

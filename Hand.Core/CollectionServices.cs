@@ -1,12 +1,12 @@
 ﻿using Hand.Comparers;
 using System.Runtime.CompilerServices;
 
-namespace Hand.Collections;
+namespace Hand;
 
 /// <summary>
 /// 集合扩展方法
 /// </summary>
-public static partial class HandCoreCollectionServices
+public static partial class HandCoreServices
 {
     /// <summary>
     /// 排除
@@ -80,13 +80,4 @@ public static partial class HandCoreCollectionServices
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Add<TKey, TValue>(this IDictionary<TKey, ISet<TValue>> group, TKey key, TValue value)
         => Add(group, key, value, EqualityComparer<TValue>.Default);
-
-//    public static ISet<TValue> ToSet<TValue>(this IEnumerable<TValue> values, IEqualityComparer<TValue> comparer)
-//    {
-//#if NET7_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-//        return values.ToHashSet(comparer);
-//#else
-//        return new HashSet<TValue>(values, comparer);
-//#endif
-//    }
 }

@@ -1,4 +1,5 @@
 using Hand.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Hand.ConcurrentCollections;
 
@@ -9,6 +10,7 @@ namespace Hand.ConcurrentCollections;
 /// <param name="target"></param>
 public class LinkedListAdaptStack<TItem>(LinkedList<TItem> target)
     : IStack<TItem>
+    where TItem : notnull
 {
     #region 配置
     private readonly LinkedList<TItem> _target = target;
@@ -43,7 +45,7 @@ public class LinkedListAdaptStack<TItem>(LinkedList<TItem> target)
         }
     }
     /// <inheritdoc />
-    public bool TryPop(out TItem? item)
+    public bool TryPop([NotNullWhen(true)] out TItem? item)
     {
         if (_target.Count > 0)
         {
@@ -62,9 +64,9 @@ public class LinkedListAdaptStack<TItem>(LinkedList<TItem> target)
                     _target.RemoveLast();
                 }
             }
-            if (state)
+            if (state && last is not null)
             {
-                item = last!.Value;
+                item = last.Value;
                 return true;
             }
         }
