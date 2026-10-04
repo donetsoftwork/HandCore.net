@@ -19,30 +19,21 @@ public static partial class ReflectionEnumeration
     /// <typeparam name="TEnum"></typeparam>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static (IReadOnlyDictionary<string, Enumeration>, IReadOnlyDictionary<long, Enumeration>) GetEnumDictionary<TEnum>(IEqualityComparer<string> comparer)
+    public static IDictionary<string, Enumeration> GetEnumDictionary<TEnum>(IEqualityComparer<string> comparer)
         where TEnum : Enum
     {
         var names = new Dictionary<string, Enumeration>(comparer);
-        var originals = new Dictionary<long, Enumeration>();
         foreach (var field in typeof(TEnum).GetFields(BindingFlags.Static | BindingFlags.Public))
         {
             var name = field.Name;
             var original = System.Convert.ToInt64(field.GetValue(null));
-            var member = field.GetCustomAttribute<EnumMemberAttribute>();
-            if (originals.TryGetValue(original, out var enumeration))
-            {
-                // 处理枚举别名
-                names[name] = enumeration;
-                CheckEnumMember(names, member, enumeration);
-                continue;
-            }
             var description = field.GetCustomAttribute<DescriptionAttribute>();
             var item = new Enumeration(name, original, description?.Description ?? string.Empty);
-            originals.Add(original, item);
             names[name] = item;
+            var member = field.GetCustomAttribute<EnumMemberAttribute>();
             CheckEnumMember(names, member, item);
         }
-        return (names, originals);
+        return names;
     }
     /// <summary>
     /// 反射位标记枚举类型为字典
@@ -50,15 +41,16 @@ public static partial class ReflectionEnumeration
     /// <typeparam name="TEnum"></typeparam>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static (FlagEnumeration[], IReadOnlyDictionary<string, FlagEnumeration>, IReadOnlyDictionary<long, FlagEnumeration>) GetFlagEnumDictionary<TEnum>(IEqualityComparer<string> comparer)
+    public static (List<FlagEnumeration>, List<FlagEnumeration>, IDictionary<string, FlagEnumeration>, IDictionary<long, FlagEnumeration>) GetFlagEnumDictionary<TEnum>(IEqualityComparer<string> comparer)
         where TEnum : Enum
     {
-        var names = new Dictionary<string, FlagEnumeration>(comparer);
-        var originals = new Dictionary<long, FlagEnumeration>();
-        var flags = new List<FlagEnumeration>();
-        // 预计下一个位标记值
-        var expectedFlag = 1L;
-        foreach (var field in typeof(TEnum).GetFields(BindingFlags.Static | BindingFlags.Public))
+        var fields = typeof(TEnum).GetFields(BindingFlags.Static | BindingFlags.Public);
+        var count = fields.Length;
+        var names = new Dictionary<string, FlagEnumeration>(count, comparer);
+        var originals = new Dictionary<long, FlagEnumeration>(count);
+        var items = new List<FlagEnumeration>(count);
+        var flags = new List<FlagEnumeration>(count);
+        foreach (var field in fields)
         {
             var name = field.Name;
             var original = System.Convert.ToInt64(field.GetValue(null));
@@ -75,7 +67,7 @@ public static partial class ReflectionEnumeration
             {
                 item = CreateFlag(comparer, name, 0L, field.GetCustomAttribute<DescriptionAttribute>());
             }
-            else if (CheckExpected(original, ref expectedFlag))
+            else if (FlagEnumeration.VerifyFlag(original))
             {
                 item = CreateFlag(comparer, name, original, field.GetCustomAttribute<DescriptionAttribute>());
                 flags.Add(item);
@@ -90,8 +82,9 @@ public static partial class ReflectionEnumeration
             CheckEnumMember(names, member, item);
             originals.Add(original, item);
             names[name] = item;
+            items.Add(item);
         }
-        return ([.. flags], names, originals);
+        return (items, flags, names, originals);
     }
     #endregion
     /// <summary>
@@ -121,111 +114,27 @@ public static partial class ReflectionEnumeration
         }
     }
     /// <summary>
-    /// 判断是否为标准位标记值
-    /// </summary>
-    /// <param name="original"></param>
-    /// <param name="expectedFlag"></param>
-    /// <returns></returns>
-    public static bool CheckExpected(long original, ref long expectedFlag)
-    {
-        if (original == expectedFlag)
-            return true;
-        if (original > expectedFlag)
-        {
-            expectedFlag <<= 1;
-            return CheckExpected(original, ref expectedFlag);
-        }
-        return false;
-    }
-    /// <summary>
     /// 反射枚举类为字典
     /// </summary>
     /// <typeparam name="TEnumeration"></typeparam>
     /// <returns></returns>
-    public static (IReadOnlyDictionary<string, TEnumeration>, IReadOnlyDictionary<long, TEnumeration>) GetEnumerationDictionary<TEnumeration>(IEqualityComparer<string>? comparer = null)
+    public static IDictionary<string, TEnumeration> GetEnumerationDictionary<TEnumeration>(IEqualityComparer<string>? comparer = null)
         where TEnumeration : IEnumeration
     {
         var names = new Dictionary<string, TEnumeration>(comparer ?? StringComparer.Ordinal);
-        var originals = new Dictionary<long, TEnumeration>();
         var fields = typeof(TEnumeration).GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly);
         foreach (var field in fields)
         {
-            CheckEnumeration(field.Name, field.GetValue(null));
+            if (field.GetValue(null) is TEnumeration item)
+                names[field.Name] = item;
         }
-
         var properties = typeof(TEnumeration).GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly);
         foreach (var property in properties)
         {
-            if (property.CanRead)
-            {
-                CheckEnumeration(property.Name, property.GetValue(null));
-            }
+            if (property.CanRead && property.GetValue(null) is TEnumeration item)
+                names[property.Name] = item;
         }
-        void CheckEnumeration(string name, object? instance)
-        {
-            if (instance is null)
-                return;
-            if (instance is not TEnumeration item)
-                return;
-            var original = item.Original;
-            if (originals.TryGetValue(original, out var enumeration))
-            {
-                // 处理枚举别名
-                names[name] = enumeration;
-                return;
-            }
-            originals.Add(original, item);
-            names[name] = item;
-        }
-        return (names, originals);
-    }
-    /// <summary>
-    /// 反射位标记枚举类为字典
-    /// </summary>
-    /// <typeparam name="TEnumeration"></typeparam>
-    /// <returns></returns>
-    public static (TEnumeration[], IReadOnlyDictionary<string, TEnumeration>, IReadOnlyDictionary<long, TEnumeration>) GetFlagEnumerationDictionary<TEnumeration>(IEqualityComparer<string>? comparer = null)
-        where TEnumeration : IFlagEnumeration
-    {
-        var names = new Dictionary<string, TEnumeration>(comparer ?? StringComparer.Ordinal);
-        var originals = new Dictionary<long, TEnumeration>();
-        var fields = typeof(TEnumeration).GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly);
-        var flags = new List<TEnumeration>();
-        // 预计下一个位标记值
-        var expectedFlag = 1L;
-        foreach (var field in fields)
-        {
-            CheckEnumeration(field.Name, field.GetValue(null));
-        }
-
-        var properties = typeof(TEnumeration).GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly);
-        expectedFlag = 1L;
-        foreach (var property in properties)
-        {
-            if (property.CanRead)
-            {
-                CheckEnumeration(property.Name, property.GetValue(null));
-            }
-        }
-        void CheckEnumeration(string name, object? instance)
-        {
-            if (instance is null)
-                return;
-            if (instance is not TEnumeration item)
-                return;
-            var original = item.Original;
-            if (originals.TryGetValue(original, out var enumeration))
-            {
-                // 处理枚举别名
-                names[name] = enumeration;
-                return;
-            }
-            originals.Add(original, item);
-            names[name] = item;
-            if (CheckExpected(original, ref expectedFlag))
-                flags.Add(item);
-        }
-        return ([.. flags], names, originals);
+        return names;
     }
     #endregion
     /// <summary>
@@ -251,10 +160,7 @@ public static partial class ReflectionEnumeration
     /// <returns></returns>
     public static EnumerationProvider<Enumeration> GetEnumProvider<TEnum>(IEqualityComparer<string>? comparer = null)
         where TEnum : Enum
-    {
-        var (names, originals) = GetEnumDictionary<TEnum>(comparer ?? StringComparer.Ordinal);
-        return new([.. originals.Values], names, originals);
-    }
+        => new(GetEnumDictionary<TEnum>(comparer ?? StringComparer.Ordinal));
     /// <summary>
     /// 获取枚举提供者
     /// </summary>
@@ -264,9 +170,8 @@ public static partial class ReflectionEnumeration
     public static FlagEnumerationProvider GetFlagEnumProvider<TEnum>(IEqualityComparer<string>? comparer = null)
         where TEnum : struct, Enum
     {
-        comparer ??= StringComparer.Ordinal;
-        var (flags, names, originals) = GetFlagEnumDictionary<TEnum>(comparer);
-        return new(flags, names, originals);
+        var(items, flags, names, originals) = GetFlagEnumDictionary<TEnum>(comparer ?? StringComparer.Ordinal);
+        return new(items, flags, names, originals);
     }
     /// <summary>
     /// 获取枚举提供者
@@ -276,10 +181,7 @@ public static partial class ReflectionEnumeration
     /// <returns></returns>
     public static EnumerationProvider<TEnumeration> GetEnumerationProvider<TEnumeration>(IEqualityComparer<string>? comparer = null)
         where TEnumeration : IEnumeration
-    {
-        var (names, originals) = GetEnumerationDictionary<TEnumeration>(comparer);
-        return new([.. originals.Values], names, originals);
-    }
+        => new(GetEnumerationDictionary<TEnumeration>(comparer));
     /// <summary>
     /// 获取枚举提供者
     /// </summary>
@@ -288,8 +190,5 @@ public static partial class ReflectionEnumeration
     /// <returns></returns>
     public static FlagReflectionProvider<TEnumeration> GetFlagEnumerationProvider<TEnumeration>(IEqualityComparer<string>? comparer = null)
          where TEnumeration : IFlagEnumeration
-    {
-        var (flags, names, originals) = GetFlagEnumerationDictionary<TEnumeration>(comparer);
-        return new(flags, names, originals);
-    }
+        => new(GetEnumerationDictionary<TEnumeration>(comparer));
 }

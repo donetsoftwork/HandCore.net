@@ -9,6 +9,32 @@ namespace Hand;
 /// </summary>
 public static partial class HandCoreServices
 {
+    #region Get
+    /// <summary>
+    /// 获取枚举
+    /// </summary>
+    /// <param name="provider"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static TEnumeration? Get<TEnumeration>(this IEnumerationProvider<TEnumeration> provider, string name)
+        where TEnumeration : IEnumeration
+    {
+        provider.TryGet(name, out var value);
+        return value;
+    }
+    /// <summary>
+    /// 获取枚举
+    /// </summary>
+    /// <param name="provider"></param>
+    /// <param name="original"></param>
+    /// <returns></returns>
+    public static TEnumeration? Get<TEnumeration>(this IEnumerationProvider<TEnumeration> provider, long original)
+        where TEnumeration : IEnumeration
+    {
+        provider.TryGet(original, out var value);
+        return value;
+    }
+    #endregion
     /// <summary>
     /// 判断是否包含指定位域
     /// </summary>

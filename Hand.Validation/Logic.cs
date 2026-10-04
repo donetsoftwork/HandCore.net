@@ -1,11 +1,8 @@
 ﻿using Hand.Comparers;
 using Hand.Rule.Logics;
-using System;
 #if NET8_0_OR_GREATER
 using System.Collections.Frozen;
 #endif
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Hand.Rule;

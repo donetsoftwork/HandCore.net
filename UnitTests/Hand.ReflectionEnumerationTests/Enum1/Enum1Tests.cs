@@ -8,7 +8,7 @@ public class Enum1Tests
     public void GetEnumprovider()
     {
         IEnumerationProvider<Enumeration> provider = ReflectionEnumeration.GetEnumProvider<CardType>();
-        Enumeration[] cardTypes = provider.Items;
+        Enumeration[] cardTypes = [.. provider.Items];
         Assert.Equal(4, cardTypes.Length);
     }
     [Fact]
@@ -16,8 +16,7 @@ public class Enum1Tests
     {
         IEnumerationProvider<Enumeration> provider = ReflectionEnumeration.GetEnumProvider<CardType>();
         // 按枚举名获取
-        Enumeration? cardType = provider.Get(nameof(CardType.Silver));
-        Assert.NotNull(cardType);
+        Assert.True(provider.TryGet(nameof(CardType.Silver), out var cardType));
         Assert.Equal(nameof(CardType.Silver), cardType.Name);
         Assert.Empty(cardType.Description);
     }
@@ -26,8 +25,7 @@ public class Enum1Tests
     {
         IEnumerationProvider<Enumeration> provider = ReflectionEnumeration.GetEnumProvider<CardType>();
         // 按枚举值获取
-        Enumeration? cardType = provider.Get(2);
-        Assert.NotNull(cardType);
+        Assert.True(provider.TryGet(2, out var cardType));
         Assert.Equal(nameof(CardType.Gold), cardType.Name);
         Assert.Empty(cardType.Description);
     }
@@ -35,8 +33,7 @@ public class Enum1Tests
     public void FromEnum()
     {
         IEnumerationProvider<Enumeration> provider = ReflectionEnumeration.GetEnumProvider<CardType>();
-        Enumeration? cardType = provider.Get((long)CardType.Silver);
-        Assert.NotNull(cardType);
+        Assert.True(provider.TryGet((long)CardType.Silver, out var cardType));
         Assert.Equal(nameof(CardType.Silver), cardType.Name);
         Assert.Empty(cardType.Description);
     }

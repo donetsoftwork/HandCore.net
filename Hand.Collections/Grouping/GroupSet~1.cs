@@ -14,7 +14,7 @@ public class GroupSet<TValue>(IDictionary<string, ISet<TValue>> group, IEquality
     /// </summary>
     /// <param name="keyComparer"></param>
     /// <param name="valueComparer"></param>
-    public GroupSet(StringComparer keyComparer, IEqualityComparer<TValue> valueComparer)
+    public GroupSet(IEqualityComparer<string> keyComparer, IEqualityComparer<TValue> valueComparer)
         : this(new Dictionary<string, ISet<TValue>>(keyComparer), valueComparer)
     {
     }

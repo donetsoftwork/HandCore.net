@@ -4,11 +4,13 @@ namespace Hand.ReflectionEnumerationTests.Enum2;
 
 public class Enum2Tests
 {
+    public static readonly IEnumerationProvider<Enumeration> Provider = ReflectionEnumeration.GetEnumProvider<CardType>(StringComparer.OrdinalIgnoreCase);
+
     [Fact]
     public void GetEnumprovider()
     {
         IEnumerationProvider<Enumeration> provider = ReflectionEnumeration.GetEnumProvider<CardType>();
-        Enumeration[] cardTypes = provider.Items;
+        Enumeration[] cardTypes = [.. provider.Items];
         Assert.Equal(4, cardTypes.Length);
     }
     [Fact]
@@ -16,12 +18,11 @@ public class Enum2Tests
     {
         IEnumerationProvider<Enumeration> provider = ReflectionEnumeration.GetEnumProvider<CardType>(StringComparer.OrdinalIgnoreCase);
         // 按枚举名获取
-        Enumeration? silver = provider.Get(nameof(CardType.Silver));
-        Assert.NotNull(silver);
+        Assert.True(provider.TryGet(nameof(CardType.Silver), out var silver));
         Assert.Equal(nameof(CardType.Silver), silver.Name);
         Assert.Equal("银卡", silver.Description);
         // 按枚举别名获取
-        Enumeration? vip = provider.Get("vip");
+        Assert.True(provider.TryGet("Vip", out var vip));
         Assert.NotNull(vip);
         Assert.Equal(silver, vip);
     }
@@ -30,7 +31,7 @@ public class Enum2Tests
     {
         IEnumerationProvider<Enumeration> provider = ReflectionEnumeration.GetEnumProvider<CardType>();
         // 按枚举值获取
-        Enumeration? gold = provider.Get(2);
+        Assert.True(provider.TryGet(2, out var gold));
         Assert.NotNull(gold);
         Assert.Equal(nameof(CardType.Gold), gold.Name);
         Assert.Equal("金卡", gold.Description);
@@ -39,8 +40,7 @@ public class Enum2Tests
     public void FromEnum()
     {
         IEnumerationProvider<Enumeration> provider = ReflectionEnumeration.GetEnumProvider<CardType>();
-        Enumeration? cardType = provider.Get((long)CardType.Silver);
-        Assert.NotNull(cardType);
+        Assert.True(provider.TryGet((long)CardType.Silver, out var cardType));
         Assert.Equal(nameof(CardType.Silver), cardType.Name);
         Assert.Equal("银卡", cardType.Description);
     }
@@ -59,8 +59,7 @@ public class Enum2Tests
     {
         IEnumerationProvider<Enumeration> provider = ReflectionEnumeration.GetEnumProvider<CardType>(StringComparer.OrdinalIgnoreCase);
         // 用EnumMember标记定义别名
-        Enumeration? svip = provider.Get("svip");
-        Assert.NotNull(svip);
+        Assert.True(provider.TryGet("svip", out _));
     }
     [Fact]
     public void Description()

@@ -8,8 +8,8 @@ public class FlagEnum1Tests
     public void GetEnumprovider()
     {
         IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<DaysOfWeek>();
-        Assert.Equal(7, provider.Items.Length);
-        Assert.Equal(7, provider.Flags.Length);
+        Assert.Equal(7, provider.Items.Count());
+        Assert.Equal(7, provider.Flags.Count());
     }
     [Fact]
     public void FromName()
@@ -61,9 +61,9 @@ public class FlagEnum1Tests
     public void TryParseByName()
     {
         IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<DaysOfWeek>();
-        Assert.True(provider.TryParse(nameof(DaysOfWeek.Monday), out var monday));
+        var monday = provider.Parse(nameof(DaysOfWeek.Monday));
         Assert.Equal(nameof(DaysOfWeek.Monday), monday.Name);
-        Assert.True(provider.TryParse("Saturday,Sunday", out var weekend));
+        var weekend = provider.Parse("Saturday,Sunday");
         Assert.True(weekend.HasFlag(nameof(DaysOfWeek.Saturday)));
         Assert.True(weekend.HasFlag((long)DaysOfWeek.Sunday));
     }
@@ -71,9 +71,9 @@ public class FlagEnum1Tests
     public void TryParseByOriginal()
     {
         IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<DaysOfWeek>();
-        Assert.True(provider.TryParse((long)DaysOfWeek.Monday, out var monday));
+        var monday = provider.Parse((long)DaysOfWeek.Monday);
         Assert.Equal(nameof(DaysOfWeek.Monday), monday.Name);
-        Assert.True(provider.TryParse((long)(DaysOfWeek.Saturday | DaysOfWeek.Sunday), out var weekend));
+        var weekend = provider.Parse((long)(DaysOfWeek.Saturday | DaysOfWeek.Sunday));
         Assert.True(weekend.HasFlag(nameof(DaysOfWeek.Saturday)));
         Assert.True(weekend.HasFlag((long)DaysOfWeek.Sunday));
     }

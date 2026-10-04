@@ -1,4 +1,6 @@
-﻿namespace Hand.EnumerationTests.Enumeration1;
+﻿using static Hand.EnumerationTests.Supports.DaysOfWeekEnumeration;
+
+namespace Hand.EnumerationTests.Enumeration1;
 
 public class Enumeration1Tests
 {
@@ -6,7 +8,7 @@ public class Enumeration1Tests
     public void Items()
     {
         var provider = CardType.Provider;
-        CardType[] cardTypes = provider.Items;
+        CardType[] cardTypes = [.. provider.Items];
         Assert.Equal(4, cardTypes.Length);
     }
     [Fact]
@@ -14,11 +16,9 @@ public class Enumeration1Tests
     {
         var provider = CardType.Provider;
         // 按枚举名获取
-        var silver = provider.Get("Silver");
-        Assert.NotNull(silver);
+        Assert.True(provider.TryGet("Silver", out var silver));
         // 按别名获取
-        var vip = provider.Get("Vip");
-        Assert.NotNull(vip);
+        Assert.True(provider.TryGet("Vip", out var vip));
         Assert.Equal(CardType.Silver, silver);
         Assert.Equal(silver, vip);
     }
@@ -26,8 +26,7 @@ public class Enumeration1Tests
     public void FromName_Null()
     {
         // 获取不存在的枚举时，返回 null
-        var unknown = CardType.Provider.Get("");
-        Assert.Null(unknown);
+        Assert.False(CardType.Provider.TryGet("", out _));
     }
     [Fact]
     public void FromName_Default()
@@ -40,15 +39,13 @@ public class Enumeration1Tests
     public void FromOriginal()
     {
         // 按枚举值获取
-        var cardType1 = CardType.Provider.Get(1);
-        Assert.Equal(CardType.Silver, cardType1);
+        Assert.True(CardType.Provider.TryGet(1, out _));
     }
     [Fact]
     public void FromOriginal_Null()
     {
         // 获取不存在的枚举时，返回 null
-        var cardType9 = CardType.Provider.Get(9);
-        Assert.Null(cardType9);
+        Assert.False(CardType.Provider.TryGet(9, out _));
     }
     [Fact]
     public void FromOriginal_Default()

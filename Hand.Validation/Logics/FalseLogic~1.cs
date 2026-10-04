@@ -9,18 +9,8 @@ public sealed class FalseLogic<TArgument> : IValidation<TArgument>
     /// <inheritdoc />
     public bool Validate(TArgument argument)
         => false;
-    #region Instance
     /// <summary>
-    /// 默认实例
+    /// 默认规则
     /// </summary>
-    public static IValidation<TArgument> Instance
-        => Inner.Instance;
-    internal static class Inner
-    {
-        /// <summary>
-        /// 默认规则
-        /// </summary>
-        public static readonly IValidation<TArgument> Instance = new FalseLogic<TArgument>();
-    }
-    #endregion
+    public static readonly IValidation<TArgument> Instance = new FalseLogic<TArgument>();
 }

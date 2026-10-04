@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<RootNamespace>Hand.Enumerations</RootNamespace>
-		<Version>$(VersionBase).1-alpha</Version>
+		<Version>$(VersionBase).6-alpha</Version>
 		<PackageReadmeFile>readme.md</PackageReadmeFile>
 	</PropertyGroup>
 	<ItemGroup>

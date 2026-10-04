@@ -1,5 +1,5 @@
-﻿using Hand.Convert;
-using Hand.Primitives;
+﻿using Hand.Primitives;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Hand.Enumerations;
 
@@ -13,7 +13,7 @@ public interface IEnumerationProvider<TEnumeration>
     /// <summary>
     /// 所有枚举项
     /// </summary>
-    TEnumeration[] Items { get; }
+    IEnumerable<TEnumeration> Items { get; }
     /// <summary>
     /// 枚举项数
     /// </summary>
@@ -57,22 +57,26 @@ public interface IEnumerationProvider<TEnumeration>
     /// <summary>
     /// 获取枚举
     /// </summary>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    TEnumeration? Get(string name);
-    /// <summary>
-    /// 获取枚举
-    /// </summary>
     /// <param name="original"></param>
     /// <param name="defaultValue"></param>
     /// <returns></returns>
     TEnumeration Get(long original, TEnumeration defaultValue);
+    #endregion
+    #region TryGet
     /// <summary>
-    /// 获取枚举
+    /// 尝试获取枚举
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    bool TryGet(string name, [NotNullWhen(true)] out TEnumeration? value);
+    /// <summary>
+    /// 尝试获取枚举
     /// </summary>
     /// <param name="original"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    TEnumeration? Get(long original);
+    bool TryGet(long original, [NotNullWhen(true)] out TEnumeration? value);
     #endregion
     /// <summary>
     /// 按备注获取枚举

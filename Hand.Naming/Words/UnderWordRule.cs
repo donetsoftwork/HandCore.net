@@ -23,45 +23,6 @@ public class UnderWordRule : IWordRule
         else
             builder.Append(char.ToUpperInvariant(first));
     }
-    ///// <summary>
-    ///// 下换线
-    ///// </summary>
-    ///// <param name="original"></param>
-    ///// <param name="startIndex"></param>
-    ///// <returns></returns>
-    //public static string Under(string original, int startIndex = 0)
-    //{
-    //    if (string.IsNullOrEmpty(original))
-    //        return "_";
-    //    var first = original[startIndex];
-    //    if (first == Prefix)
-    //        return original.Substring(startIndex);
-    //    var count = original.Length;
-    //    var builder = new StringBuilder(count + 1 - startIndex);
-    //    builder.Append(Prefix);
-    //    for (var i = startIndex; i < count; i++)
-    //        builder.Append(original[i]);
-    //    return builder.ToString();
-    //}
-    ///// <summary>
-    ///// 下换线
-    ///// </summary>
-    ///// <param name="original"></param>
-    ///// <returns></returns>
-    //public static string Under(ReadOnlySpan<char> original)
-    //{
-    //    var count = original.Length;
-    //    if (count == 0)
-    //        return "_";
-    //    var first = original[0];
-    //    if (first == Prefix)
-    //        return original.ToString();
-    //    var builder = new StringBuilder(count + 1);
-    //    builder.Append(Prefix);
-    //    for (var i = 0; i < count; i++)
-    //        builder.Append(original[i]);
-    //    return builder.ToString();
-    //}
     /// <summary>
     /// 下换线次字母小写
     /// </summary>

@@ -9,11 +9,12 @@ public sealed class FlagEnumerationProvider
     /// <summary>
     /// 构造函数
     /// </summary>
+    /// <param name="items"></param>
     /// <param name="flags"></param>
     /// <param name="names"></param>
     /// <param name="originals"></param>
-    public FlagEnumerationProvider(FlagEnumeration[] flags, IReadOnlyDictionary<string, FlagEnumeration> names, IReadOnlyDictionary<long, FlagEnumeration> originals)
-        : base(flags, names, originals)
+    public FlagEnumerationProvider(List<FlagEnumeration> items, List<FlagEnumeration> flags, IDictionary<string, FlagEnumeration> names, IDictionary<long, FlagEnumeration> originals)
+        : base(items, flags, names, originals)
     {
         _empty = new Lazy<FlagEnumeration>(CreateEmpty, true);
     }

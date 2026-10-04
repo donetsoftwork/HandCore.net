@@ -1,10 +1,6 @@
 ﻿using Hand.Comparers;
 using Hand.Maping;
 using Hand.Maping.Recognizers;
-using Hand.Rule;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Hand;
 
@@ -93,6 +89,14 @@ public class MemberRecognizeParser(string cross, string through, string filter, 
             filter = new ValidationRecognizer<string>(Skip(parts, start), false, _memberComparer);
         return true;
     }
+    /// <summary>
+    /// 跳过
+    /// </summary>
+    /// <param name="parts"></param>
+    /// <param name="skip"></param>
+    /// <returns></returns>
+    public static IEnumerable<string> Skip(string[] parts, int skip)
+        => skip > 0 ? parts.Skip(skip).Distinct() : parts.Distinct();
     /// <summary>
     /// 解析投影
     /// </summary>

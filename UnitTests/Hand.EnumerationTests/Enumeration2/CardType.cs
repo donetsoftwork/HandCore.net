@@ -120,25 +120,25 @@ public abstract class CardType : Enumeration
     {
         internal CardTypeProvider()
             : base(
-            [Silver, Gold, Platinum, Black]
-            , new Dictionary<string, CardType>(StringComparer.OrdinalIgnoreCase)
-            {
-                { nameof(Silver), Silver},
-                { nameof(Gold), Gold},
-                { nameof(Platinum), Platinum},
-                { nameof(Black), Black},
-                { nameof(Vip) , Silver},
-                { nameof(Vip2) , Gold},
-                { nameof(Vip3) , Platinum},
-                { nameof(Vip4) , Black},
-            }
-            , new Dictionary<long, CardType>()
-            {
-                { Silver.Original, Silver},
-                { Gold.Original, Gold},
-                { Platinum.Original, Platinum},
-                { Black.Original, Black}
-            }
+                [Silver, Gold, Platinum, Black]
+                , new Dictionary<string, CardType>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { nameof(Silver), Silver},
+                    { nameof(Gold), Gold},
+                    { nameof(Platinum), Platinum},
+                    { nameof(Black), Black},
+                    { nameof(Vip) , Silver},
+                    { nameof(Vip2) , Gold},
+                    { nameof(Vip3) , Platinum},
+                    { nameof(Vip4) , Black},
+                }
+                , new Dictionary<long, CardType>()
+                {
+                    { Silver.Original, Silver},
+                    { Gold.Original, Gold},
+                    { Platinum.Original, Platinum},
+                    { Black.Original, Black}
+                }
         )
         {
         }

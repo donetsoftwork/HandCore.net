@@ -15,9 +15,9 @@
 >* 通过Items属性获取所有枚举项,相当于Enum.GetValues方法
 >* 通过Names属性获取所有枚举名,相当于Enum.GetNames方法
 >* 16个枚举字段转化为16个枚举类(Enumeration)对象
->* 通过Get方法获取单个枚举项
->* Get方法可以通过枚举名获取,相当于Enum.Parse方法
->* Get方法也可以通过枚举值获取,相当于强转为enum
+>* 通过TryGet方法获取单个枚举项
+>* TryGet方法可以通过枚举名获取,相当于Enum.TryParse方法
+>* TryGet方法也可以通过枚举值获取,相当于强转为enum
 >* 枚举接口是IEnumeration
 >* 枚举类是Enumeration
 
@@ -32,19 +32,16 @@ Assert.Equal(16, names.Length);
 string[] names0 = Enum.GetNames<ConsoleColor>();
 Assert.Equal(16, names0.Length);
 // 按枚举名获取
-Enumeration? red = provider.Get(nameof(ConsoleColor.Red));
-Assert.NotNull(red);
+Assert.True(provider.TryGet(nameof(ConsoleColor.Red), out var red));
 Assert.Equal(nameof(ConsoleColor.Red), red.Name);
-var red0 = Enum.Parse<ConsoleColor>(nameof(ConsoleColor.Red));
-Assert.Equal(ConsoleColor.Red, red0);
+Assert.True(Enum.TryParse<ConsoleColor>(nameof(ConsoleColor.Red), out var red2));
+Assert.Equal(ConsoleColor.Red, red2);
 // 按枚举值获取
-Enumeration? green = provider.Get(10);
-Assert.NotNull(green);
+Assert.True(provider.TryGet(10, out var green));
 Assert.Equal(nameof(ConsoleColor.Green), green.Name);
 var green0 = (ConsoleColor)10;
 Assert.Equal(ConsoleColor.Green, green0);
-Enumeration? blue = provider.Get((long)ConsoleColor.Blue);
-Assert.NotNull(blue);
+Assert.True(provider.TryGet((long)ConsoleColor.Blue, out var blue));
 Assert.Equal(nameof(ConsoleColor.Blue), blue.Name);
 ~~~
 
@@ -76,6 +73,7 @@ Assert.True(Enum.IsDefined(typeof(ConsoleColor), (int)ConsoleColor.Green));
 >* IFlagEnumeration比IEnumeration多个Flags属性
 >* Flags为单位标记,0和复合位标记除外
 >* 本Case中ReadWrite就是复合位,等效于 Read | Write,所以Flags比Items少
+>* 标记枚举支持直接Get(也可以用TryGet),如果获取不到用Empty填充
 
 ~~~csharp
 IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>();
@@ -88,15 +86,13 @@ Assert.Equal(3, names.Length);
 string[] names0 = Enum.GetNames<FileAccess>();
 Assert.Equal(3, names0.Length);
 // 按枚举名获取
-FlagEnumeration? read = provider.Get(nameof(FileAccess.Read));
-Assert.NotNull(read);
+FlagEnumeration read = provider.Get(nameof(FileAccess.Read));
 Assert.Equal(nameof(FileAccess.Read), read.Name);
 Assert.Empty(read.Description);
 var red0 = Enum.Parse<FileAccess>(nameof(FileAccess.Read));
 Assert.Equal(FileAccess.Read, red0);
 // 按枚举值获取
-FlagEnumeration? write = provider.Get(2);
-Assert.NotNull(write);
+FlagEnumeration write = provider.Get(2);
 Assert.Equal(nameof(FileAccess.Write), write.Name);
 Assert.Empty(write.Description);
 var write0 = (FileAccess)2;
@@ -175,20 +171,20 @@ Assert.True(readWrite.HasFlag((long)FileAccess.Write));
 Assert.True(FileAccess.ReadWrite.HasFlag(FileAccess.Read));
 ~~~
 
-#### 2.6 TryParse方法
->* TryParse支持多个枚举名(逗号分割)和枚举值
->* TryParse方法用于平替Enum.TryParse方法
->* TryParse与Get有区别
->* Get只能获取定义的枚举项
->* TryParse可以获取位运算后的枚举项(能按位拆解)
+#### 2.6 Parse方法
+>* Parse支持多个枚举名(逗号分割)和枚举值
+>* Parse方法用于平替Enum.TryParse方法
+>* Parse与Get有区别
+>* Get只能获取定义的枚举项或Empty
+>* Parse可以获取位运算后的枚举项(能按位拆解)
 
 ~~~csharp
 IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>(StringComparer.OrdinalIgnoreCase);
-Assert.True(provider.TryParse("read,write", out var result));
+var result = provider.Parse("read,write");
 FlagEnumeration? readWrite = provider.Get(nameof(FileAccess.ReadWrite));
 Assert.NotNull(readWrite);
 Assert.Equal(readWrite, result);
-Assert.True(provider.TryParse((long)FileAccess.Read, out var read));
+var read = provider.Parse((long)FileAccess.Read);
 Assert.Equal(nameof(FileAccess.Read), read.Name);
 Assert.True(Enum.TryParse<FileAccess>("read,write", true, out var result0));
 Assert.Equal(FileAccess.ReadWrite, result0);
@@ -234,13 +230,11 @@ IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationPr
 Enumeration[] cardTypes = provider.Items;
 Assert.Equal(4, cardTypes.Length);
 // 按枚举名获取
-Enumeration? silver = provider.Get(nameof(CardType.Silver));
-Assert.NotNull(silver);
+Assert.True(provider.TryGet(nameof(CardType.Silver), out var silver));
 Assert.Equal(nameof(CardType.Silver), silver.Name);
 Assert.Equal("银卡", silver.Description);
 // 按枚举别名获取
-Enumeration? vip = provider.Get("vip");
-Assert.NotNull(vip);
+Assert.True(provider.TryGet("Vip", out var vip));
 Assert.Equal(silver, vip);
 // 按枚举值获取
 Enumeration? gold = provider.Get(2);
@@ -248,8 +242,7 @@ Assert.NotNull(gold);
 Assert.Equal(nameof(CardType.Gold), gold.Name);
 Assert.Equal("金卡", gold.Description);
 // 用EnumMember标记定义别名
-Enumeration? svip = provider.Get("svip");
-Assert.NotNull(svip);
+Assert.True(provider.TryGet("svip", out var svip));
 // 支持用Description标记定义备注
 Enumeration? description = provider.GetByDescription("银卡");
 Assert.NotNull(description);
@@ -429,8 +422,7 @@ public abstract class CardType : Enumeration
 
 ~~~csharp
 var user = GetUserByDb("张三");
-var cardType = CardType.Provider.Get(user.CardType);
-Assert.NotNull(cardType);
+Assert.True(CardType.Provider.TryGet(user.CardType, out var cardType));
 var product = GetProductByDb("帽子");
 // 随机领取优惠券
 decimal coupon = Random.Shared.Next(0, 20);
@@ -638,12 +630,10 @@ IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationPr
 CardType[] cardTypes = provider.Items;
 Assert.Equal(4, cardTypes.Length);
 // 按枚举名获取
-var silver = provider.Get("Silver");
-Assert.NotNull(silver);
+Assert.True(provider.TryGet("Silver", out var silver));
 Assert.Equal("银卡", silver.Description);
 // 按别名获取
-var vip = provider.Get("Vip");
-Assert.NotNull(vip);
+Assert.True(provider.TryGet("Vip", out var vip));
 Assert.Equal(CardType.Silver, silver);
 Assert.Equal(silver, vip);
 // 获取不存在的枚举时指定默认值，返回默认值

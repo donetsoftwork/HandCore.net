@@ -8,7 +8,7 @@ public class FlagEnumeration1Tests
     public void GetEnumprovider()
     {
         IFlagEnumerationProvider<DaysOfWeek> provider = ReflectionEnumeration.GetFlagEnumerationProvider<DaysOfWeek>();
-        DaysOfWeek[] cardTypes = provider.Items;
+        DaysOfWeek[] cardTypes = [.. provider.Items];
         Assert.Equal(7, cardTypes.Length);
     }
     [Fact]

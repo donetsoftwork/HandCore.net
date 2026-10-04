@@ -6,8 +6,7 @@ public class DiscountTests
     public void Buy()
     {
         var user = GetUserByDb("张三");
-        var cardType = CardType.Provider.Get(user.CardType);
-        Assert.NotNull(cardType);
+        Assert.True(CardType.Provider.TryGet(user.CardType, out var cardType));
         var product = GetProductByDb("帽子");
         // 随机领取优惠券
         decimal coupon = Random.Shared.Next(0, 20);

@@ -1,7 +1,5 @@
 ﻿using Hand.Comparers;
 using Hand.Primitives;
-using System.Diagnostics.CodeAnalysis;
-using System.Xml.Linq;
 
 namespace Hand.Enumerations;
 
@@ -9,20 +7,29 @@ namespace Hand.Enumerations;
 /// 位标记枚举提供者
 /// </summary>
 /// <typeparam name="TEnumeration"></typeparam>
+/// <param name="items"></param>
 /// <param name="flags"></param>
 /// <param name="names"></param>
 /// <param name="originals"></param>
-public abstract class FlagEnumerationProvider<TEnumeration>(TEnumeration[] flags, IReadOnlyDictionary<string, TEnumeration> names, IReadOnlyDictionary<long, TEnumeration> originals)
-    : EnumerationProvider<TEnumeration>([.. originals.Values], names, originals), IFlagEnumerationProvider<TEnumeration>
+public abstract class FlagEnumerationProvider<TEnumeration>(List<TEnumeration> items, List<TEnumeration> flags, IDictionary<string, TEnumeration> names, IDictionary<long, TEnumeration> originals)
+    : EnumerationProvider<TEnumeration>(items, names, originals), IFlagEnumerationProvider<TEnumeration>
     where TEnumeration : IFlagEnumeration
 {
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    public FlagEnumerationProvider(IDictionary<string, TEnumeration> names)
+        : this([], [], names, new Dictionary<long, TEnumeration>())
+    {
+        Check(names);
+    }
     #region 配置
     /// <summary>
     /// 枚举分隔符
     /// </summary>
     private static readonly char[] _separator = [','];
     /// <summary>
-    /// 
+    /// 枚举名比较器
     /// </summary>
     private readonly IEqualityComparer<string> _comparer = CompareConverter.GetComparer(names);
     /// <summary>
@@ -30,46 +37,66 @@ public abstract class FlagEnumerationProvider<TEnumeration>(TEnumeration[] flags
     /// </summary>
     public const long EmptyOriginal = 0L;
     /// <inheritdoc cref="Flags" path="/summary"/>
-    protected TEnumeration[] _flags = flags;
+    protected List<TEnumeration> _flags = flags;
     /// <inheritdoc />
-    public TEnumeration[] Flags
+    public IEnumerable<TEnumeration> Flags
         => _flags;
     /// <summary>
     /// 空枚举
     /// </summary>
     public abstract TEnumeration Empty { get; }
     #endregion
+    /// <inheritdoc />
+    protected override bool Check(string name, TEnumeration item)
+    {
+        var original = item.Original;
+        if (_originals.TryGetValue(original, out var enumeration))
+        {
+            // 处理枚举别名
+            _names[name] = _names[enumeration.Name] = enumeration;
+            return false;
+        }
+        _items.Add(item);
+        _originals.Add(original, item);
+        if (FlagEnumeration.VerifyFlag(original))
+            _flags.Add(item);
+        return true;
+    }
     #region Get
     /// <inheritdoc />
     public override TEnumeration Get(string name, TEnumeration defaultValue)
     {
-        var value = base.Get(name, defaultValue);
-        if (value.Original == EmptyOriginal)
-            return defaultValue;
-        return value;
+        if(_names.TryGetValue(name, out var value))
+            return value.Original == EmptyOriginal ? defaultValue : value;
+        return defaultValue;
     }
     /// <inheritdoc />
     public override TEnumeration Get(long original, TEnumeration defaultValue)
     {
-        var value = base.Get(original, defaultValue);
-        if (value.Original == EmptyOriginal)
-            return defaultValue;
-        return value;
+        if (_originals.TryGetValue(original, out var value))
+            return value.Original == EmptyOriginal ? defaultValue : value;
+        return defaultValue;
     }
+    /// <inheritdoc />
+    public virtual TEnumeration Get(string name)
+        => _names.TryGetValue(name, out var value) ? value : Empty;
+    /// <inheritdoc />
+    public virtual TEnumeration Get(long original)
+        => _originals.TryGetValue(original, out var value) ? value : Empty;
     #endregion
     #region TryParse
     /// <inheritdoc />
-    public bool TryParse(string name, [NotNullWhen(true)] out TEnumeration? value)
+    public TEnumeration Parse(string name)
     {
-        if(_names.TryGetValue(name, out value))
-            return true;
-        return TryParse(name.Split(_separator), out value);
+        if(_names.TryGetValue(name, out var value))
+            return value;
+        return Parse(name.Split(_separator));
     }
     /// <inheritdoc />
-    public bool TryParse(long original, [NotNullWhen(true)] out TEnumeration? value)
+    public TEnumeration Parse(long original)
     {
-        if (_originals.TryGetValue(original, out value))
-            return true;
+        if (_originals.TryGetValue(original, out var value))
+            return value;
         TEnumeration? result = default;
         foreach (var flag in _flags)
         {
@@ -84,11 +111,11 @@ public abstract class FlagEnumerationProvider<TEnumeration>(TEnumeration[] flags
                     result = Or(result, flag);
             }
         }
-        return (value = result) is not null;
+        return result ?? Empty;
     }
     #endregion
-    /// <inheritdoc cref="TryParse(string, out TEnumeration)" path="/*"/>
-    public bool TryParse(string[] name, out TEnumeration? value)
+    /// <inheritdoc cref="Parse(string)" path="/*"/>
+    public TEnumeration Parse(string[] name)
     {
         TEnumeration? result = default;
         foreach (var item in name)
@@ -101,7 +128,7 @@ public abstract class FlagEnumerationProvider<TEnumeration>(TEnumeration[] flags
                     result = Or(result, enumeration);
             }
         }
-        return (value = result) is not null;
+        return result ?? Empty;
     }
     /// <inheritdoc />
     public TEnumeration And(TEnumeration left, TEnumeration right, string description = "")
@@ -120,14 +147,11 @@ public abstract class FlagEnumerationProvider<TEnumeration>(TEnumeration[] flags
             return left;
         if (combinedOriginal == rightOriginal)
             return right;
+        if (_originals.TryGetValue(combinedOriginal, out var enumeration))
+            return enumeration;
 
-        var enumeration = Get(combinedOriginal);
-        if (enumeration is null)
-        {
-            var combinedFlags = new HashSet<string>(left.Names.Except(right.Names, _comparer), _comparer);
-            return CreateFlag(combinedFlags, combinedOriginal, description);
-        }
-        return enumeration;
+        var combinedFlags = new HashSet<string>(left.Names.Except(right.Names, _comparer), _comparer);
+        return CreateFlag(combinedFlags, combinedOriginal, description);
     }
     /// <inheritdoc />
     public TEnumeration Or(TEnumeration left, TEnumeration right, string description = "")
@@ -144,19 +168,14 @@ public abstract class FlagEnumerationProvider<TEnumeration>(TEnumeration[] flags
             return left;
         if (combinedOriginal == rightOriginal)
             return right;
+        if (_originals.TryGetValue(combinedOriginal, out var enumeration))
+            return enumeration;
 
-        var enumeration = Get(combinedOriginal);
-        if (enumeration is null)
-        {
-            var leftFlags = left.Names;
-            var combinedFlags = new HashSet<string>(leftFlags, _comparer);
-            foreach (var flagName in right.Names)
-            {
-                combinedFlags.Add(flagName);
-            }
-            return CreateFlag(combinedFlags, combinedOriginal, description);
-        }
-        return enumeration;
+        var leftFlags = left.Names;
+        var combinedFlags = new HashSet<string>(leftFlags, _comparer);
+        foreach (var flagName in right.Names)
+            combinedFlags.Add(flagName);
+        return CreateFlag(combinedFlags, combinedOriginal, description);
     }
     /// <summary>
     /// 构造位标记枚举

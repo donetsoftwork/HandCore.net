@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Hand.Rule.Logics;
+﻿namespace Hand.Rule.Logics;
 
 /// <summary>
 /// 与逻辑

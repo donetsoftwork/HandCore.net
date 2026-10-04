@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Hand.Rule;
+﻿namespace Hand.Rule;
 
 /// <summary>
 /// 被包含验证规则(成员之一)

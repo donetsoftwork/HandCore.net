@@ -8,7 +8,7 @@ public class Enumeration2Tests
     public void GetEnumprovider()
     {
         IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
-        Enumeration[] cardTypes = provider.Items;
+        Enumeration[] cardTypes = [.. provider.Items];
         Assert.Equal(4, cardTypes.Length);
     }
     [Fact]
@@ -16,12 +16,10 @@ public class Enumeration2Tests
     {
         IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
         // 按枚举名获取
-        var silver = provider.Get("Silver");
-        Assert.NotNull(silver);
+        Assert.True(provider.TryGet("Silver", out var silver));
         Assert.Equal("银卡", silver.Description);
         // 按别名获取
-        var vip = provider.Get("Vip");
-        Assert.NotNull(vip);
+        Assert.True(provider.TryGet("Vip", out var vip));
         Assert.Equal(CardType.Silver, silver);
         Assert.Equal(silver, vip);
     }
@@ -30,8 +28,7 @@ public class Enumeration2Tests
     {
         IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
         // 获取不存在的枚举时，返回 null
-        var unknown = provider.Get("");
-        Assert.Null(unknown);
+        Assert.False(provider.TryGet("", out _));
     }
     [Fact]
     public void FromName_Default()
@@ -46,7 +43,7 @@ public class Enumeration2Tests
     {
         IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
         // 按枚举值获取
-        var cardType1 = provider.Get(1);
+        Assert.True(provider.TryGet(1, out var cardType1));
         Assert.Equal(CardType.Silver, cardType1);
     }
     [Fact]
@@ -54,8 +51,7 @@ public class Enumeration2Tests
     {
         IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
         // 获取不存在的枚举时，返回 null
-        var cardType9 = provider.Get(9);
-        Assert.Null(cardType9);
+        Assert.False(provider.TryGet(9, out _));
     }
     [Fact]
     public void FromOriginal_Default()

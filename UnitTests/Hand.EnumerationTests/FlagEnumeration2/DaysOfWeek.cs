@@ -83,29 +83,30 @@ public sealed class DaysOfWeek
     {
         internal DaysOfWeekProvider()
             : base(
-            [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
-            , new Dictionary<string, DaysOfWeek>(_comparer)
-            {
-                { nameof(Unknown), Unknown },
-                { nameof(Sunday), Sunday},
-                { nameof(Monday), Monday},
-                { nameof(Tuesday), Tuesday},
-                { nameof(Wednesday), Wednesday},
-                { nameof(Thursday),Thursday},
-                { nameof(Friday), Friday},
-                { nameof(Saturday), Saturday}
-            }
-            , new Dictionary<long, DaysOfWeek>()
-            {
-                { Unknown.Original, Unknown },
-                { Sunday.Original, Sunday},
-                { Monday.Original, Monday},
-                { Tuesday.Original, Tuesday},
-                { Wednesday.Original, Wednesday},
-                { Thursday.Original, Thursday},
-                { Friday.Original, Friday},
-                { Saturday.Original, Saturday}
-            }
+                  [Unknown, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday],
+                  [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday],
+                  new Dictionary<string, DaysOfWeek>(_comparer)
+                  {
+                      { nameof(Unknown), Unknown },
+                      { nameof(Sunday), Sunday},
+                      { nameof(Monday), Monday},
+                      { nameof(Tuesday), Tuesday},
+                      { nameof(Wednesday), Wednesday},
+                      { nameof(Thursday),Thursday},
+                      { nameof(Friday), Friday},
+                      { nameof(Saturday), Saturday}
+                  }, 
+                  new Dictionary<long, DaysOfWeek>()
+                  {
+                      { Unknown.Original, Unknown },
+                      { Sunday.Original, Sunday},
+                      { Monday.Original, Monday},
+                      { Tuesday.Original, Tuesday},
+                      { Wednesday.Original, Wednesday},
+                      { Thursday.Original, Thursday},
+                      { Friday.Original, Friday},
+                      { Saturday.Original, Saturday}
+                  }
         )
         {
         }

@@ -173,8 +173,7 @@ public abstract class CardType : Enumeration
 
 ~~~csharp
 var user = GetUserByDb("张三");
-var cardType = CardType.Provider.Get(user.CardType);
-Assert.NotNull(cardType);
+Assert.True(CardType.Provider.TryGet(user.CardType, out var cardType));
 var product = GetProductByDb("帽子");
 // 随机领取优惠券
 decimal coupon = Random.Shared.Next(0, 20);
@@ -269,33 +268,34 @@ public sealed class DaysOfWeek
     /// <summary>
     /// 星期几枚举提供者
     /// </summary>
-    private sealed class DaysOfWeekProvider : FlagEnumerationProvider<DaysOfWeek>
+        private sealed class DaysOfWeekProvider : FlagEnumerationProvider<DaysOfWeek>
     {
         internal DaysOfWeekProvider()
             : base(
-            [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
-            , new Dictionary<string, DaysOfWeek>(_comparer)
-            {
-                { nameof(Unknown), Unknown },
-                { nameof(Sunday), Sunday},
-                { nameof(Monday), Monday},
-                { nameof(Tuesday), Tuesday},
-                { nameof(Wednesday), Wednesday},
-                { nameof(Thursday),Thursday},
-                { nameof(Friday), Friday},
-                { nameof(Saturday), Saturday}
-            }
-            , new Dictionary<long, DaysOfWeek>()
-            {
-                { Unknown.Original, Unknown },
-                { Sunday.Original, Sunday},
-                { Monday.Original, Monday},
-                { Tuesday.Original, Tuesday},
-                { Wednesday.Original, Wednesday},
-                { Thursday.Original, Thursday},
-                { Friday.Original, Friday},
-                { Saturday.Original, Saturday}
-            }
+                  [Unknown, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday],
+                  [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday],
+                  new Dictionary<string, DaysOfWeek>(_comparer)
+                  {
+                      { nameof(Unknown), Unknown },
+                      { nameof(Sunday), Sunday},
+                      { nameof(Monday), Monday},
+                      { nameof(Tuesday), Tuesday},
+                      { nameof(Wednesday), Wednesday},
+                      { nameof(Thursday),Thursday},
+                      { nameof(Friday), Friday},
+                      { nameof(Saturday), Saturday}
+                  }, 
+                  new Dictionary<long, DaysOfWeek>()
+                  {
+                      { Unknown.Original, Unknown },
+                      { Sunday.Original, Sunday},
+                      { Monday.Original, Monday},
+                      { Tuesday.Original, Tuesday},
+                      { Wednesday.Original, Wednesday},
+                      { Thursday.Original, Thursday},
+                      { Friday.Original, Friday},
+                      { Saturday.Original, Saturday}
+                  }
         )
         {
         }

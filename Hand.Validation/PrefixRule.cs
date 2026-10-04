@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Hand.Rule;
+﻿namespace Hand.Rule;
 
 /// <summary>
 /// 前缀规则

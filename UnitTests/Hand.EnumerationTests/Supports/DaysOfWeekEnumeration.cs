@@ -73,58 +73,6 @@ public class DaysOfWeekEnumeration
     public static readonly DaysOfWeekEnumeration Saturday = new(_comparer, SaturdayName, SaturdayOriginal, "星期六");
     #endregion
     #endregion 
-    ///// <summary>
-    ///// 按位或操作
-    ///// </summary>
-    ///// <param name="flag"></param>
-    ///// <param name="description"></param>
-    ///// <returns></returns>
-    //public DaysOfWeekEnumeration And(DaysOfWeekEnumeration flag, string description = "")
-    //{
-    //    var flagOriginal = flag._original;
-    //    if (_original == flagOriginal)
-    //        return this;
-    //    if (_original == UnknownOriginal || flagOriginal == UnknownOriginal)
-    //        return Unknown;
-
-    //    var combinedOriginal = _original & flag.Original;
-    //    if (combinedOriginal == UnknownOriginal)
-    //        return Unknown;
-    //    var days = Provider.Instance.Get(combinedOriginal);
-    //    if (days is null)
-    //    {
-    //        var combinedFlags = new HashSet<string>(_flags.Except(flag.Flags, _comparer), _comparer);
-    //        return new(combinedFlags, combinedOriginal, description);
-    //    }
-    //    return days;
-    //}
-    ///// <inheritdoc />
-    //public override FlagEnumeration And<TEnumeration>(TEnumeration flag, string description = "")
-    //    => flag is DaysOfWeekEnumeration days ? And(days, description) : Unknown;
-    ///// <summary>
-    ///// 按位或操作
-    ///// </summary>
-    ///// <param name="flag"></param>
-    ///// <param name="description"></param>
-    ///// <returns></returns>
-    //public DaysOfWeekEnumeration Or(DaysOfWeekEnumeration flag, string description = "")
-    //{
-    //    var flagOriginal = flag._original;
-    //    if (_original == flagOriginal || flagOriginal == UnknownOriginal)
-    //        return this;
-    //    if (_original == UnknownOriginal)
-    //        return flag;
-
-    //    var combinedFlags = new HashSet<string>(_flags, _comparer);
-    //    foreach (var flagName in flag.Flags)
-    //    {
-    //        combinedFlags.Add(flagName);
-    //    }
-    //    return new(combinedFlags, _original | flag.Original, description);
-    //}
-    ///// <inheritdoc />
-    //public override FlagEnumeration Or<TEnumeration>(TEnumeration flag, string description = "")
-    //    => flag is DaysOfWeekEnumeration days ? Or(days, description) : this;
     /// <summary>
     /// 是否为未知枚举
     /// </summary>
@@ -138,29 +86,30 @@ public class DaysOfWeekEnumeration
     {
         private Provider()
             : base(
-            [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
-            , new Dictionary<string, DaysOfWeekEnumeration>(_comparer)
-            {
-                { UnknownName, Unknown },
-                { SundayName, Sunday},
-                { MondayName, Monday},
-                { TuesdayName, Tuesday},
-                { WednesdayName, Wednesday},
-                { ThursdayName, Thursday},
-                { FridayName, Friday},
-                { SaturdayName, Saturday}
-            }
-            , new Dictionary<long, DaysOfWeekEnumeration>()
-            {
-                { UnknownOriginal, Unknown },
-                { SundayOriginal, Sunday},
-                { MondayOriginal, Monday},
-                { TuesdayOriginal, Tuesday},
-                { WednesdayOriginal, Wednesday},
-                { ThursdayOriginal, Thursday},
-                { FridayOriginal, Friday},
-                { SaturdayOriginal, Saturday}
-            }
+                  [Unknown, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday],
+                  [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday], 
+                  new Dictionary<string, DaysOfWeekEnumeration>(_comparer)
+                  {
+                      { UnknownName, Unknown },
+                      { SundayName, Sunday},
+                      { MondayName, Monday},
+                      { TuesdayName, Tuesday},
+                      { WednesdayName, Wednesday},
+                      { ThursdayName, Thursday},
+                      { FridayName, Friday},
+                      { SaturdayName, Saturday}
+                  }, 
+                  new Dictionary<long, DaysOfWeekEnumeration>()
+                 {
+                     { UnknownOriginal, Unknown },
+                     { SundayOriginal, Sunday},
+                     { MondayOriginal, Monday},
+                     { TuesdayOriginal, Tuesday},
+                     { WednesdayOriginal, Wednesday},
+                     { ThursdayOriginal, Thursday},
+                     { FridayOriginal, Friday},
+                     { SaturdayOriginal, Saturday}
+                 }
         )
         {
         }

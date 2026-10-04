@@ -9,15 +9,14 @@ public class FromOriginalTests
     public void FromOriginal()
     {
         // 按枚举值获取
-        var cardType = CardType.Provider.Get(1);
+        Assert.True(CardType.Provider.TryGet(1, out var cardType));
         Assert.Equal(CardType.Silver, cardType);
     }
     [Fact]
     public void FromOriginal_Null()
     {
         // 获取不存在的枚举时，返回 null
-        var cardType = CardType.Provider.Get(9);
-        Assert.Null(cardType);
+        Assert.False(CardType.Provider.TryGet(9, out _));
     }
     [Fact]
     public void FromOriginal_Default()

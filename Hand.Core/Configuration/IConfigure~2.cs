@@ -4,13 +4,13 @@ namespace Hand.Configuration;
 /// 配置(一般为用户配置)
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
-/// <typeparam name="TConfig"></typeparam>
-public interface IConfigure<TKey, TConfig>
+/// <typeparam name="TValue"></typeparam>
+public interface IConfigure<TKey, TValue>
 {
     /// <summary>
     /// 设置
     /// </summary>
     /// <param name="key"></param>
-    /// <param name="config"></param>
-    void Set(in TKey key, TConfig config);
+    /// <param name="value"></param>
+    void Set(in TKey key, TValue value);
 }

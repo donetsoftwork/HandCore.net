@@ -5,7 +5,7 @@
 /// </summary>
 /// <param name="group"></param>
 /// <param name="valueComparer"></param>
-public class GroupSet(IDictionary<string, ISet<string>> group, StringComparer valueComparer)
+public class GroupSet(IDictionary<string, ISet<string>> group, IEqualityComparer<string> valueComparer)
     : GroupSet<string, string>(group, valueComparer)
 {
     /// <summary>
@@ -13,7 +13,7 @@ public class GroupSet(IDictionary<string, ISet<string>> group, StringComparer va
     /// </summary>
     /// <param name="keyComparer"></param>
     /// <param name="valueComparer"></param>
-    public GroupSet(StringComparer keyComparer, StringComparer valueComparer)
+    public GroupSet(IEqualityComparer<string> keyComparer, IEqualityComparer<string> valueComparer)
         : this(new Dictionary<string, ISet<string>>(keyComparer), valueComparer)
     {
     }

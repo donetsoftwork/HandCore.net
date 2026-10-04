@@ -8,8 +8,8 @@ public class FlagEnumeration1Tests
     public void GetEnumprovider()
     {
         var provider = DaysOfWeek.Provider;
-        Assert.Equal(8, provider.Items.Length);
-        Assert.Equal(7, provider.Flags.Length);
+        Assert.Equal(8, provider.Items.Count());
+        Assert.Equal(7, provider.Flags.Count());
     }
     [Fact]
     public void FromName()

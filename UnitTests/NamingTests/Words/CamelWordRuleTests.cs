@@ -7,6 +7,7 @@ public class CamelWordRuleTests
     [Theory]
     [InlineData("Test", "test")]
     [InlineData("_id", "id")]
+    [InlineData("name", "name")]
     [InlineData("", "")]
     public void FistToLower(string original, string expected)
     {

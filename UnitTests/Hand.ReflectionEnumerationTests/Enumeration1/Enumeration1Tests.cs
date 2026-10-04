@@ -8,7 +8,7 @@ public class Enumeration1Tests
     public void GetEnumprovider()
     {
         IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
-        CardType[] cardTypes = provider.Items;
+        CardType[] cardTypes = [.. provider.Items];
         Assert.Equal(4, cardTypes.Length);
     }
     [Fact]
@@ -16,8 +16,7 @@ public class Enumeration1Tests
     {
         IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
         // 按枚举名获取
-        CardType? silver = provider.Get("Silver");
-        Assert.NotNull(silver);
+        Assert.True(provider.TryGet("Silver", out var silver));
         Assert.Equal(CardType.Silver, silver);
     }
     [Fact]
@@ -25,15 +24,14 @@ public class Enumeration1Tests
     {
         IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
         // 获取不存在的枚举时，返回 null
-        CardType? unknown = provider.Get("");
-        Assert.Null(unknown);
+        Assert.False(provider.TryGet("", out _));
     }
     [Fact]
     public void FromName_Default()
     {
         IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
         // 获取不存在的枚举时指定默认值，返回默认值
-        CardType? unknownDefault = provider.Get("", CardType.Silver);
+        CardType unknownDefault = provider.Get("", CardType.Silver);
         Assert.Equal(CardType.Silver, unknownDefault);
     }
     [Fact]
@@ -41,7 +39,7 @@ public class Enumeration1Tests
     {
         IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
         // 按枚举值获取
-        CardType? cardType1 = provider.Get(1);
+        Assert.True(provider.TryGet(1, out var cardType1));
         Assert.Equal(CardType.Silver, cardType1);
     }
     [Fact]
@@ -49,8 +47,7 @@ public class Enumeration1Tests
     {
         IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
         // 获取不存在的枚举时，返回 null
-        CardType? cardType9 = provider.Get(9);
-        Assert.Null(cardType9);
+        Assert.False(provider.TryGet("", out _));
     }
     [Fact]
     public void FromOriginal_Default()

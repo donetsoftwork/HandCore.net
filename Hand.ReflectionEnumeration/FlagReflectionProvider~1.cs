@@ -14,13 +14,22 @@ public sealed class FlagReflectionProvider<TEnumeration>
     /// <summary>
     /// 构造函数
     /// </summary>
+    /// <param name="items"></param>
     /// <param name="flags"></param>
     /// <param name="names"></param>
     /// <param name="originals"></param>
-    public FlagReflectionProvider(TEnumeration[] flags, IReadOnlyDictionary<string, TEnumeration> names, IReadOnlyDictionary<long, TEnumeration> originals)
-        : base(flags, names, originals)
+    public FlagReflectionProvider(List<TEnumeration> items, List<TEnumeration> flags, IDictionary<string, TEnumeration> names, IDictionary<long, TEnumeration> originals)
+        : base(items, flags, names, originals)
     {
         _empty = new Lazy<TEnumeration>(CreateEmpty, true);
+    }
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    public FlagReflectionProvider(IDictionary<string, TEnumeration> names)
+        : this([], [], names, new Dictionary<long, TEnumeration>())
+    {
+        Check(names);
     }
     #region 配置
     /// <summary>

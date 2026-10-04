@@ -7,22 +7,22 @@
 >* 违反开闭原则（需大量 switch-case）的问题
 
 ## 2. 反射系统enum类型 ConsoleColor
-## 2.1 获取枚举项
+### 2.1 获取枚举项
 >* 使用方法ReflectionEnumeration.GetEnumProvider反射enum
 >* IEnumerationProvider对象存储了枚举信息避免重复反射
 >* 可以把IEnumerationProvider对象注入IOC容器方便随时使用
 >* 通过Items属性获取所有枚举项,相当于Enum.GetValues方法
 >* 通过Names属性获取所有枚举名,相当于Enum.GetNames方法
 >* 16个枚举字段转化为16个枚举类(Enumeration)对象
->* 通过Get方法获取单个枚举项
->* Get方法可以通过枚举名获取,相当于Enum.Parse方法
->* Get方法也可以通过枚举值获取,相当于强转为enum
+>* 通过TryGet方法获取单个枚举项
+>* TryGet方法可以通过枚举名获取,相当于Enum.TryParse方法
+>* TryGet方法也可以通过枚举值获取,相当于强转为enum
 >* 枚举接口是IEnumeration
 >* 枚举类是Enumeration
 
 ~~~csharp
 IEnumerationProvider<Enumeration> provider = ReflectionEnumeration.GetEnumProvider<ConsoleColor>();
-Enumeration[] items = provider.Items;
+Enumeration[] items = [.. provider.Items];
 Assert.Equal(16, items.Length);
 ConsoleColor[] values = Enum.GetValues<ConsoleColor>();
 Assert.Equal(16, values.Length);
@@ -31,23 +31,20 @@ Assert.Equal(16, names.Length);
 string[] names0 = Enum.GetNames<ConsoleColor>();
 Assert.Equal(16, names0.Length);
 // 按枚举名获取
-Enumeration? red = provider.Get(nameof(ConsoleColor.Red));
-Assert.NotNull(red);
+Assert.True(provider.TryGet(nameof(ConsoleColor.Red), out var red));
 Assert.Equal(nameof(ConsoleColor.Red), red.Name);
-var red0 = Enum.Parse<ConsoleColor>(nameof(ConsoleColor.Red));
-Assert.Equal(ConsoleColor.Red, red0);
+Assert.True(Enum.TryParse<ConsoleColor>(nameof(ConsoleColor.Red), out var red2));
+Assert.Equal(ConsoleColor.Red, red2);
 // 按枚举值获取
-Enumeration? green = provider.Get(10);
-Assert.NotNull(green);
+Assert.True(provider.TryGet(10, out var green));
 Assert.Equal(nameof(ConsoleColor.Green), green.Name);
 var green0 = (ConsoleColor)10;
 Assert.Equal(ConsoleColor.Green, green0);
-Enumeration? blue = provider.Get((long)ConsoleColor.Blue);
-Assert.NotNull(blue);
+Assert.True(provider.TryGet((long)ConsoleColor.Blue, out var blue));
 Assert.Equal(nameof(ConsoleColor.Blue), blue.Name);
 ~~~
 
-## 2.2 校验枚举项
+### 2.2 校验枚举项
 >* 通过IsDefined校验枚举是否定义
 >* 可以通过枚举名校验也可以通过枚举值校验
 >* 相当于Enum.IsDefined方法
@@ -63,7 +60,7 @@ Assert.True(Enum.IsDefined(typeof(ConsoleColor), (int)ConsoleColor.Green));
 ~~~
 
 ## 3. 反射位标记枚举类型 FileAccess
-## 3.1 获取位标记枚举项
+### 3.1 获取位标记枚举项
 >* 使用方法ReflectionEnumeration.GetFlagEnumProvider反射位标记enum
 >* 这里说的位标记枚举类型就是添加了Flags标记的enum
 >* IFlagEnumerationProvider对象存储了位标记枚举信息避免重复反射
@@ -75,11 +72,12 @@ Assert.True(Enum.IsDefined(typeof(ConsoleColor), (int)ConsoleColor.Green));
 >* IFlagEnumeration比IEnumeration多个Flags属性
 >* Flags为单位标记,0和复合位标记除外
 >* 本Case中ReadWrite就是复合位,等效于 Read | Write,所以Flags比Items少
+>* 标记枚举支持直接Get(也可以用TryGet),如果获取不到用Empty填充
 
 ~~~csharp
 IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>();
-Assert.Equal(3, provider.Items.Length);
-Assert.Equal(2, provider.Flags.Length);
+Assert.Equal(3, provider.Items.Count());
+Assert.Equal(2, provider.Flags.Count());
 FileAccess[] values = Enum.GetValues<FileAccess>();
 Assert.Equal(3, values.Length);
 string[] names = provider.Names.ToArray();
@@ -87,22 +85,20 @@ Assert.Equal(3, names.Length);
 string[] names0 = Enum.GetNames<FileAccess>();
 Assert.Equal(3, names0.Length);
 // 按枚举名获取
-FlagEnumeration? read = provider.Get(nameof(FileAccess.Read));
-Assert.NotNull(read);
+FlagEnumeration read = provider.Get(nameof(FileAccess.Read));
 Assert.Equal(nameof(FileAccess.Read), read.Name);
 Assert.Empty(read.Description);
 var red0 = Enum.Parse<FileAccess>(nameof(FileAccess.Read));
 Assert.Equal(FileAccess.Read, red0);
 // 按枚举值获取
-FlagEnumeration? write = provider.Get(2);
-Assert.NotNull(write);
+FlagEnumeration write = provider.Get(2);
 Assert.Equal(nameof(FileAccess.Write), write.Name);
 Assert.Empty(write.Description);
 var write0 = (FileAccess)2;
 Assert.Equal(FileAccess.Write, write0);
 ~~~
 
-## 3.2 Empty属性
+### 3.2 Empty属性
 >* 由于位标记枚举支持位运算,所以很容易出现枚举值为0的情况
 >* 所以定义标记enum尽量定义一个0值字段
 >* 0值字段就会转化为Empty属性
@@ -115,7 +111,7 @@ var empty = provider.Empty;
 Assert.Equal(0L, empty.Original);
 ~~~
 
-## 3.3 与运算
+### 3.3 与运算
 >* And方法用于位标记枚举的与运算,用于平替enum的与(&)运算
 >* And支持传多个同类型的位标记枚举
 
@@ -135,7 +131,7 @@ var result0 = FileAccess.ReadWrite & FileAccess.Read;
 Assert.Equal(FileAccess.Read, result0);
 ~~~
 
-## 3.4 或运算
+### 3.4 或运算
 >* Or方法用于位标记枚举的与运算,用于平替enum的或(|)运算
 >* Or支持传多个同类型的位标记枚举
 
@@ -157,7 +153,7 @@ var result0 = FileAccess.Read | FileAccess.Write;
 Assert.Equal(FileAccess.ReadWrite, result0);
 ~~~
 
-## 3.5 HasFlag方法
+### 3.5 HasFlag方法
 >* IFlagEnumeration的HasFlag方法用于平替方法enum的HasFlag方法
 >* HasFlag支持传枚举、枚举名和枚举值
 >* enum的HasFlag只支持枚举
@@ -174,27 +170,27 @@ Assert.True(readWrite.HasFlag((long)FileAccess.Write));
 Assert.True(FileAccess.ReadWrite.HasFlag(FileAccess.Read));
 ~~~
 
-## 3.6 TryParse方法
->* TryParse支持多个枚举名(逗号分割)和枚举值
->* TryParse方法用于平替Enum.TryParse方法
->* TryParse与Get有区别
->* Get只能获取定义的枚举项
->* TryParse可以获取位运算后的枚举项(能按位拆解)
+### 3.6 Parse方法
+>* Parse支持多个枚举名(逗号分割)和枚举值
+>* Parse方法用于平替Enum.TryParse方法
+>* Parse与Get有区别
+>* Get只能获取定义的枚举项或Empty
+>* Parse可以获取位运算后的枚举项(能按位拆解)
 
 ~~~csharp
 IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>(StringComparer.OrdinalIgnoreCase);
-Assert.True(provider.TryParse("read,write", out var result));
+var result = provider.Parse("read,write");
 FlagEnumeration? readWrite = provider.Get(nameof(FileAccess.ReadWrite));
 Assert.NotNull(readWrite);
 Assert.Equal(readWrite, result);
-Assert.True(provider.TryParse((long)FileAccess.Read, out var read));
+var read = provider.Parse((long)FileAccess.Read);
 Assert.Equal(nameof(FileAccess.Read), read.Name);
 Assert.True(Enum.TryParse<FileAccess>("read,write", true, out var result0));
 Assert.Equal(FileAccess.ReadWrite, result0);
 ~~~
 
 ## 4. 枚举别名和备注
-## 4.1 定义含别名和备注的enum
+### 4.1 定义含别名和备注的enum
 ~~~csharp
 /// <summary>
 /// Vip卡类型
@@ -217,7 +213,7 @@ public enum CardType
 }
 ~~~
 
-## 4.2 别名和备注使用示例如下
+### 4.2 别名和备注使用示例如下
 >* CardType定义了8个字段,解析为4个枚举项
 >* 其中Silver、Gold、Platinum和Black为四个枚举项
 >* Description标记解析为枚举项的备注(Description属性),作为扩展属性,一般用于展示
@@ -230,16 +226,14 @@ public enum CardType
 
 ~~~csharp
 IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>(StringComparer.OrdinalIgnoreCase);
-Enumeration[] cardTypes = provider.Items;
+Enumeration[] cardTypes = [.. provider.Items];
 Assert.Equal(4, cardTypes.Length);
 // 按枚举名获取
-Enumeration? silver = provider.Get(nameof(CardType.Silver));
-Assert.NotNull(silver);
+Assert.True(provider.TryGet(nameof(CardType.Silver), out var silver));
 Assert.Equal(nameof(CardType.Silver), silver.Name);
 Assert.Equal("银卡", silver.Description);
 // 按枚举别名获取
-Enumeration? vip = provider.Get("vip");
-Assert.NotNull(vip);
+Assert.True(provider.TryGet("Vip", out var vip));
 Assert.Equal(silver, vip);
 // 按枚举值获取
 Enumeration? gold = provider.Get(2);
@@ -247,8 +241,7 @@ Assert.NotNull(gold);
 Assert.Equal(nameof(CardType.Gold), gold.Name);
 Assert.Equal("金卡", gold.Description);
 // 用EnumMember标记定义别名
-Enumeration? svip = provider.Get("svip");
-Assert.NotNull(svip);
+Assert.True(provider.TryGet("svip", out var svip));
 // 支持用Description标记定义备注
 Enumeration? description = provider.GetByDescription("银卡");
 Assert.NotNull(description);
@@ -305,15 +298,13 @@ public sealed class CardType : Enumeration
 
 ~~~csharp
 IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
-CardType[] cardTypes = provider.Items;
+CardType[] cardTypes = [.. provider.Items];
 Assert.Equal(4, cardTypes.Length);
 // 按枚举名获取
-var silver = provider.Get("Silver");
-Assert.NotNull(silver);
+Assert.True(provider.TryGet("Silver", out var silver));
 Assert.Equal("银卡", silver.Description);
 // 按别名获取
-var vip = provider.Get("Vip");
-Assert.NotNull(vip);
+Assert.True(provider.TryGet("Vip", out var vip));
 Assert.Equal(CardType.Silver, silver);
 Assert.Equal(silver, vip);
 // 获取不存在的枚举时指定默认值，返回默认值
@@ -387,7 +378,7 @@ public class DaysOfWeek
 
 ~~~csharp
 IFlagEnumerationProvider<DaysOfWeek> provider = ReflectionEnumeration.GetFlagEnumerationProvider<DaysOfWeek>();
-DaysOfWeek[] cardTypes = provider.Items;
+DaysOfWeek[] cardTypes = [.. provider.Items];
 Assert.Equal(7, cardTypes.Length);
 Assert.True(provider.IsDefined(DaysOfWeek.Saturday));
 Assert.True(provider.IsDefined(DaysOfWeek.Saturday.Original));

@@ -10,11 +10,9 @@ public class FromNameTests
     {
         var provider = CardType.Provider;
         // 按枚举名获取
-        var cardType = provider.Get("Silver");
-        Assert.NotNull(cardType);
+        Assert.True(provider.TryGet("Silver", out var cardType));
         // 按别名获取
-        var vip = provider.Get("Vip");
-        Assert.NotNull(vip);
+        Assert.True(provider.TryGet("Vip", out var vip));
         Assert.Equal(CardType.Silver, cardType);
         Assert.Equal(cardType, vip);
     }
@@ -22,8 +20,7 @@ public class FromNameTests
     public void FromName_Null()
     {
         // 获取不存在的枚举时，返回 null
-        var cardType = CardType.Provider.Get("");
-        Assert.Null(cardType);
+        Assert.False(CardType.Provider.TryGet("", out _));
     }
     [Fact]
     public void FromName_Default()

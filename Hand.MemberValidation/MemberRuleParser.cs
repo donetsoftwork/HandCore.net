@@ -1,7 +1,5 @@
-using Hand.Rule;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using Hand.Comparers;
+using Hand.Rule.Configurations;
 
 namespace Hand;
 
@@ -12,7 +10,7 @@ namespace Hand;
 /// <param name="exclude"></param>
 /// <param name="separators"></param>
 /// <param name="memberComparer"></param>
-public class MemberRuleParser(string include, string exclude, char[] separators, IEqualityComparer<string> memberComparer)
+public class MemberRuleParser(string include, string exclude, char[] separators, StringComparer memberComparer)
 {
     #region 配置
     /// <summary>
@@ -30,7 +28,7 @@ public class MemberRuleParser(string include, string exclude, char[] separators,
     /// <summary>
     /// 成员比较
     /// </summary>
-    protected readonly IEqualityComparer<string> _memberComparer = memberComparer;
+    protected readonly StringComparer _memberComparer = memberComparer;
 
     /// <summary>
     /// 包含标记
@@ -50,7 +48,7 @@ public class MemberRuleParser(string include, string exclude, char[] separators,
     /// <summary>
     /// 成员比较
     /// </summary>
-    public IEqualityComparer<string> MemberComparer
+    public StringComparer MemberComparer
         => _memberComparer;
     #endregion
     /// <summary>
@@ -58,47 +56,52 @@ public class MemberRuleParser(string include, string exclude, char[] separators,
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
-    public IValidation<string> Parse(string? text)
+    public ValidationConfiguration<string> Parse(string? text)
     {
-        if (string.IsNullOrWhiteSpace(text) || text!.Equals("ALL", StringComparison.OrdinalIgnoreCase))
-            return Logic.True<string>();
-        if (text!.Equals("Empty", StringComparison.OrdinalIgnoreCase))
-            return Logic.False<string>();
-        if (text.StartsWith(_includePrefix, StringComparison.OrdinalIgnoreCase))
-            return ToIncluded(text, _separators, _memberComparer, 1);
-        // 逐个排除
-        if (text.StartsWith(_excludePrefix, StringComparison.OrdinalIgnoreCase))
-            return ToIncluded(text, _separators, _memberComparer, 1).Not();
-        // 逐个解析
-        return ToIncluded(text, _separators, _memberComparer, 0);
+        var comparison = CompareConverter.ToComparison(_memberComparer);
+        if (string.IsNullOrWhiteSpace(text) || text!.Equals("ALL", comparison))
+            return AllConfiguration<string>.Instance;
+        if (text.Equals("Empty", comparison))
+            return EmptyConfiguration<string>.Instance;
+        var includes = new HashSet<string>(_memberComparer);
+        var excludes = new HashSet<string>(_memberComparer);
+        HashSet<string> items = includes;
+        var parts = text.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
+        foreach (var part in parts)
+        {
+            if (part.StartsWith(_includePrefix, comparison))
+            {
+                items = includes;
+            }
+            else if (part.StartsWith(_excludePrefix, comparison))
+            {
+                items = excludes;
+            }
+            else
+            {
+                items.Add(part);
+            }
+        }
+        if (includes.Count > 0)
+        {
+            if(excludes.Count > 0)
+            {
+                return new ComplexConfiguration<string>(includes, excludes);
+            }
+            else
+            {
+                return new IncludeConfiguration<string>(includes);
+            }
+        }
+        else if (excludes.Count > 0)
+        {
+            return new ExcludeConfiguration<string>(excludes);
+        }
+        else
+        {
+            return EmptyConfiguration<string>.Instance;
+        }
     }
-    /// <summary>
-    /// 转化为被包含验证规则
-    /// </summary>
-    /// <param name="text"></param>
-    /// <param name="separators"></param>
-    /// <param name="comparer"></param>
-    /// <param name="skip"></param>
-    /// <returns></returns>
-    public static IValidation<string> ToIncluded(string text, char[] separators, IEqualityComparer<string> comparer, int skip)
-        => ToIncluded(text.Split(separators, StringSplitOptions.RemoveEmptyEntries), comparer, skip);
-    /// <summary>
-    /// 转化为被包含验证规则
-    /// </summary>
-    /// <param name="parts"></param>
-    /// <param name="comparer"></param>
-    /// <param name="skip"></param>
-    /// <returns></returns>
-    public static IValidation<string> ToIncluded(string[] parts, IEqualityComparer<string> comparer, int skip)
-        => Logic.Included(comparer, Skip(parts, skip));
-    /// <summary>
-    /// 跳过
-    /// </summary>
-    /// <param name="parts"></param>
-    /// <param name="skip"></param>
-    /// <returns></returns>
-    public static IEnumerable<string> Skip(string[] parts, int skip)
-        => skip > 0 ? parts.Skip(skip).Distinct() : parts.Distinct();
     /// <summary>
     /// 默认实例
     /// </summary>
@@ -110,7 +113,7 @@ public class MemberRuleParser(string include, string exclude, char[] separators,
         /// <summary>
         /// 默认实例
         /// </summary>
-        internal static readonly MemberRuleParser Instance = new("Include:", "Exclude:", [' '], StringComparer.Ordinal);
+        internal static readonly MemberRuleParser Instance = new("Include:", "Exclude:", [' '], StringComparer.OrdinalIgnoreCase);
     }
     #endregion
 }

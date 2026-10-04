@@ -35,6 +35,16 @@ public class FlagEnumeration(ISet<string> names, string name, long original, str
         : this(new HashSet<string>(comparer) { name }, name, original, description)
     {
     }
+    /// <summary>
+    /// 构造函数
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="original"></param>
+    /// <param name="description"></param>
+    public FlagEnumeration(string name, long original, string description = "")
+        : this(new HashSet<string>() { name }, name, original, description)
+    {
+    }
     #region 配置
     /// <inheritdoc cref="Names" path="/summary"/>
     protected readonly ISet<string> _flags = names;
@@ -57,4 +67,16 @@ public class FlagEnumeration(ISet<string> names, string name, long original, str
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string FormatName(IEnumerable<string> names)
         => string.Join(",", names);
+    /// <summary>
+    /// 检查位标记
+    /// </summary>
+    /// <param name="original"></param>
+    /// <returns></returns>
+    public static bool VerifyFlag(long original)
+    {
+        if (original < 1L)
+            return false;
+        // 2的n次
+        return (original & (original - 1L)) == 0L;
+    }
 }

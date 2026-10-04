@@ -12,7 +12,7 @@ public class GroupList<TValue>(IDictionary<string, ICollection<TValue>> group)
     /// 分组列表
     /// </summary>
     /// <param name="comparer"></param>
-    public GroupList(StringComparer comparer)
+    public GroupList(IEqualityComparer<string> comparer)
         : this(new Dictionary<string, ICollection<TValue>>(comparer))
     {
     }

@@ -8,8 +8,8 @@ public class FileAccessTests
     public void GetEnumprovider()
     {
         IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>();
-        Assert.Equal(3, provider.Items.Length);
-        Assert.Equal(2, provider.Flags.Length);
+        Assert.Equal(3, provider.Items.Count());
+        Assert.Equal(2, provider.Flags.Count());
         FileAccess[] values = Enum.GetValues<FileAccess>();
         Assert.Equal(3, values.Length);
         string[] names = provider.Names.ToArray();
@@ -22,8 +22,7 @@ public class FileAccessTests
     {
         IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>();
         // 按枚举名获取
-        FlagEnumeration? read = provider.Get(nameof(FileAccess.Read));
-        Assert.NotNull(read);
+        FlagEnumeration read = provider.Get(nameof(FileAccess.Read));
         Assert.Equal(nameof(FileAccess.Read), read.Name);
         Assert.Empty(read.Description);
         var red0 = Enum.Parse<FileAccess>(nameof(FileAccess.Read));
@@ -34,8 +33,7 @@ public class FileAccessTests
     {
         IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>();
         // 按枚举值获取
-        FlagEnumeration? write = provider.Get(2);
-        Assert.NotNull(write);
+        FlagEnumeration write = provider.Get(2);
         Assert.Equal(nameof(FileAccess.Write), write.Name);
         Assert.Empty(write.Description);
         var write0 = (FileAccess)2;
@@ -45,7 +43,7 @@ public class FileAccessTests
     public void FromEnum()
     {
         IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>();
-        FlagEnumeration? fileAccess = provider.Get((long)FileAccess.Read);
+        FlagEnumeration fileAccess = provider.Get((long)FileAccess.Read);
         Assert.NotNull(fileAccess);
         Assert.Equal(nameof(FileAccess.Read), fileAccess.Name);
         Assert.Empty(fileAccess.Description);
@@ -54,7 +52,7 @@ public class FileAccessTests
     public void HasFlag()
     {
         IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>();
-        FlagEnumeration? read = provider.Get(nameof(FileAccess.Read));
+        FlagEnumeration read = provider.Get(nameof(FileAccess.Read));
         Assert.NotNull(read);
         var readWrite = provider.Get(nameof(FileAccess.ReadWrite));
         Assert.NotNull(readWrite);
@@ -82,8 +80,8 @@ public class FileAccessTests
     public void TryParseByName()
     {
         IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>(StringComparer.OrdinalIgnoreCase);
-        Assert.True(provider.TryParse("read,write", out var result));
-        FlagEnumeration? readWrite = provider.Get(nameof(FileAccess.ReadWrite));
+        var result = provider.Parse("read,write");
+        FlagEnumeration readWrite = provider.Get(nameof(FileAccess.ReadWrite));
         Assert.NotNull(readWrite);
         Assert.Equal(readWrite, result);
         Assert.True(Enum.TryParse<FileAccess>("read,write", true, out var result0));
@@ -93,9 +91,9 @@ public class FileAccessTests
     public void TryParseByOriginal()
     {
         IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>();
-        Assert.True(provider.TryParse((long)FileAccess.Read, out var read));
+        var read = provider.Parse((long)FileAccess.Read);
         Assert.Equal(nameof(FileAccess.Read), read.Name);
-        Assert.True(provider.TryParse((long)(FileAccess.Read | FileAccess.Write), out var readWrite));
+        var readWrite = provider.Parse((long)(FileAccess.Read | FileAccess.Write));
         Assert.True(readWrite.HasFlag((long)FileAccess.Read));
     }
     [Fact]
@@ -137,10 +135,10 @@ public class FileAccessTests
     {
         IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>(StringComparer.OrdinalIgnoreCase);
         // 按枚举名获取
-        Enumeration? fileAccess = provider.Get("read");
+        Enumeration fileAccess = provider.Get("read");
         Assert.NotNull(fileAccess);
         Assert.True(provider.IsDefined("readwrite"));
-        Assert.True(provider.TryParse("read,write", out var result));
+        var result = provider.Parse("read,write");
         var readWrite = provider.Get(nameof(FileAccess.ReadWrite));
         Assert.NotNull(readWrite);
         Assert.Equal(readWrite, result);

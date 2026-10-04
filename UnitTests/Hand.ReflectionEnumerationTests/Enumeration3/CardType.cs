@@ -72,4 +72,6 @@ public abstract class CardType : Enumeration
         public override decimal Discount => 0.75m;
     }
     #endregion
+
+    public static readonly IEnumerationProvider<CardType> Provider = ReflectionEnumeration.GetEnumerationProvider<CardType>(StringComparer.OrdinalIgnoreCase);
 }

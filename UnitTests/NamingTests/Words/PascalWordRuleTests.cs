@@ -7,6 +7,7 @@ public class PascalWordRuleTests
     [Theory]
     [InlineData("test", "Test")]
     [InlineData("_id", "Id")]
+    [InlineData("Name", "Name")]
     [InlineData("", "")]
     public void FistToUpper(string original, string expected)
     {
