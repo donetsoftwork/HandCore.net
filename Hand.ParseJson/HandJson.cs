@@ -26,7 +26,7 @@ public class HandJson(IMemberBuilderProvider builderProvider, DefaultValueBuilde
     private readonly PrimitiveReaderCacher _primitives = new(defaultValue);
 
     /// <summary>
-    /// 构造器提供者
+    /// 构造器提供器
     /// </summary>
     public IMemberBuilderProvider Builders
         => _builders;
@@ -36,7 +36,7 @@ public class HandJson(IMemberBuilderProvider builderProvider, DefaultValueBuilde
     internal PrimitiveReaderCacher Primitives
         => _primitives;
     /// <summary>
-    /// 默认值提供者
+    /// 默认值提供器
     /// </summary>
     public DefaultValueBuilder DefaultValues
         => _defaultValues;

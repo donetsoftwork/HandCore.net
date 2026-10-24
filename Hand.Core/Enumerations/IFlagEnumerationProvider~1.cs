@@ -3,7 +3,7 @@
 namespace Hand.Enumerations;
 
 /// <summary>
-/// 位标记枚举提供者
+/// 位标记枚举提供器
 /// </summary>
 /// <typeparam name="TEnumeration"></typeparam>
 public interface IFlagEnumerationProvider<TEnumeration>

@@ -4,7 +4,7 @@ using System.Reflection;
 namespace Hand.Enumerations;
 
 /// <summary>
-/// 位标记枚举反射提供者
+/// 位标记枚举反射提供器
 /// </summary>
 /// <typeparam name="TEnumeration"></typeparam>
 public sealed class FlagReflectionProvider<TEnumeration>

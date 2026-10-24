@@ -15,7 +15,7 @@ public class PrimitiveReaderCacher(DefaultValueBuilder defaultValue)
     #region 配置
     private readonly DefaultValueBuilder _defaultValue = defaultValue;
     /// <summary>
-    /// 默认值提供者
+    /// 默认值提供器
     /// </summary>
     public DefaultValueBuilder DefaultValue
         => _defaultValue;

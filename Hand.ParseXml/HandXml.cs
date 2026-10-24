@@ -30,7 +30,7 @@ public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaul
     private readonly XmlConvertCacher _converters = new();
 
     /// <summary>
-    /// 构造器提供者
+    /// 构造器提供器
     /// </summary>
     public IMemberBuilderProvider Builders
         => _builders;
@@ -40,7 +40,7 @@ public class HandXml(IMemberBuilderProvider builders, DefaultValueBuilder defaul
     internal XmlConvertCacher Converters 
         => _converters;
     /// <summary>
-    /// 默认值提供者
+    /// 默认值提供器
     /// </summary>
     public DefaultValueBuilder DefaultValues
         => _defaultValues;

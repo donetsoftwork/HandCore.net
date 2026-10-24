@@ -1,7 +1,7 @@
 namespace Hand.EventHandlers;
 
 /// <summary>
-/// 事件处理器提供者
+/// 事件处理器提供器
 /// </summary>
 public interface IEventHandlerProvider
 {

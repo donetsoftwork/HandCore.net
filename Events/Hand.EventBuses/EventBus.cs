@@ -12,7 +12,7 @@ public class EventBus(IEventHandlerProvider handlerProvider, EventDispatcher dis
 {
     #region 配置
     /// <summary>
-    /// 事件处理器提供者
+    /// 事件处理器提供器
     /// </summary>
     private readonly IEventHandlerProvider _handlerProvider = handlerProvider;
     /// <summary>

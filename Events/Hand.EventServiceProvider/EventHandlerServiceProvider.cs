@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Hand.Events;
 
 /// <summary>
-/// 事件订阅提供者(容器实现)
+/// 事件订阅提供器(容器实现)
 /// </summary>
 /// <param name="provider"></param>
 public class EventHandlerServiceProvider(IServiceProvider provider)

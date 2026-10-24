@@ -5,7 +5,7 @@ using Hand.Creational;
 namespace Hand;
 
 /// <summary>
-/// 实体建造提供者
+/// 实体建造提供器
 /// </summary>
 /// <param name="cacher"></param>
 public class MemberBuilderProvider(IGenericCacher<Type> cacher)
@@ -15,7 +15,7 @@ public class MemberBuilderProvider(IGenericCacher<Type> cacher)
     private readonly IGenericCacher<Type> _cacher = cacher;
     #endregion
     /// <summary>
-    /// 实体建造提供者
+    /// 实体建造提供器
     /// </summary>
     public MemberBuilderProvider()
         : this(new EntityBuilderCacher(new DictionaryCacher<Type>()))

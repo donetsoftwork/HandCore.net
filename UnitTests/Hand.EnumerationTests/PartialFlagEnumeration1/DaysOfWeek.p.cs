@@ -9,7 +9,7 @@ partial class DaysOfWeek
     /// </summary>
     public static readonly IFlagEnumerationProvider<DaysOfWeek> Provider = new DaysOfWeekProvider();
     /// <summary>
-    /// 星期几枚举提供者
+    /// 星期几枚举提供器
     /// </summary>
     private sealed class DaysOfWeekProvider : FlagEnumerationProvider<DaysOfWeek>
     {

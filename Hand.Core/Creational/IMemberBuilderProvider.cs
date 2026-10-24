@@ -1,7 +1,7 @@
 ﻿namespace Hand.Creational;
 
 /// <summary>
-/// 成员建造提供者
+/// 成员建造提供器
 /// </summary>
 public interface IMemberBuilderProvider
 {

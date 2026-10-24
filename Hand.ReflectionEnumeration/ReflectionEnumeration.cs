@@ -153,7 +153,7 @@ public static partial class ReflectionEnumeration
         names[memberName] = enumeration;
     }
     /// <summary>
-    /// 获取枚举提供者
+    /// 获取枚举提供器
     /// </summary>
     /// <typeparam name="TEnum"></typeparam>
     /// <param name="comparer"></param>
@@ -162,7 +162,7 @@ public static partial class ReflectionEnumeration
         where TEnum : Enum
         => new(GetEnumDictionary<TEnum>(comparer ?? StringComparer.Ordinal));
     /// <summary>
-    /// 获取枚举提供者
+    /// 获取枚举提供器
     /// </summary>
     /// <typeparam name="TEnum"></typeparam>
     /// <param name="comparer"></param>
@@ -174,7 +174,7 @@ public static partial class ReflectionEnumeration
         return new(items, flags, names, originals);
     }
     /// <summary>
-    /// 获取枚举提供者
+    /// 获取枚举提供器
     /// </summary>
     /// <typeparam name="TEnumeration"></typeparam>
     /// <param name="comparer"></param>
@@ -183,7 +183,7 @@ public static partial class ReflectionEnumeration
         where TEnumeration : IEnumeration
         => new(GetEnumerationDictionary<TEnumeration>(comparer));
     /// <summary>
-    /// 获取枚举提供者
+    /// 获取枚举提供器
     /// </summary>
     /// <typeparam name="TEnumeration"></typeparam>
     /// <param name="comparer"></param>

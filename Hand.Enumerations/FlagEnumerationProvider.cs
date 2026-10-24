@@ -1,7 +1,7 @@
 ﻿namespace Hand.Enumerations;
 
 /// <summary>
-/// 位标记枚举提供者
+/// 位标记枚举提供器
 /// </summary>
 public sealed class FlagEnumerationProvider
     : FlagEnumerationProvider<FlagEnumeration>

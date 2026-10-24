@@ -4,7 +4,7 @@ using Hand.Services;
 namespace Hand.Events;
 
 /// <summary>
-/// 事件处理器提供者(字典实现)
+/// 事件处理器提供器(字典实现)
 /// </summary>
 public class EventHandlerDictionaryProvider
     : IEventHandlerProvider

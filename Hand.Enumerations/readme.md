@@ -10,7 +10,7 @@
 ### 2.1 自定义普通枚举类CardType示例
 >* CardType继承枚举类Enumeration
 >* 构造函数定义为私有的,避免外部生成CardType实例
->* 内部类CardTypeProvider继承EnumerationProvider,其唯一实例是CardType的静态字段Provider
+>* 内部类CardTypeProvider继承EnumerationProvider,是枚举提供器,用于把枚举名或枚举值转化为枚举
 >* CardType封装了一个复杂的打折逻辑
 >* 银卡9折(不与其他折扣同享)
 >* 金卡最低85折
@@ -126,11 +126,11 @@ public abstract class CardType : Enumeration
     #endregion
     #region Provider
     /// <summary>
-    /// Vip枚举提供者
+    /// Vip枚举提供器
     /// </summary>
     public static readonly IEnumerationProvider<CardType> Provider = new CardTypeProvider();
     /// <summary>
-    /// Vip枚举提供者
+    /// Vip枚举提供器
     /// </summary>
     class CardTypeProvider : EnumerationProvider<CardType>
     {
@@ -266,7 +266,7 @@ public sealed class DaysOfWeek
     /// </summary>
     public static readonly IFlagEnumerationProvider<DaysOfWeek> Provider = new DaysOfWeekProvider();
     /// <summary>
-    /// 星期几枚举提供者
+    /// 星期几枚举提供器
     /// </summary>
         private sealed class DaysOfWeekProvider : FlagEnumerationProvider<DaysOfWeek>
     {

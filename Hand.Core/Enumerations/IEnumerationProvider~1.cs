@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Hand.Enumerations;
 
 /// <summary>
-/// 枚举提供者
+/// 枚举提供器
 /// </summary>
 /// <typeparam name="TEnumeration"></typeparam>
 public interface IEnumerationProvider<TEnumeration>

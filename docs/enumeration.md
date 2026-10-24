@@ -1,4 +1,4 @@
-# .net core 使用枚举类而不是枚举类型的升级版本
+# .net core 使用枚举类而不是枚举类型及应用源生成器
 
 ## 官方建议使用枚举类而不是枚举类型
 >* 原生枚举缺乏行为封装
@@ -10,7 +10,7 @@
 ### 1. 反射系统enum类型 ConsoleColor
 #### 1.1 获取枚举项
 >* 使用方法ReflectionEnumeration.GetEnumProvider反射enum
->* IEnumerationProvider对象存储了枚举信息避免重复反射
+>* IEnumerationProvider是枚举提供器,用于把枚举名或枚举值转化为枚举
 >* 可以把IEnumerationProvider对象注入IOC容器方便随时使用
 >* 通过Items属性获取所有枚举项,相当于Enum.GetValues方法
 >* 通过Names属性获取所有枚举名,相当于Enum.GetNames方法
@@ -23,7 +23,7 @@
 
 ~~~csharp
 IEnumerationProvider<Enumeration> provider = ReflectionEnumeration.GetEnumProvider<ConsoleColor>();
-Enumeration[] items = provider.Items;
+Enumeration[] items = provider.Items.ToArray();
 Assert.Equal(16, items.Length);
 ConsoleColor[] values = Enum.GetValues<ConsoleColor>();
 Assert.Equal(16, values.Length);
@@ -64,7 +64,7 @@ Assert.True(Enum.IsDefined(typeof(ConsoleColor), (int)ConsoleColor.Green));
 #### 2.1 获取位标记枚举项
 >* 使用方法ReflectionEnumeration.GetFlagEnumProvider反射位标记enum
 >* 这里说的位标记枚举类型就是添加了Flags标记的enum
->* IFlagEnumerationProvider对象存储了位标记枚举信息避免重复反射
+>* IFlagEnumerationProvider是枚举提供器,用于把枚举名或枚举值转化为枚举
 >* 可以把IFlagEnumerationProvider对象注入IOC容器方便随时使用
 >* IFlagEnumerationProvider包含IEnumerationProvider的所有功能,并支持位运算
 >* IFlagEnumerationProvider派生自枚举接口IEnumerationProvider
@@ -77,8 +77,8 @@ Assert.True(Enum.IsDefined(typeof(ConsoleColor), (int)ConsoleColor.Green));
 
 ~~~csharp
 IFlagEnumerationProvider<FlagEnumeration> provider = ReflectionEnumeration.GetFlagEnumProvider<FileAccess>();
-Assert.Equal(3, provider.Items.Length);
-Assert.Equal(2, provider.Flags.Length);
+Assert.Equal(3, provider.Items.Count());
+Assert.Equal(2, provider.Flags.Count());
 FileAccess[] values = Enum.GetValues<FileAccess>();
 Assert.Equal(3, values.Length);
 string[] names = provider.Names.ToArray();
@@ -227,7 +227,7 @@ public enum CardType
 
 ~~~csharp
 IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>(StringComparer.OrdinalIgnoreCase);
-Enumeration[] cardTypes = provider.Items;
+Enumeration[] cardTypes = provider.Items.ToArray();
 Assert.Equal(4, cardTypes.Length);
 // 按枚举名获取
 Assert.True(provider.TryGet(nameof(CardType.Silver), out var silver));
@@ -375,18 +375,18 @@ public abstract class CardType : Enumeration
     #endregion
     #region Provider
     /// <summary>
-    /// Vip枚举提供者
+    /// Vip枚举提供器
     /// </summary>
     public static readonly IEnumerationProvider<CardType> Provider = new CardTypeProvider();
     /// <summary>
-    /// Vip枚举提供者
+    /// Vip枚举提供器
     /// </summary>
     class CardTypeProvider : EnumerationProvider<CardType>
     {
         internal CardTypeProvider()
             : base(
-            [Silver, Gold, Platinum, Black]
-            , new Dictionary<string, CardType>(StringComparer.OrdinalIgnoreCase)
+            [Silver, Gold, Platinum, Black], 
+            new Dictionary<string, CardType>(StringComparer.OrdinalIgnoreCase)
             {
                 { nameof(Silver), Silver},
                 { nameof(Gold), Gold},
@@ -396,8 +396,8 @@ public abstract class CardType : Enumeration
                 { nameof(Vip2) , Gold},
                 { nameof(Vip3) , Platinum},
                 { nameof(Vip4) , Black},
-            }
-            , new Dictionary<long, CardType>()
+            }, 
+            new Dictionary<long, CardType>()
             {
                 { Silver.Original, Silver},
                 { Gold.Original, Gold},
@@ -515,14 +515,14 @@ public sealed class DaysOfWeek
     /// </summary>
     public static readonly IFlagEnumerationProvider<DaysOfWeek> Provider = new DaysOfWeekProvider();
     /// <summary>
-    /// 星期几枚举提供者
+    /// 星期几枚举提供器
     /// </summary>
     private sealed class DaysOfWeekProvider : FlagEnumerationProvider<DaysOfWeek>
     {
         internal DaysOfWeekProvider()
             : base(
-            [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
-            , new Dictionary<string, DaysOfWeek>(_comparer)
+            [Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday], 
+            new Dictionary<string, DaysOfWeek>(_comparer)
             {
                 { nameof(Unknown), Unknown },
                 { nameof(Sunday), Sunday},
@@ -532,8 +532,8 @@ public sealed class DaysOfWeek
                 { nameof(Thursday),Thursday},
                 { nameof(Friday), Friday},
                 { nameof(Saturday), Saturday}
-            }
-            , new Dictionary<long, DaysOfWeek>()
+            }, 
+            new Dictionary<long, DaysOfWeek>()
             {
                 { Unknown.Original, Unknown },
                 { Sunday.Original, Sunday},
@@ -627,7 +627,7 @@ public sealed class CardType : Enumeration
 
 ~~~csharp
 IEnumerationProvider<CardType> provider = ReflectionEnumeration.GetEnumerationProvider<CardType>();
-CardType[] cardTypes = provider.Items;
+CardType[] cardTypes = provider.Items.ToArray();
 Assert.Equal(4, cardTypes.Length);
 // 按枚举名获取
 Assert.True(provider.TryGet("Silver", out var silver));
@@ -648,7 +648,6 @@ Assert.False(provider.IsDefined("SVip"));
 ### 2. 反射位标记枚举类
 #### 2.1 自定义位标记枚举类DaysOfWeek
 >* DaysOfWeek除了构造函数,复杂度和enum差不多了
-
 
 ~~~csharp
 public class DaysOfWeek
@@ -707,7 +706,7 @@ public class DaysOfWeek
 
 ~~~csharp
 IFlagEnumerationProvider<DaysOfWeek> provider = ReflectionEnumeration.GetFlagEnumerationProvider<DaysOfWeek>();
-DaysOfWeek[] cardTypes = provider.Items;
+DaysOfWeek[] cardTypes = provider.Items.ToArray();
 Assert.Equal(7, cardTypes.Length);
 Assert.True(provider.IsDefined(DaysOfWeek.Saturday));
 Assert.True(provider.IsDefined(DaysOfWeek.Saturday.Original));
@@ -726,8 +725,180 @@ var overlay = provider.And(duty1, duty2);
 Assert.Equal(DaysOfWeek.Tuesday, overlay);
 ~~~
 
-## 四、基于enum原型生成枚举类
+## 四、基于enum类型生成枚举类
+### 1. 配置代码
+>* 枚举类型CardType作为枚举类CardEnumeration的原型
+>* 使用源生成器GenerateEnumeration生成CardEnumeration
 
+~~~csharp
+using Hand.Enumerations;
+using Hand.Primitives;
+using System.ComponentModel;
+using System.Runtime.Serialization;
+
+namespace GenerateEnumerationTests;
+
+/// <summary>
+/// Vip卡类型
+/// </summary>
+public enum CardType
+{
+    /// <summary>
+    /// 银卡
+    /// </summary>
+    [Description("银卡")]
+    Silver = 1,
+    Vip = Silver,
+    /// <summary>
+    /// 金卡
+    /// </summary>
+    [Description("金卡")]
+    Gold = 2,
+    Vip2 = Gold,
+    /// <summary>
+    /// 白金卡
+    /// </summary>
+    [Description("白金卡")]
+    Platinum = 3,
+    Vip3 = Platinum,
+    /// <summary>
+    /// 黑金卡
+    /// </summary>
+    [Description("黑金卡")]
+    [EnumMember(Value = "SVIP")]
+    Black = 4,
+    Vip4 = Black,
+}
+
+[GenerateEnumeration<CardType>]
+public partial class CardEnumeration;
+~~~
+
+### 2. 生成后的代码
+>* CardEnumeration为枚举类
+>* 静态字段Provider用来把枚举名和枚举值转化为CardEnumeration
+>* 其他静态字段和属性用来平替CardType的枚举字段
+>* EnumMember作为别名
+>* Description和注释作为备注
+
+~~~csharp
+// <auto-generated/>
+
+using Hand.Enumerations;
+using System.Collections.Generic;
+
+namespace GenerateEnumerationTests;
+partial class CardEnumeration : Enumeration
+{
+    ///<summary>
+    ///银卡
+    ///</summary>
+    public static readonly CardEnumeration Silver = new("Silver", 1L, "银卡");
+    ///<summary>
+    ///金卡
+    ///</summary>
+    public static readonly CardEnumeration Gold = new("Gold", 2L, "金卡");
+    ///<summary>
+    ///白金卡
+    ///</summary>
+    public static readonly CardEnumeration Platinum = new("Platinum", 3L, "白金卡");
+    ///<summary>
+    ///黑金卡
+    ///</summary>
+    public static readonly CardEnumeration Black = new("Black", 4L, "黑金卡");
+    ///<summary>
+    ///Silver
+    ///</summary>
+    public static CardEnumeration Vip => Silver;
+    ///<summary>
+    ///Gold
+    ///</summary>
+    public static CardEnumeration Vip2 => Gold;
+    ///<summary>
+    ///Platinum
+    ///</summary>
+    public static CardEnumeration Vip3 => Platinum;
+    ///<summary>
+    ///Black
+    ///</summary>
+    public static CardEnumeration SVIP => Black;
+    ///<summary>
+    ///Black
+    ///</summary>
+    public static CardEnumeration Vip4 => Black;
+
+    public static readonly IEnumerationProvider<CardEnumeration> Provider = new CardEnumerationProvider();
+    class CardEnumerationProvider : EnumerationProvider<CardEnumeration>
+    {
+        internal CardEnumerationProvider() : base([Silver, Gold, Platinum, Black], new Dictionary<string, CardEnumeration> { { "Silver", Silver }, { "Gold", Gold }, { "Platinum", Platinum }, { "Black", Black }, { "Vip", Silver }, { "Vip2", Gold }, { "Vip3", Platinum }, { "SVIP", Black }, { "Vip4", Black } }, new Dictionary<string, CardEnumeration> { { 1L, Silver }, { 2L, Gold }, { 3L, Platinum }, { 4L, Black } })
+        {
+        }
+    }
+}
+~~~
 
 ## 五、源生成器对枚举类补充代码
+### 1. 配置代码
+>* Status是枚举类
+>* StatusProvider作为Status的枚举提供器用于解析枚举
+>* 如果是位标记枚举务必一个枚举项的枚举值定为0,原生器不方便解析枚举值,默认把第一个作为值为0的空枚举
 
+~~~csharp
+using Hand.Enumerations;
+using Hand.Primitives;
+
+namespace GenerateEnumerationTests;
+
+public class Status : Enumeration
+{
+    private Status(string name, int value) : base(name, value, name)
+    {
+    }
+    public static readonly Status Open = new("Open", 1);
+    public static readonly Status Closed = new("Closed", 2);
+}
+[GenerateEnumeration<Status>]
+public partial class StatusProvider;
+~~~
+
+### 2. 生成后的代码
+~~~csharp
+// <auto-generated/>
+
+using Hand.Enumerations;
+using System.Collections.Generic;
+
+namespace GenerateEnumerationTests;
+partial class StatusProvider : EnumerationProvider<Status>
+{
+    internal StatusProvider() : base(new Dictionary<string, Status> { { "Open", Status.Open }, { "Closed", Status.Closed } })
+    {
+    }
+
+    public static readonly StatusProvider Instance = new();
+}
+~~~
+
+## 六、示例说明
+### 1. 示例执行说明
+>* 以上代码执行依赖开源项目Hand.Enumeration、Hand.GenerateEnumeration和Hand.ReflectionEnumeration
+>* Hand.Enumeration --version 0.3.2.7-alpha
+>* Hand.GenerateEnumeration --version 0.3.1-alpha
+>* Hand.ReflectionEnumeration --version 0.3.2.7-alpha
+
+### 2. Hand.Enumerationn和Hand.ReflectionEnumeration示例代码及开源源码
+>* github仓库: https://github.com/donetsoftwork/HandCore.net
+>* gitee同步更新: https://gitee.com/donetsoftwork/HandCore.net
+
+### 3. Hand.GenerateEnumeration示例代码及开源源码
+>* github仓库: https://github.com/donetsoftwork/Hand.Generators
+>* gitee同步更新:https://gitee.com/donetsoftwork/hand.-generators
+
+## 七、最佳实践总结
+### 1. 简单枚举以枚举类型为原型
+>* 使用源生成器生成枚举类及枚举提供器
+>* 使用源生成器节约了反射的开销,性能更好,AOT友好
+
+### 2. 自定义枚举类扩展枚举属性和功能
+>* 使用源生成器生成枚举提供器
+>* 枚举类修改后枚举提供器会自动更新

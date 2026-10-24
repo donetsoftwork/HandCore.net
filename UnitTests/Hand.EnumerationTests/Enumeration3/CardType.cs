@@ -132,11 +132,11 @@ public abstract class CardType : Enumeration
     #endregion
     #region Provider
     /// <summary>
-    /// Vip枚举提供者
+    /// Vip枚举提供器
     /// </summary>
     public static readonly IEnumerationProvider<CardType> Provider = new CardTypeProvider();
     /// <summary>
-    /// Vip枚举提供者实现类
+    /// Vip枚举提供器实现类
     /// </summary>
     class CardTypeProvider : EnumerationProvider<CardType>
     {

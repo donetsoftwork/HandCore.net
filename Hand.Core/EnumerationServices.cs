@@ -36,10 +36,10 @@ public static partial class HandCoreServices
     }
     #endregion
     /// <summary>
-    /// 判断是否包含指定位域
+    /// 判断是否包含指定位标记
     /// </summary>
     /// <param name="enumeration"></param>
-    /// <param name="flag">位域</param>
+    /// <param name="flag">位标记</param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool HasFlag<TEnumeration>(this TEnumeration enumeration, TEnumeration flag)

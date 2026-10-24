@@ -80,7 +80,7 @@ public class DaysOfWeekEnumeration
         => _original == UnknownOriginal;
 
     /// <summary>
-    /// 星期几枚举提供者
+    /// 星期几枚举提供器
     /// </summary>
     public sealed class Provider : FlagEnumerationProvider<DaysOfWeekEnumeration>
     {
