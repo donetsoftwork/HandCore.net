@@ -5,6 +5,33 @@ namespace ReflectionTests;
 public class ReflectionTypeTests
 {
     [Fact]
+    public void IsSubclassOf()
+    {
+        Assert.True(typeof(int).IsSubclassOf(typeof(object)));
+    }
+    [Fact]
+    public void IsInterface()
+    {
+        Assert.True(ReflectionType.IsInterface(typeof(List<int>), typeof(IEnumerable<int>)));
+        Assert.True(ReflectionType.IsInterface(typeof(List<int>), typeof(IList<int>)));
+        Assert.True(ReflectionType.IsInterface(typeof(List<int>), typeof(ICollection<int>)));
+        Assert.False(ReflectionType.IsInterface(typeof(List<int>), typeof(IDisposable)));
+    }
+    [Fact]
+    public void IsCompatible()
+    {
+        Assert.True(ReflectionType.IsCompatible(typeof(int), typeof(int)));
+        Assert.True(ReflectionType.IsCompatible(typeof(int), typeof(object)));
+        Assert.False(ReflectionType.IsCompatible(typeof(object), typeof(int)));
+        Assert.True(ReflectionType.IsCompatible(typeof(int), typeof(int?)));
+        Assert.False(ReflectionType.IsCompatible(typeof(int?), typeof(int)));
+        Assert.True(ReflectionType.IsCompatible(typeof(int[]), typeof(IEnumerable<int>)));
+        Assert.True(ReflectionType.IsCompatible(typeof(List<int>), typeof(IEnumerable<int>)));
+        Assert.True(ReflectionType.IsCompatible(typeof(List<int>), typeof(IList<int>)));
+        Assert.True(ReflectionType.IsCompatible(typeof(List<int>), typeof(ICollection<int>)));
+        Assert.False(ReflectionType.IsCompatible(typeof(List<int>), typeof(IDisposable)));
+    }
+    [Fact]
     public void ClassIsGenericType()
     {
         Assert.True(ReflectionType.IsGenericType(typeof(List<int>), typeof(List<>)));

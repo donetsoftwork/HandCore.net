@@ -32,14 +32,14 @@ public abstract class CacheAsyncBase<TKey, TValue>(ICacher<TKey, TValue> cacher)
     /// <returns></returns>
     public async Task<TValue> Get(TKey key, CancellationToken token = default)
     {
-        if (_cacher.TryGetCache(key, out TValue value))
-            return value;
+        if (_cacher.TryGetCache(key, out var value))
+            return value!;
         // 异步等待锁
-        await _semaphore.WaitAsync();
+        await _semaphore.WaitAsync(token);
         try
         {
             if (_cacher.TryGetCache(key, out value))
-                return value;
+                return value!;
             value = await CreateAsync(key, token);
             _cacher.Save(key, value);
             return value;

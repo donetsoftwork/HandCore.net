@@ -9,7 +9,7 @@ namespace Hand.Cache;
 /// </summary>
 /// <typeparam name="TKey"></typeparam>
 public abstract class CacheFactoryBase<TKey>(IGenericCacher<TKey> cacher)
-    : AutoCacheBase<TKey>(cacher)    
+    : AutoCacheBase<TKey>(cacher)
     where TKey : notnull
 {
     /// <summary>
@@ -29,8 +29,8 @@ public abstract class CacheFactoryBase<TKey>(IGenericCacher<TKey> cacher)
     /// <returns></returns>
     public override TValue Get<TValue>(TKey key)
     {
-        if (_cacher.TryGetCache(key, out TValue value))
-            return value;
+        if (_cacher.TryGetCache<TValue>(key, out var value))
+            return value!;
 #if NET9_0_OR_GREATER
         lock (_cacherLock)
 #else
@@ -38,7 +38,7 @@ public abstract class CacheFactoryBase<TKey>(IGenericCacher<TKey> cacher)
 #endif
         {
             if (_cacher.TryGetCache(key, out value))
-                return value;
+                return value!;
             value = CreateNew<TValue>(key);
             _cacher.Save(key, value);
         }

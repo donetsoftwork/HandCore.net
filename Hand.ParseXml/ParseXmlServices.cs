@@ -7,7 +7,6 @@ using Hand.ParseXml.Nodes;
 using Hand.Storage;
 using System.Runtime.CompilerServices;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace Hand.ParseXml;
 
@@ -23,7 +22,7 @@ public static class ParseXmlServices
     /// <param name="parser"></param>
     /// <param name="xml"></param>
     /// <returns></returns>
-    public static TResult Get<TResult>(this IDataGet<XmlReader, TResult> parser, string xml)
+    public static TResult? Get<TResult>(this IDataGet<XmlReader, TResult> parser, string xml)
     {
         using var stringReader = new StringReader(xml);
         using var xmlReader = XmlReader.Create(stringReader);

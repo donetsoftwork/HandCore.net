@@ -18,7 +18,7 @@ public abstract class AutoCacheBase<TKey, TValue>(ICacher<TKey, TValue> cacher)
     public bool ContainsKey(in TKey key)
         => _cacher.ContainsKey(key);
     /// <inheritdoc />
-    public bool TryGetCache(in TKey key, out TValue cached)
+    public bool TryGetCache(in TKey key, out TValue? cached)
         => _cacher.TryGetCache(key, out cached);
     /// <inheritdoc />
     public void Save(in TKey key, TValue value)

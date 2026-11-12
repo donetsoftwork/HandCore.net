@@ -1,6 +1,7 @@
 <Project>
 	<PropertyGroup>
-		<VersionBase>0.3.2</VersionBase>
+		<VersionBase>0.3.3</VersionBase>
+		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>Latest</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>

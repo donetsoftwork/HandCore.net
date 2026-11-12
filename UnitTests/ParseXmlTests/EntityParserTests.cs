@@ -22,7 +22,7 @@ public class EntityParserTests
             .WithItem<int>(nameof(User.Id))
             .WithItem(nameof(User.Name))
             .WithItem<int>(nameof(User.Age));
-        User result = userParser.Get(text);
+        var result = userParser.Get(text);
         Assert.NotNull(result);
         Assert.Equal(id, result.Id);
         Assert.Equal(name, result.Name);

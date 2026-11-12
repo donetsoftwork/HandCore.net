@@ -33,8 +33,8 @@ public abstract class CacheFactoryBase<TKey, TValue>(ICacher<TKey, TValue> cache
     /// <returns></returns>
     public virtual TValue Get(TKey key)
     {
-        if (_cacher.TryGetCache(key, out TValue value))
-            return value;
+        if (_cacher.TryGetCache(key, out var value))
+            return value!;
 #if NET9_0_OR_GREATER
         lock (_cacherLock)
 #else
@@ -42,7 +42,7 @@ public abstract class CacheFactoryBase<TKey, TValue>(ICacher<TKey, TValue> cache
 #endif
         {
             if (_cacher.TryGetCache(key, out value))
-                return value;
+                return value!;
             value = CreateNew(key);
             _cacher.Save(key, value);
         }

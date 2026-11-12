@@ -14,18 +14,18 @@ public abstract class AutoCacheBase<TKey>(IGenericCacher<TKey> cacher)
     /// </summary>
     protected readonly IGenericCacher<TKey> _cacher = cacher;
     /// <inheritdoc />
-    public virtual TValue Get<TValue>(TKey spec)
-    {
-        TryGetCache<TValue>(spec, out var value);
-        return value;
-    }
+    public abstract TValue Get<TValue>(TKey spec);
+    //{
+    //    _cacher.TryGetCache<TValue>(spec, out var value);
+    //    return value;
+    //}
     /// <inheritdoc />
     public bool Contains(in TKey key)
         => _cacher.Contains(key);
     /// <inheritdoc />
-    public bool TryGetCache<TValue>(in TKey key, out TValue cached)
+    public bool TryGetCache<TValue>(in TKey key, out TValue? cached)
         => _cacher.TryGetCache(key, out cached);
     /// <inheritdoc />
-    public void Save<TValue>(in TKey key, TValue value)
+    public void Save<TValue>(in TKey key, TValue? value)
         => _cacher.Save(key, value);
 }

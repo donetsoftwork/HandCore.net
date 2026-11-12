@@ -8,7 +8,7 @@ namespace Hand.Cache;
 /// <typeparam name="TKey"></typeparam>
 /// <typeparam name="TValue"></typeparam>
 /// <param name="provider"></param>
-public sealed class DictionaryCacher<TKey, TValue>(IDictionary<TKey, TValue> provider)
+public sealed class DictionaryCacher<TKey, TValue>(IDictionary<TKey, TValue?> provider)
     : ICacher<TKey, TValue>
     where TKey : notnull
 {
@@ -16,14 +16,14 @@ public sealed class DictionaryCacher<TKey, TValue>(IDictionary<TKey, TValue> pro
     /// 字典缓存
     /// </summary>
     public DictionaryCacher()
-        : this(new ConcurrentDictionary<TKey, TValue>())
+        : this(new ConcurrentDictionary<TKey, TValue?>())
     {
     }
     #region 配置
     /// <summary>
     /// 存储字典
     /// </summary>
-    private readonly IDictionary<TKey, TValue> _provider = provider;
+    private readonly IDictionary<TKey, TValue?> _provider = provider;
     #endregion
     #region ICacher<TKey, TValue>
     /// <inheritdoc />
@@ -34,7 +34,7 @@ public sealed class DictionaryCacher<TKey, TValue>(IDictionary<TKey, TValue> pro
         => _provider.TryGetValue(key, out cached!);
     #region IStore<TKey, TValue>
     /// <inheritdoc />
-    public void Save(in TKey key, TValue value)
+    public void Save(in TKey key, TValue? value)
         => _provider[key] = value;
     #endregion
     #endregion

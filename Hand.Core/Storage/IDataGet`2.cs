@@ -12,5 +12,5 @@ public interface IDataGet<in TSpec, out TResult>
     /// </summary>
     /// <param name="spec">规格(条件)</param>
     /// <returns></returns>
-    TResult Get(TSpec spec);
+    TResult? Get(TSpec spec);
 }

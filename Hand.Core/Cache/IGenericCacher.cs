@@ -21,5 +21,5 @@ public interface IGenericCacher<TKey>
     /// <param name="key"></param>
     /// <param name="cached"></param>
     /// <returns></returns>
-    bool TryGetCache<TValue>(in TKey key, out TValue cached);
+    bool TryGetCache<TValue>(in TKey key, out TValue? cached);
 }

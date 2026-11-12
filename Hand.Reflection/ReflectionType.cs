@@ -7,6 +7,57 @@ namespace Hand.Reflection;
 /// </summary>
 public static class ReflectionType
 {
+    /// <summary>
+    /// 是否兼容
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="dest"></param>
+    /// <returns></returns>
+    public static bool IsCompatible(Type source, Type dest)
+       => IsCompatible(source, dest, out _);
+    /// <summary>
+    /// 是否兼容
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="dest"></param>
+    /// <param name="nullable"></param>
+    /// <returns></returns>
+    public static bool IsCompatible(Type source, Type dest, out bool nullable)
+    {
+        nullable = false;
+        if (source == dest)
+            return true;
+        if (dest.IsInterface)
+            return IsInterface(source, dest);
+        if (IsNullable(dest))
+        {
+            if (IsNullable(source)) 
+                return IsCompatible(source.GetGenericArguments()[0], dest.GetGenericArguments()[0], out _);
+            nullable = true;
+            return IsCompatible(source, dest.GetGenericArguments()[0], out _);
+        }
+        return source.IsSubclassOf(dest);
+    }
+    /// <summary>
+    /// 是否接口
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="interfaceType"></param>
+    /// <returns></returns>
+    public static bool IsInterface(Type type, Type interfaceType)
+    {
+        if (type == interfaceType)
+            return true;
+        foreach (var @interface in type.GetInterfaces())
+        {
+            if (IsInterface(@interface, interfaceType))
+                return true;
+        }
+        var @base = type.BaseType;
+        if (@base is null)
+            return false;
+        return IsInterface(@base, interfaceType);
+    }
     #region IsNullable
     /// <summary>
     /// 是否可空类型
@@ -15,6 +66,14 @@ public static class ReflectionType
     /// <returns></returns>
     public static bool IsNullable(Type type)
         => IsGenericType(type, typeof(Nullable<>));
+    /// <summary>
+    /// 是否可空类型
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="originalType"></param>
+    /// <returns></returns>
+    public static bool IsNullable(Type type, Type originalType)
+        => IsGenericType(type, typeof(Nullable<>)) && type.GetGenericArguments()[0] == originalType;
     #endregion
     #region IsGenericType
     /// <summary>
@@ -131,7 +190,7 @@ public static class ReflectionType
             {
                 foreach (var type in types)
                 {
-                    var isImpl = PairTypeKey.CheckValueType(type, @interface);
+                    var isImpl = IsCompatible(type, @interface);
                     if (isImpl)
                         action(@interface, type);
                 }

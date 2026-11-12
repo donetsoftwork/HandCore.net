@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Hand.Maping.Recognizers;
+﻿namespace Hand.Maping.Recognizers;
 
 /// <summary>
 /// 穿透投影识别器

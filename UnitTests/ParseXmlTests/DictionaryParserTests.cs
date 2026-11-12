@@ -27,7 +27,8 @@ public class DictionaryParserTests
         var config = HandXml.Default;
         var dictionaryReader = config.Element<int>(nameof(User.Id))
             .Dictionary(config.Element("Name").First());
-        IDictionary<int,string> result = dictionaryReader.Get(text);
+        var result = dictionaryReader.Get(text);
+        Assert.NotNull(result);
         Assert.Equal(2, result.Count);
     }
     [Fact]
@@ -50,7 +51,8 @@ public class DictionaryParserTests
         var config = HandXml.Default;
         var dictionaryReader = config.Element<int>(nameof(User.Id))
             .Dictionary(config.Element("Name").First(), true);
-        IDictionary<int, string> result = dictionaryReader.Get(text);
+        var result = dictionaryReader.Get(text);
+        Assert.NotNull(result);
         Assert.Equal(3, result.Count);
     }
     [Fact]

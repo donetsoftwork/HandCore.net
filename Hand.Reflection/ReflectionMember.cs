@@ -129,7 +129,7 @@ public static class ReflectionMember
         => GetConstructor(
             declareType,
             parameters => parameters.Length == 1
-                && PairTypeKey.CheckValueType(parameters[0].ParameterType, parameterType));
+                && ReflectionType.IsCompatible(parameters[0].ParameterType, parameterType));
     /// <summary>
     /// 获取构造函数
     /// </summary>

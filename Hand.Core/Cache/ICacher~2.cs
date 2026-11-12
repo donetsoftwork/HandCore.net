@@ -22,6 +22,6 @@ public interface ICacher<TKey, TValue>
     /// <param name="key"></param>
     /// <param name="cached"></param>
     /// <returns></returns>
-    bool TryGetCache(in TKey key, out TValue cached);
+    bool TryGetCache(in TKey key, out TValue? cached);
 }
 

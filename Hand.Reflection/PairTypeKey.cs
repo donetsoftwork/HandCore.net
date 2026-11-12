@@ -118,26 +118,26 @@ public readonly struct PairTypeKey(Type leftType, Type rightType)
         return destType.IsValueType && CheckNullCondition(sourceType);
     }
     #endregion
-    #region CheckType
-    /// <summary>
-    /// 判断是否兼容值类型
-    /// </summary>
-    /// <param name="leftType"></param>
-    /// <param name="rightType"></param>
-    /// <returns></returns>
-    public static bool CheckValueType(Type leftType, Type rightType)
-    {
-        if (leftType == rightType)
-            return true;
-        if (rightType.IsValueType)
-        {
-            if (leftType.IsValueType && !rightType.IsGenericType)
-                return rightType.IsAssignableFrom(leftType);
-            return false;
-        }
-        if (leftType.IsValueType)
-            return false;
-        return rightType.IsAssignableFrom(leftType);
-    }
-    #endregion
+    //#region CheckType
+    ///// <summary>
+    ///// 判断是否兼容值类型
+    ///// </summary>
+    ///// <param name="leftType"></param>
+    ///// <param name="rightType"></param>
+    ///// <returns></returns>
+    //public static bool CheckValueType(Type leftType, Type rightType)
+    //{
+    //    if (leftType == rightType)
+    //        return true;
+    //    if (rightType.IsValueType)
+    //    {
+    //        if (leftType.IsValueType && !rightType.IsGenericType)
+    //            return rightType.IsAssignableFrom(leftType);
+    //        return false;
+    //    }
+    //    if (leftType.IsValueType)
+    //        return false;
+    //    return rightType.IsAssignableFrom(leftType);
+    //}
+    //#endregion
 }

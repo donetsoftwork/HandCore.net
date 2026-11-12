@@ -1,5 +1,4 @@
 ﻿using Hand.Rule;
-using System.Collections.Generic;
 
 namespace Hand.Maping.Recognizers;
 

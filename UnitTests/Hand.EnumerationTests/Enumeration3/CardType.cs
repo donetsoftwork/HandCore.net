@@ -5,7 +5,7 @@ namespace Hand.EnumerationTests.Enumeration3;
 /// <summary>
 /// Vip枚举
 /// </summary>
-public abstract class CardType : Enumeration
+public  abstract class CardType : Enumeration
 {
     private CardType(string name, long original, string description)
         : base(name, original, description)
