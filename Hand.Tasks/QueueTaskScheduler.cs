@@ -45,6 +45,8 @@ public class QueueTaskScheduler
     {
         if (taskWasPreviouslyQueued)
             TryDequeue(task);
+        if (task.IsCompleted)
+            return true;
         return TryExecuteTask(task);
     }
     /// <inheritdoc />

@@ -141,7 +141,6 @@ public class ProcessorTests(ITestOutputHelper output)
         }
         await Task.WhenAll(tasks);
     }
-
     [Fact]
     public async Task CurrentItem()
     {

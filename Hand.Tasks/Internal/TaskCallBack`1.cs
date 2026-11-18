@@ -42,21 +42,18 @@ public class TaskCallBack<TResult>
     /// 成功回调
     /// </summary>
     /// <param name="result"></param>
-    public virtual void OnSuccess(TResult? result)
-    {
-        if (result is not null)
-            _source.SetResult(result);
-    }
+    public virtual void OnSuccess(TResult result)
+        => _source.TrySetResult(result);
     /// <inheritdoc />
     public virtual void OnFail()
-        => _source.SetCanceled();
+        => _source.TrySetCanceled();
     /// <inheritdoc />
     public virtual void OnCancel()
-        => _source.SetCanceled();
+        => _source.TrySetCanceled();
     /// <inheritdoc />
     public virtual void OnException(Exception exception)
-        => _source.SetException(exception);
+        => _source.TrySetException(exception);
     /// <inheritdoc />
     void ISuccessable.OnSuccess()
-        => OnSuccess(default);
+        => OnSuccess(default!);
 }

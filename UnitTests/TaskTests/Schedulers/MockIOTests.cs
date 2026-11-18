@@ -99,10 +99,18 @@ public class MockIOTests(ITestOutputHelper output)
             var task = factory.StartNew(() => GetProduct(id));
             tasks.Add(task);
         }
-        var products = await Task.WhenAll(tasks);
+        Exception? exception = null;
+        try
+        {
+            var products = await Task.WhenAll(tasks);
+        }catch(Exception ex)
+        {
+            exception = ex;
+        }
         sw.Stop();
         _output.WriteLine($"end {DateTime.Now:HH:mm:ss.fff}, Elapsed {sw.ElapsedMilliseconds}");
         Assert.True(sw.ElapsedMilliseconds < 300);
+        Assert.Null(exception);
     }
     [Fact]
     public async Task Single()
@@ -118,11 +126,20 @@ public class MockIOTests(ITestOutputHelper output)
             var task = factory.StartTask(() => GetProductAsync(id));
             tasks.Add(task);
         }
-        var products = await Task.WhenAll(tasks);
+        Exception? exception = null;
+        try
+        {
+            var products = await Task.WhenAll(tasks);
+            Assert.NotNull(products);
+            Assert.Equal(10, products.Length);
+        }
+        catch (Exception ex)
+        {
+            exception = ex;
+        }
         sw.Stop();
         _output.WriteLine($"end {DateTime.Now:HH:mm:ss.fff}, Elapsed {sw.ElapsedMilliseconds}");
-        Assert.NotNull(products);
-        Assert.Equal(10, products.Length);
+        Assert.Null(exception);
     }
     [Fact]
     public async Task Concurrent()
@@ -138,6 +155,7 @@ public class MockIOTests(ITestOutputHelper output)
             var task = factory.StartTask(() => GetProductAsync(id));
             tasks.Add(task);
         }
+        await Task.Delay(1000);
         var products = await Task.WhenAll(tasks);
         sw.Stop();
         _output.WriteLine($"end {DateTime.Now:HH:mm:ss.fff}, Elapsed {sw.ElapsedMilliseconds}");

@@ -25,17 +25,20 @@ public class ThreadJobService<TItem>(IQueue<TItem> queue, IQueueProcessor<TItem>
     /// Token
     /// </summary>
     private CancellationTokenSource? _source = null;
-    private bool _started = false;
+    /// <summary>
+    /// 状态(1为正在启动,0为未启动,2为已启动,-1为正在停止)
+    /// </summary>
+    private int _state = 0;
     /// <summary>
     /// 最近活动时间
     /// </summary>
     protected DateTime _lastTime = DateTime.Now;
-    private TItem? _lastItem = default;
+    private TItem? _lastItem;
     /// <summary>
     /// 是否已启动
     /// </summary>
     public bool Started
-        => _started;
+        => Volatile.Read(ref _state) == 2;
     /// <summary>
     /// 最近执行时间
     /// </summary>
@@ -61,27 +64,29 @@ public class ThreadJobService<TItem>(IQueue<TItem> queue, IQueueProcessor<TItem>
     /// <inheritdoc />
     public virtual bool Activate(TItem instance)
     {
-        if(_started)
+        if (Volatile.Read(ref _state) >= 1)
         {
             if(_source == null || _source.IsCancellationRequested) 
                 return false;
             _lastTime = DateTime.Now;
             _lastItem = instance;
+            //Console.WriteLine($"Activate:{_state}");
             return true;
         }
+        //Console.WriteLine($"Activate:{_state}");
         return false;
     }
     #endregion
     /// <inheritdoc />
     public virtual bool Start()
     {
-        // 避免重复启动
-        if (_started)
-            return true;
-        _started = true;
-        _source = new();
-        StartThread(_source.Token);
-        return true;
+        if (Interlocked‌.CompareExchange(ref _state, 1, 0) == 0)
+        {
+            _source = new();
+            StartThread(_source.Token);
+            return Interlocked‌.CompareExchange(ref _state, 2, 1) == 1;
+        }
+        return false;
     }
     /// <summary>
     /// 启动线程
@@ -97,16 +102,16 @@ public class ThreadJobService<TItem>(IQueue<TItem> queue, IQueueProcessor<TItem>
     /// <inheritdoc />
     public virtual bool Stop()
     {
-        if(_started)
+        if (Interlocked‌.CompareExchange(ref _state, -1, 2) == 2)
         {
             try
             {
                 _source?.Cancel();
             }
-            catch { }  
-            _started = false;
+            catch { }
+            return Interlocked‌.CompareExchange(ref _state, 0, -1) == -1;
         }
-        return true;
+        return false;
     }
     /// <summary>
     /// 执行

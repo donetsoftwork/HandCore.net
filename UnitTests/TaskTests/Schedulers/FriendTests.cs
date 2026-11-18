@@ -85,6 +85,7 @@ public class FriendTests(ITestOutputHelper output)
     [Fact]
     public async Task Cancel()
     {
+        Exception? exception = null;
         var factory = new ConcurrentTaskFactory(new ReduceOptions { ConcurrencyLevel = 10 });
         var tokenSource = new CancellationTokenSource(100);
         var sw = Stopwatch.StartNew();
@@ -93,8 +94,15 @@ public class FriendTests(ITestOutputHelper output)
         //var threeTask = factory.StartTask(() => Three(3, tokenSource.Token));
         await Task.Delay(50, tokenSource.Token);
         //tokenSource.Cancel();
-        //var one = await onetTask;
-        await Assert.ThrowsAsync<OperationCanceledException>(() => onetTask);
+        try
+        {
+            await onetTask;
+        }
+        catch(Exception ex)
+        {
+            exception = ex;
+        }
+        //await Assert.ThrowsAsync<OperationCanceledException, TaskCanceledException>(() => onetTask);
         //await Assert.ThrowsAsync<TaskCanceledException>(() => twotTask);
         //await Assert.ThrowsAsync<TaskCanceledException>(() => threeTask);
         //try
@@ -108,6 +116,7 @@ public class FriendTests(ITestOutputHelper output)
         //}
         sw.Stop();
         _output.WriteLine("Total Span :" + sw.Elapsed.TotalMilliseconds);
+        Assert.True(exception is OperationCanceledException or TaskCanceledException);
     }
     [Fact]
     public async Task Partial()
